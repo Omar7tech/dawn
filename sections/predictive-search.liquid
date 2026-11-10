@@ -122,6 +122,9 @@
               class="predictive-search__heading text-body caption-with-letter-spacing"
             >
               {{- 'templates.search.products' | t -}}
+              <span class="dunas-search__count">
+                &middot; {{ predictive_search.resources.products.size -}}
+              </span>
             </h2>
             <ul
               id="predictive-search-results-products-list"
@@ -245,6 +248,7 @@
         <span class="svg-wrapper">
           {{- 'icon-arrow.svg' | inline_asset_content -}}
         </span>
+        <kbd class="dunas-search__key dunas-search__key--enter" aria-hidden="true">&#8629;</kbd>
       </button>
     </div>
 

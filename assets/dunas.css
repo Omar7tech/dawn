@@ -687,6 +687,7 @@ body,
   --ds-chip: rgba(var(--dunas-ink), 0.06);
   --ds-term-bg: transparent;
   --ds-term-edge: rgba(var(--dunas-ink), 0.18);
+  --ds-tile: rgba(var(--dunas-ink), 0.045);
   --ds-shadow: 0 2.4rem 6rem -2rem rgba(var(--dunas-ink), 0.3), 0 0.2rem 0.6rem rgba(var(--dunas-ink), 0.06);
   --ds-pad-y: 0.8rem;
   --ds-pad-x: 0.8rem;
@@ -694,7 +695,7 @@ body,
 
 .dunas-header .dunas-search--glass {
   --ds-surface: radial-gradient(120% 60% at 20% -10%, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 60%),
-    rgba(var(--dunas-cream), 0.62);
+    rgba(var(--dunas-cream), 0.74);
   --ds-field: rgba(255, 255, 255, 0.72);
   --ds-field-edge: rgba(255, 255, 255, 0.85);
   --ds-field-edge-focus: rgba(255, 255, 255, 1);
@@ -703,6 +704,7 @@ body,
   --ds-chip: rgba(255, 255, 255, 0.55);
   --ds-term-bg: rgba(255, 255, 255, 0.6);
   --ds-term-edge: rgba(255, 255, 255, 0.95);
+  --ds-tile: rgba(255, 255, 255, 0.62);
   --ds-shadow: inset 0 0.1rem 0.1rem rgba(255, 255, 255, 0.7), inset 0 -0.1rem 0.1rem rgba(255, 255, 255, 0.2),
     inset 0 0 2.4rem rgba(255, 255, 255, 0.18), 0 2.4rem 6rem -2rem rgba(var(--dunas-ink), 0.35),
     0 0.2rem 0.6rem rgba(var(--dunas-ink), 0.06);
@@ -729,6 +731,7 @@ body,
   --ds-chip: rgba(255, 255, 255, 0.1);
   --ds-term-bg: transparent;
   --ds-term-edge: rgba(255, 255, 255, 0.35);
+  --ds-tile: rgba(255, 255, 255, 0.92);
 }
 
 /* ---- Layer + backdrop ---- */
@@ -787,7 +790,24 @@ body,
 }
 
 .dunas-header .header--dunas details[open] .search-modal__content {
-  animation: dunas-fade-in 180ms ease;
+  animation: dunas-search-drop 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes dunas-search-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-0.4rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dunas-header .header--dunas details[open] .search-modal__content {
+    animation: dunas-fade-in 120ms ease;
+  }
 }
 
 .dunas-header .dunas-search--glass .search-modal__content {
@@ -1103,9 +1123,213 @@ body,
   padding: 1.6rem 0.8rem 0.6rem;
 }
 
-.dunas-header predictive-search[open] > .dunas-search__popular,
-.dunas-header predictive-search[loading] > .dunas-search__popular {
+/* Start state (before typing): popular chips + trending cards. Hidden once results show. */
+.dunas-search__start {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.dunas-header predictive-search[open] > .dunas-search__start,
+.dunas-header predictive-search[loading] > .dunas-search__start {
   display: none;
+}
+
+.dunas-search__trending {
+  padding: 1.6rem 0.8rem 0.8rem;
+}
+
+.dunas-search__cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.2rem;
+  margin: 0;
+}
+
+@media screen and (min-width: 750px) {
+  .dunas-search__cards {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Trending cards: the same look as the store's product cards (photo fills a 20px rounded
+   frame, name in the heading font, price in brand green). No tile, no box around the card. */
+.dunas-search__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  color: rgb(var(--ds-ink));
+  text-decoration: none;
+}
+
+.dunas-search__card:focus-visible {
+  outline: 0.2rem solid rgb(var(--ds-ink));
+  outline-offset: 0.3rem;
+  border-radius: 2rem;
+}
+
+.dunas-search__card-media {
+  display: block;
+  margin-bottom: 1rem;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 2rem;
+  background: #fff;
+}
+
+.dunas-search__card-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .dunas-search__card-media img {
+    transition: transform 800ms var(--dunas-ease);
+  }
+
+  .dunas-search__card:hover .dunas-search__card-media img {
+    transform: scale(1.05);
+  }
+}
+
+.dunas-search__card-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-family: var(--font-heading-family);
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+}
+
+.dunas-search__card-price {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ds-price, rgb(var(--dunas-green)));
+}
+
+.dunas-header .dunas-search--green .dunas-search__card-price {
+  --ds-price: rgb(var(--dunas-cream));
+}
+
+/* Key hints (desktop): "Esc" on the close button, "Enter" on the Search-for pill */
+.dunas-search__key {
+  display: none;
+  font-family: var(--font-body-family);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+@media screen and (min-width: 990px) and (hover: hover) {
+  .dunas-header .header--dunas .search-modal__close-button {
+    width: auto;
+    border-radius: 10rem;
+  }
+
+  .dunas-header .header--dunas .search-modal__close-button .svg-wrapper,
+  .dunas-header .header--dunas .predictive-search__item--term .svg-wrapper {
+    display: none;
+  }
+
+  .dunas-search__key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dunas-search__key--esc {
+    min-width: 4.4rem;
+    height: 3.4rem;
+    padding: 0 1.2rem;
+  }
+
+  .dunas-search__key--enter {
+    min-width: 2.4rem;
+    height: 2.2rem;
+    padding: 0 0.6rem;
+    border-radius: 0.6rem;
+    background: rgba(var(--ds-ink), 0.08);
+    font-size: 1.2rem;
+  }
+
+  .dunas-header .header--dunas .predictive-search__item--term:hover .dunas-search__key--enter,
+  .dunas-header .header--dunas .predictive-search__item--term[aria-selected='true'] .dunas-search__key--enter {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .dunas-header .header--dunas .search-modal .search__input.field__input {
+    padding-right: 8rem;
+  }
+}
+
+/* Skeleton rows while results load (replaces Dawn's spinner) */
+.dunas-header .dunas-search .predictive-search__loading-state > svg,
+.dunas-header .dunas-search .predictive-search__loading-state .spinner {
+  display: none;
+}
+
+.dunas-header .dunas-search predictive-search[loading] .predictive-search__loading-state {
+  display: block;
+  padding: 0.8rem 0 0;
+}
+
+.dunas-search__skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  padding: 0.8rem 1.2rem;
+}
+
+.dunas-search__skeleton-thumb,
+.dunas-search__skeleton-lines > span {
+  display: block;
+  border-radius: 1.2rem;
+  background: linear-gradient(90deg, var(--ds-tile) 0%, rgba(var(--ds-ink), 0.08) 50%, var(--ds-tile) 100%);
+  background-size: 200% 100%;
+  animation: dunas-skeleton 1.2s ease-in-out infinite;
+}
+
+.dunas-search__skeleton-thumb {
+  flex: 0 0 var(--ds-thumb, 52px);
+  height: var(--ds-thumb, 52px);
+}
+
+.dunas-search__skeleton-lines {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.dunas-search__skeleton-lines > span {
+  height: 1.2rem;
+  width: 55%;
+  border-radius: 0.6rem;
+}
+
+.dunas-search__skeleton-lines > span + span {
+  width: 25%;
+}
+
+@keyframes dunas-skeleton {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dunas-search__skeleton-thumb,
+  .dunas-search__skeleton-lines > span {
+    animation: none;
+  }
 }
 
 /* No results: Dawn's translated message, then the popular chips as a way back */
@@ -1169,8 +1393,8 @@ body,
 
 .dunas-header .header--dunas .predictive-search__heading {
   margin: 0 1.2rem;
-  padding: 1.6rem 0 0.8rem;
-  border-bottom: 0.1rem solid var(--ds-rule);
+  padding: 1.6rem 0 0.4rem;
+  border-bottom: 0;
   font-family: var(--font-body-family);
   font-size: 1.2rem;
   font-weight: 600;
@@ -1180,7 +1404,12 @@ body,
 }
 
 .dunas-header .header--dunas .predictive-search__results-list {
-  margin-top: 0.6rem;
+  margin-top: 0.4rem;
+}
+
+.dunas-search__count {
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
 }
 
 .dunas-header .header--dunas .predictive-search__item {
@@ -1222,22 +1451,32 @@ body,
   align-items: center;
 }
 
+/* Thumbnails: a soft tile, product fitted inside with room to breathe (packshot style) */
 .dunas-header .header--dunas .predictive-search__image {
   width: var(--ds-thumb, 52px);
   height: var(--ds-thumb, 52px);
-  object-fit: cover;
-  border-radius: 1rem;
-  background: #fff;
-  border: 0.1rem solid var(--ds-rule);
+  padding: 0.4rem;
+  object-fit: contain;
+  border: 0;
+  border-radius: 1.2rem;
+  background: var(--ds-tile);
 }
 
 .dunas-header .header--dunas .predictive-search__item-heading {
+  margin: 0;
   font-family: var(--font-body-family);
-  font-size: 1.4rem;
-  font-weight: 500;
-  line-height: 1.4;
-  letter-spacing: 0;
+  font-size: 1.5rem;
+  font-weight: 450;
+  line-height: 1.35;
+  letter-spacing: -0.005em;
   color: rgb(var(--ds-ink));
+}
+
+/* the typed text, bolded inside each result (added by dunas-search.js) */
+.dunas-search__match {
+  background: transparent;
+  color: inherit;
+  font-weight: 700;
 }
 
 .dunas-header .header--dunas .predictive-search__item-vendor {
@@ -1252,8 +1491,8 @@ body,
 
 .dunas-header .header--dunas .predictive-search__item .price,
 .dunas-header .header--dunas .predictive-search__item .price-item {
-  margin-top: 0.2rem;
-  font-size: 1.3rem;
+  margin-top: 0.1rem;
+  font-size: 1.25rem;
   font-weight: 400;
   letter-spacing: 0;
   color: var(--ds-muted);
@@ -1315,8 +1554,8 @@ body,
   display: flex;
   justify-content: center;
   margin: 0;
-  padding: 1rem 0 0;
-  border-top: 0.1rem solid var(--ds-rule);
+  padding: 1.2rem 0 0.2rem;
+  border-top: 0;
   background: transparent;
 }
 
@@ -1383,6 +1622,261 @@ body,
   .dunas-header .dunas-search--fullscreen .predictive-search__result-group:first-child {
     flex-basis: 28rem;
   }
+}
+
+/* ---------- Search results page ----------
+   Same system as the search panel (cream style tokens): editorial header with the term set large,
+   the same white pill field, the same chips and trending cards when nothing is found. */
+
+.dunas-search-page {
+  --ds-ink: var(--dunas-ink);
+  --ds-muted: rgba(var(--dunas-ink), 0.72);
+  --ds-hover: rgba(var(--dunas-ink), 0.05);
+  --ds-tile: rgba(var(--dunas-ink), 0.045);
+  --ds-chip: rgba(var(--dunas-ink), 0.06);
+  --ds-pill-bg: rgb(var(--dunas-ink));
+  --ds-pill-ink: rgb(var(--dunas-cream));
+  --ds-radius: 28px;
+}
+
+.dunas-search-page .template-search__header {
+  margin-bottom: 3.2rem;
+}
+
+.dunas-search-page__head {
+  text-align: center;
+}
+
+.dunas-search-page__eyebrow {
+  margin: 0 0 1.2rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--ds-muted);
+}
+
+.dunas-search-page__title {
+  margin: 0;
+  font-family: var(--font-heading-family);
+  font-weight: var(--font-heading-weight);
+  font-size: clamp(3.6rem, 6vw, 6.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: rgb(var(--ds-ink));
+  overflow-wrap: anywhere;
+}
+
+.dunas-search-page__meta {
+  margin: 1.2rem 0 0;
+  font-size: 1.4rem;
+  color: var(--ds-muted);
+}
+
+/* Field: the panel's white pill, icon on the left, placeholder instead of a floating label */
+.dunas-search-page .template-search__search {
+  max-width: 64rem;
+  margin: 3.2rem auto 0;
+}
+
+.dunas-search-page .template-search__search .search {
+  margin-top: 0;
+}
+
+.dunas-search-page .field::before {
+  display: none;
+}
+
+.dunas-search-page .field::after {
+  border-radius: 10rem;
+  box-shadow: 0 0 0 0.1rem rgba(var(--ds-ink), 0.12);
+  transition: box-shadow 150ms ease;
+}
+
+.dunas-search-page .field:hover::after {
+  box-shadow: 0 0 0 0.1rem rgba(var(--ds-ink), 0.24);
+}
+
+.dunas-search-page .field:focus-within::after {
+  box-shadow: 0 0 0 0.1rem rgba(var(--ds-ink), 0.55);
+}
+
+.dunas-search-page .search__input.field__input {
+  height: 5.6rem;
+  min-height: 0;
+  padding: 0 5.6rem 0 5.2rem;
+  border-radius: 10rem;
+  background: #fff;
+  color: rgb(var(--ds-ink));
+  font-family: var(--font-body-family);
+  font-size: 1.6rem;
+  letter-spacing: 0;
+  box-shadow: none;
+}
+
+.dunas-search-page .search__input.field__input:focus,
+.dunas-search-page .search__input.field__input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.dunas-search-page .search__input.field__input::placeholder {
+  opacity: 1;
+  color: var(--ds-muted);
+}
+
+.dunas-search-page .field__label {
+  display: none;
+}
+
+.dunas-search-page .search__button {
+  left: 0.6rem;
+  right: auto;
+  top: 50%;
+  width: 4.4rem;
+  height: 4.4rem;
+  transform: translateY(-50%);
+  color: var(--ds-muted);
+}
+
+.dunas-search-page .reset__button {
+  right: 0.6rem;
+  top: 50%;
+  width: 4.4rem;
+  height: 4.4rem;
+  transform: translateY(-50%);
+  color: var(--ds-muted);
+}
+
+.dunas-search-page .reset__button::after {
+  display: none;
+}
+
+.dunas-search-page .reset__button .icon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+/* Suggestions dropdown under the page field: the same soft card language */
+.dunas-search-page .predictive-search {
+  top: calc(100% + 0.8rem);
+  left: 0;
+  width: 100%;
+  border: 0;
+  border-radius: 2rem;
+  background: rgb(var(--dunas-cream));
+  box-shadow: 0 2.4rem 6rem -2rem rgba(var(--dunas-ink), 0.3), 0 0 0 0.1rem rgba(var(--dunas-ink), 0.06);
+  overflow: hidden auto;
+  padding: 0.6rem;
+}
+
+.dunas-search-page .predictive-search__results-groups-wrapper {
+  border-bottom: 0;
+}
+
+.dunas-search-page .predictive-search__heading {
+  margin: 0 1rem;
+  padding: 1.2rem 0 0.4rem;
+  border-bottom: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ds-muted);
+}
+
+.dunas-search-page .predictive-search__item {
+  padding: 0.8rem 1rem;
+  border-radius: 1.4rem;
+}
+
+.dunas-search-page .predictive-search__list-item[aria-selected='true'] > *,
+.dunas-search-page .predictive-search__list-item:hover > * {
+  background-color: transparent;
+}
+
+.dunas-search-page .predictive-search__list-item[aria-selected='true'] .predictive-search__item,
+.dunas-search-page .predictive-search__list-item:hover .predictive-search__item {
+  background-color: var(--ds-hover);
+}
+
+.dunas-search-page .predictive-search__image {
+  padding: 0.4rem;
+  object-fit: contain;
+  border-radius: 1.2rem;
+  background: var(--ds-tile);
+}
+
+.dunas-search-page .predictive-search__item-heading {
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  font-weight: 450;
+  letter-spacing: 0;
+}
+
+.dunas-search-page .predictive-search__item--term {
+  justify-content: center;
+  margin: 0.4rem 0 0;
+  min-height: 4.8rem;
+  border: 0.1rem solid rgba(var(--ds-ink), 0.16);
+  border-radius: 10rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dunas-search-page .predictive-search__item--term:hover {
+  background: var(--ds-pill-bg);
+  color: var(--ds-pill-ink);
+}
+
+.dunas-search-page .predictive-search__search-for-button {
+  border-top: 0;
+}
+
+/* Nothing found (or nothing searched yet): the message, chips and trending cards */
+.dunas-search-page__empty {
+  max-width: 96rem;
+  margin: 4rem auto 0;
+  text-align: center;
+}
+
+.dunas-search-page__empty-text {
+  margin: 0 auto;
+  max-width: 48rem;
+  font-size: 1.5rem;
+  line-height: 1.6;
+  color: rgb(var(--ds-ink));
+}
+
+.dunas-search-page__empty .dunas-search__popular {
+  padding: 2.4rem 0 0;
+}
+
+.dunas-search-page__empty .dunas-search__chips {
+  justify-content: center;
+}
+
+.dunas-search-page__empty .dunas-search__trending {
+  padding: 4rem 0 0;
+  text-align: left;
+}
+
+.dunas-search-page__empty .dunas-search__trending .dunas-search__popular-label {
+  text-align: center;
+  margin-bottom: 1.6rem;
+}
+
+.dunas-search-page.template-search--empty {
+  padding-bottom: 8rem;
+}
+
+/* Filter / sort row: quieter, sentence case, in the body font */
+.template-search .facets__summary,
+.template-search .facet-filters__label,
+.template-search .product-count__text {
+  font-family: var(--font-body-family);
+  letter-spacing: 0;
 }
 
 /* ---------- Menu drawer: floating card under the pill ---------- */

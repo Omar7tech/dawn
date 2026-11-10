@@ -64,15 +64,20 @@
 {%- endstyle -%}
 
 {% paginate search.results by 24 %}
-  <div class="template-search{% unless search.performed and search.results_count > 0 %} template-search--empty{% endunless %} section-{{ section.id }}-padding">
+  <div class="template-search dunas-search-page{% unless search.performed and search.results_count > 0 %} template-search--empty{% endunless %} section-{{ section.id }}-padding">
     <div class="template-search__header page-width{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
-      <h1 class="h2 center">
+      {%- comment -%} DUNAS: editorial header. Eyebrow, the term set large, then the count. {%- endcomment -%}
+      <div class="dunas-search-page__head">
         {%- if search.performed -%}
-          {{- 'templates.search.title' | t -}}
+          <p class="dunas-search-page__eyebrow">{{ 'templates.search.title' | t }}</p>
+          <h1 class="dunas-search-page__title">&ldquo;{{ search.terms | escape }}&rdquo;</h1>
+          <p class="dunas-search-page__meta" role="status">
+            {{- 'templates.search.results_with_count' | t: count: search.results_count -}}
+          </p>
         {%- else -%}
-          {{- 'general.search.search' | t -}}
+          <h1 class="dunas-search-page__title">{{ 'general.search.search' | t }}</h1>
         {%- endif -%}
-      </h1>
+      </div>
       <div class="template-search__search">
         {%- if settings.predictive_search_enabled -%}
           <predictive-search data-loading-text="{{ 'accessibility.loading' | t }}">
@@ -86,7 +91,7 @@
                 type="search"
                 name="q"
                 value="{{ search.terms | escape }}"
-                placeholder="{{ 'general.search.search' | t }}"
+                placeholder="{{ settings.dunas_search_placeholder | default: 'Search' | escape }}"
                 {%- if settings.predictive_search_enabled -%}
                   role="combobox"
                   aria-expanded="false"
@@ -133,16 +138,18 @@
         {%- endif -%}
       </div>
       {%- if search.performed -%}
-        {%- unless section.settings.enable_filtering or section.settings.enable_sorting -%}
-          {%- if search.results_count > 0 -%}
-            <p role="status">
-              {{ 'templates.search.results_with_count_and_term' | t: terms: search.terms, count: search.results_count }}
-            </p>
-          {%- endif -%}
-        {%- endunless -%}
         {%- if search.results_count == 0 and search.filters == empty -%}
-          <p role="status">{{ 'templates.search.no_results' | t: terms: search.terms }}</p>
+          <div class="dunas-search-page__empty">
+            <p class="dunas-search-page__empty-text">{{ 'templates.search.no_results' | t: terms: search.terms }}</p>
+            {%- render 'dunas-search-chips' -%}
+            {%- render 'dunas-search-trending' -%}
+          </div>
         {%- endif -%}
+      {%- else -%}
+        <div class="dunas-search-page__empty">
+          {%- render 'dunas-search-chips' -%}
+          {%- render 'dunas-search-trending' -%}
+        </div>
       {%- endif -%}
     </div>
     {%- if search.performed -%}

@@ -8,6 +8,8 @@
      request. Dawn's getSearchResults() is wrapped, not copied: fetch is swapped only for the
      synchronous duration of that call, so nothing else on the page is affected, and if Dawn
      ever changes the method the search simply falls back to Dawn's defaults.
+  4. Polish: bolds the typed text inside each result, swaps Dawn's spinner for skeleton rows,
+     and opens search with "/" or Cmd/Ctrl+K from anywhere on the page.
 */
 (function () {
   'use strict';
@@ -93,9 +95,110 @@
     PredictiveSearch.prototype.getSearchResults = wrapped;
   }
 
+  /* ---------- 4a. Bold the typed text inside results ---------- */
+
+  function escapeRegExp(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function highlightMatches(root, term) {
+    var words = (term || '').trim().split(/\s+/).filter(function (w) { return w.length > 0; });
+    if (!root || !words.length) return;
+    var pattern = new RegExp('(' + words.map(escapeRegExp).join('|') + ')', 'gi');
+
+    root.querySelectorAll('.predictive-search__item-heading').forEach(function (heading) {
+      if (heading.closest('#predictive-search-results-queries-list')) return; // Dawn marks these itself
+      if (heading.querySelector('.dunas-search__match')) return;
+      var text = heading.textContent;
+      if (!pattern.test(text)) return;
+      pattern.lastIndex = 0;
+      var fragment = document.createDocumentFragment();
+      var last = 0;
+      text.replace(pattern, function (match, _group, index) {
+        if (index > last) fragment.appendChild(document.createTextNode(text.slice(last, index)));
+        var mark = document.createElement('mark');
+        mark.className = 'dunas-search__match';
+        mark.textContent = match;
+        fragment.appendChild(mark);
+        last = index + match.length;
+        return match;
+      });
+      if (last < text.length) fragment.appendChild(document.createTextNode(text.slice(last)));
+      heading.textContent = '';
+      heading.appendChild(fragment);
+    });
+  }
+
+  /* ---------- 4b. Skeleton rows instead of the spinner ---------- */
+
+  var SKELETON_ROWS = 4;
+
+  function addSkeletons(root) {
+    (root || document).querySelectorAll('.dunas-search .predictive-search__loading-state').forEach(function (state) {
+      if (state.querySelector('.dunas-search__skeleton')) return;
+      var wrap = document.createElement('div');
+      wrap.className = 'dunas-search__skeleton';
+      wrap.setAttribute('aria-hidden', 'true');
+      for (var i = 0; i < SKELETON_ROWS; i++) {
+        var row = document.createElement('div');
+        row.className = 'dunas-search__skeleton-row';
+        row.innerHTML =
+          '<span class="dunas-search__skeleton-thumb"></span>' +
+          '<span class="dunas-search__skeleton-lines"><span></span><span></span></span>';
+        wrap.appendChild(row);
+      }
+      state.appendChild(wrap);
+    });
+  }
+
+  function initRenderHooks() {
+    var PredictiveSearch = window.customElements && customElements.get('predictive-search');
+    if (!PredictiveSearch || typeof PredictiveSearch.prototype.renderSearchResults !== 'function') return;
+    if (PredictiveSearch.prototype.renderSearchResults.__dunas) return;
+    var original = PredictiveSearch.prototype.renderSearchResults;
+    function wrapped(markup) {
+      var result = original.call(this, markup);
+      try {
+        highlightMatches(this.predictiveSearchResults, this.searchTerm);
+        addSkeletons(this);
+      } catch (error) {
+        /* cosmetic only: never break search */
+      }
+      return result;
+    }
+    wrapped.__dunas = true;
+    PredictiveSearch.prototype.renderSearchResults = wrapped;
+  }
+
+  /* ---------- 4c. "/" and Cmd/Ctrl+K open search ---------- */
+
+  function isTypingTarget(element) {
+    if (!element) return false;
+    var tag = element.tagName;
+    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || element.isContentEditable;
+  }
+
+  document.addEventListener('keydown', function (event) {
+    var isSlash = event.key === '/' && !event.metaKey && !event.ctrlKey && !event.altKey;
+    var isCmdK = (event.metaKey || event.ctrlKey) && !event.altKey && (event.key === 'k' || event.key === 'K');
+    if (!isSlash && !isCmdK) return;
+    if (isSlash && isTypingTarget(document.activeElement)) return;
+    var details = document.querySelector('.dunas-header .header__search details');
+    var summary = details && details.querySelector('summary');
+    if (!summary) return;
+    event.preventDefault();
+    if (!details.open) summary.click();
+    else {
+      var input = details.querySelector('input[type="search"]');
+      if (input) input.focus();
+    }
+  });
+
   function init() {
     initPlacement();
     initResultSettings();
+    initRenderHooks();
+    addSkeletons(document);
   }
 
   if (document.readyState === 'loading') {

@@ -107,7 +107,10 @@
             <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
           {%- endif -%}
         </form>
-        {%- render 'dunas-search-chips' -%}
+        <div class="dunas-search__start">
+          {%- render 'dunas-search-chips' -%}
+          {%- render 'dunas-search-trending' -%}
+        </div>
         {%- if settings.predictive_search_enabled -%}
           </predictive-search>
         {%- else -%}
@@ -121,6 +124,7 @@
           <span class="svg-wrapper">
             {{- 'icon-close.svg' | inline_asset_content -}}
           </span>
+          <kbd class="dunas-search__key dunas-search__key--esc" aria-hidden="true">Esc</kbd>
         </button>
       </div>
     </div>

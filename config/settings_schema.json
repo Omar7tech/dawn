@@ -1610,6 +1610,33 @@
         "default": "Popular"
       },
       {
+        "type": "collection",
+        "id": "dunas_search_trending",
+        "label": "Trending products collection",
+        "info": "Shown as product cards when search opens, before typing. Leave empty to use All products."
+      },
+      {
+        "type": "checkbox",
+        "id": "dunas_search_show_trending",
+        "label": "Show trending products",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "dunas_search_trending_label",
+        "label": "Trending heading",
+        "default": "Trending now"
+      },
+      {
+        "type": "range",
+        "id": "dunas_search_trending_count",
+        "label": "Trending products shown",
+        "min": 2,
+        "max": 8,
+        "step": 1,
+        "default": 4
+      },
+      {
         "type": "header",
         "content": "Design"
       },

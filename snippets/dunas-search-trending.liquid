@@ -1,0 +1,53 @@
+{% doc %}
+  Renders "Trending now" product cards from Theme settings > DUNAS search
+  (falls back to All products). Used in the search panel's start state and on the
+  search page when nothing is found.
+
+  @example
+  {% render 'dunas-search-trending' %}
+{% enddoc %}
+{%- liquid
+  assign ds_trending = settings.dunas_search_trending
+  if ds_trending == blank
+    assign ds_trending = collections['all']
+  endif
+  assign ds_trending_count = settings.dunas_search_trending_count | default: 4
+-%}
+{%- if settings.dunas_search_show_trending and ds_trending.products.size > 0 -%}
+  <div class="dunas-search__trending">
+    {%- if settings.dunas_search_trending_label != blank -%}
+      <p class="dunas-search__popular-label">{{ settings.dunas_search_trending_label | escape }}</p>
+    {%- endif -%}
+    <ul class="dunas-search__cards list-unstyled" role="list">
+      {%- for product in ds_trending.products limit: ds_trending_count -%}
+        <li>
+          <a class="dunas-search__card" href="{{ product.url }}">
+            <span class="dunas-search__card-media">
+              {%- if product.featured_media != blank -%}
+                {%- assign card_alt = product.featured_media.alt | default: product.title | escape -%}
+                {{
+                  product.featured_media
+                  | image_url: width: 480
+                  | image_tag:
+                    loading: 'lazy',
+                    widths: '240, 360, 480',
+                    sizes: '(min-width: 990px) 200px, 45vw',
+                    alt: card_alt
+                }}
+              {%- endif -%}
+            </span>
+            <span class="dunas-search__card-title">{{ product.title | escape }}</span>
+            <span class="dunas-search__card-price">
+              {%- if product.price_varies -%}
+                {%- assign card_min_price = product.price_min | money -%}
+                {{- 'products.product.price.from_price_html' | t: price: card_min_price -}}
+              {%- else -%}
+                {{- product.price | money -}}
+              {%- endif -%}
+            </span>
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}
