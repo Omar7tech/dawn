@@ -1,7 +1,7 @@
 /*
   DUNAS branded menu.
 
-  Open:  a brand-green panel grows in a circle from the menu button, the top bar fades in,
+  Open:  a cream panel grows in a circle from the menu button, the top bar fades in,
          headline links rise out of their masks with their numbers, divider rules draw in,
          the giant wordmark drifts up, and the footer settles last.
   Close: the same timeline plays in reverse, faster.
@@ -93,11 +93,12 @@
         },
         'reveal'
       )
-      .fromTo(mark, { yPercent: 14, opacity: 0 }, { yPercent: 0, opacity: 0.07, duration: 1.4 }, 'reveal+=0.25')
+      .fromTo(mark, { yPercent: 14, opacity: 0 }, { yPercent: 0, opacity: 0.09, duration: 1.4 }, 'reveal+=0.25')
       .addLabel('content', 'reveal+=0.34')
       .fromTo(top, { opacity: 0, y: -6 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.04 }, 'content')
+      .fromTo(closeButton, { rotate: -90 }, { rotate: 0, duration: 0.7, ease: 'back.out(1.6)' }, 'content')
       .fromTo(labels, { yPercent: 115, rotate: 4 }, { yPercent: 0, rotate: 0, stagger: 0.065 }, 'content+=0.04')
-      .fromTo(numbers, { opacity: 0, x: -8 }, { opacity: 0.55, x: 0, duration: 0.6, stagger: 0.065 }, 'content+=0.12')
+      .fromTo(numbers, { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: 0.6, stagger: 0.065 }, 'content+=0.12')
       .fromTo(rules, { scaleX: 0 }, { scaleX: 1, duration: 1, ease: 'expo.inOut', stagger: 0.065 }, 'content+=0.02')
       .fromTo(expands, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.6, stagger: 0.065 }, 'content+=0.2')
       .fromTo(foot, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.7, stagger: 0.06 }, 'content+=0.28');
@@ -135,7 +136,15 @@
   }
 
   function lockScroll(locked) {
-    document.documentElement.classList.toggle('dunas-menu-lock', locked);
+    var root = document.documentElement;
+    if (locked) {
+      var scrollbar = window.innerWidth - root.clientWidth;
+      if (scrollbar > 0) root.style.paddingRight = scrollbar + 'px';
+      root.classList.add('dunas-menu-lock');
+    } else {
+      root.classList.remove('dunas-menu-lock');
+      root.style.paddingRight = '';
+    }
   }
 
   function open() {
@@ -150,7 +159,11 @@
     if (window.gsap && !reduceMotion.matches) {
       menu.classList.remove('is-static');
       if (!timeline) timeline = buildTimeline(window.gsap);
-      timeline.invalidate().timeScale(1).play(0);
+      if (timeline.reversed() && timeline.isActive()) {
+        timeline.timeScale(1).play();
+      } else {
+        timeline.invalidate().timeScale(1).play(0);
+      }
     } else {
       menu.classList.add('is-static');
       warm();
@@ -236,6 +249,19 @@
     button.addEventListener('click', function () {
       setExpanded(button, button.getAttribute('aria-expanded') !== 'true');
     });
+  });
+
+  // A page restored from the back/forward cache must never show the menu stuck open
+  window.addEventListener('pageshow', function (event) {
+    if (!event.persisted || menu.hidden) return;
+    if (timeline) timeline.pause(0);
+    isOpen = false;
+    menu.hidden = true;
+    menu.classList.remove('is-static');
+    toggle.setAttribute('aria-expanded', 'false');
+    document.removeEventListener('keydown', onKeydown);
+    collapseAll();
+    lockScroll(false);
   });
 
   // Keep the circle origin right if the screen rotates while open

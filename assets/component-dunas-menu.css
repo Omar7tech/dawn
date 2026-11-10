@@ -51,7 +51,9 @@
   --menu-x: 3rem;
   --menu-y: 4rem;
   --menu-r: 150vmax;
-  --menu-ink: var(--dunas-cream);
+  --menu-ink: var(--dunas-ink);
+  --menu-accent: var(--dunas-green);
+  --menu-bg: var(--dunas-cream);
   position: fixed;
   inset: 0;
   z-index: 10;
@@ -78,7 +80,7 @@ html.dunas-menu-lock body {
 .dunas-menu__panel {
   position: absolute;
   inset: 0;
-  background: rgb(var(--dunas-green));
+  background: rgb(var(--menu-bg));
   clip-path: circle(var(--menu-r) at var(--menu-x) var(--menu-y));
 }
 
@@ -199,8 +201,8 @@ html.dunas-menu-lock body {
   height: 1.8rem;
   padding: 0 0.4rem;
   border-radius: 1rem;
-  background: rgb(var(--menu-ink));
-  color: rgb(var(--dunas-green));
+  background: rgb(var(--menu-accent));
+  color: rgb(var(--menu-bg));
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.8rem;
@@ -470,5 +472,127 @@ html.dunas-menu-lock body {
 
   .dunas-menu__foot {
     padding: 0 4rem;
+  }
+}
+
+/* =====================================================================
+   Cream edition refinements
+   Cream panel, ink type, brand-green accents.
+   ===================================================================== */
+
+/* Watermark in brand green, a touch more present on cream */
+.dunas-menu__mark {
+  color: rgb(var(--menu-accent));
+}
+
+/* Close: a soft round button */
+.dunas-menu__close {
+  background: rgba(var(--menu-ink), 0.06);
+  transition: background-color 200ms ease;
+}
+
+.dunas-menu__close:hover {
+  background: rgba(var(--menu-ink), 0.1);
+}
+
+.dunas-menu__close:active {
+  background: rgba(var(--menu-ink), 0.14);
+}
+
+.dunas-menu__close-lines {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+/* Numbers and active dot in the brand green */
+.dunas-menu__num {
+  color: rgb(var(--menu-accent));
+  opacity: 1;
+}
+
+.dunas-menu__item.is-active .dunas-menu__link {
+  color: rgb(var(--menu-accent));
+}
+
+/* Links respond to touch and hover: a small shift and the accent colour */
+.dunas-menu__link {
+  transition: color 250ms ease;
+}
+
+.dunas-menu__link:active,
+.dunas-menu__link:focus-visible {
+  color: rgb(var(--menu-accent));
+}
+
+.dunas-menu__link:active .dunas-menu__label {
+  transform: translateX(0.6rem);
+}
+
+@media (hover: hover) {
+  .dunas-menu__link:hover {
+    color: rgb(var(--menu-accent));
+  }
+}
+
+/* Dividers slightly finer on cream */
+.dunas-menu__rule {
+  background: rgba(var(--menu-ink), 0.1);
+}
+
+/* Expand buttons in ink, green when open */
+.dunas-menu__expand {
+  border-color: rgba(var(--menu-ink), 0.16);
+}
+
+.dunas-menu__expand[aria-expanded='true'] {
+  background: rgba(var(--menu-accent), 0.1);
+  color: rgb(var(--menu-accent));
+}
+
+.dunas-menu__sublink {
+  color: rgba(var(--menu-ink), 0.7);
+}
+
+.dunas-menu__sublink[aria-current='page'],
+.dunas-menu__sublink:hover {
+  color: rgb(var(--menu-accent));
+}
+
+/* Footer: a fine line above, tagline as a quiet brand signature */
+.dunas-menu__foot {
+  padding-top: 2rem;
+  border-top: 0.1rem solid rgba(var(--menu-ink), 0.1);
+  margin: 0 0.8rem;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.dunas-menu__tagline {
+  color: rgb(var(--menu-accent));
+  opacity: 1;
+}
+
+/* Bottom pills: account and country on white */
+.dunas-menu__account {
+  min-height: 4rem;
+  padding: 0.8rem 1.6rem;
+  border-radius: 10rem;
+  background: #fff;
+  border: 0.1rem solid rgba(var(--menu-ink), 0.08);
+  font-weight: 600;
+}
+
+.dunas-menu .localization-form__select {
+  background: #fff;
+  border: 0.1rem solid rgba(var(--menu-ink), 0.08);
+}
+
+.dunas-menu__social .list-social__link {
+  color: rgb(var(--menu-ink));
+}
+
+@media screen and (min-width: 750px) {
+  .dunas-menu__foot {
+    margin: 0 4rem;
   }
 }
