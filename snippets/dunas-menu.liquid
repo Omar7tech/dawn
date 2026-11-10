@@ -56,10 +56,19 @@
             <span class="svg-wrapper" aria-hidden="true">{{ 'icon-search.svg' | inline_asset_content }}</span>
           </a>
         {%- endif -%}
+        {%- comment -%} Same bag icon as the navbar pill, with the count as a badge {%- endcomment -%}
         <a href="{{ routes.cart_url }}" class="dunas-menu__action dunas-menu__action--cart">
-          {{- 'templates.cart.cart' | t -}}
+          <span class="svg-wrapper" aria-hidden="true">
+            {%- if cart == empty -%}
+              {{- 'icon-cart-empty.svg' | inline_asset_content -}}
+            {%- else -%}
+              {{- 'icon-cart.svg' | inline_asset_content -}}
+            {%- endif -%}
+          </span>
+          <span class="visually-hidden">{{ 'templates.cart.cart' | t }}</span>
           {%- if cart.item_count > 0 -%}
-            <span class="dunas-menu__count">{{ cart.item_count }}</span>
+            <span class="dunas-menu__count" aria-hidden="true">{{ cart.item_count }}</span>
+            <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
           {%- endif -%}
         </a>
         <button type="button" class="dunas-menu__close" aria-label="{{ 'accessibility.close' | t }}">

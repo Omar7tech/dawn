@@ -184,31 +184,75 @@ html.dunas-menu-lock {
   height: 100%;
 }
 
+/* Dawn's bag icon has built-in padding (40px artboard), so it is drawn at 44px like the navbar */
+.dunas-menu__action--cart {
+  position: relative;
+  width: 4.4rem;
+  min-width: 0;
+  padding: 0;
+}
+
+.dunas-menu__action--cart .svg-wrapper {
+  width: 4.4rem;
+  height: 4.4rem;
+}
+
+/* Count badge on the bag, like the navbar */
 .dunas-menu__count {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.4rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 2rem;
-  height: 2rem;
-  padding: 0 0.6rem;
+  min-width: 1.7rem;
+  height: 1.7rem;
+  padding: 0 0.4rem;
   border-radius: 10rem;
   background: rgb(var(--menu-ink));
   color: rgb(var(--menu-bg));
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
+  line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
+/* Close: the same soft tinted circle as the search panel's close control.
+   44px tap target, 34px visible circle (background clipped to the content box). */
+.dunas-menu__close {
+  width: 4.4rem;
+  min-width: 0;
+  padding: 0.5rem;
+  margin-left: 0.4rem;
+  border-radius: 50%;
+  background: rgba(var(--menu-ink), 0.07);
+  background-clip: content-box;
+}
+
+.dunas-menu__close .svg-wrapper {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
 @media (hover: hover) {
-  .dunas-menu__action:hover,
-  .dunas-menu__close:hover {
+  .dunas-menu__action:hover {
     background: rgba(var(--menu-ink), 0.06);
+  }
+
+  .dunas-menu__close:hover {
+    background: rgb(var(--menu-ink));
+    background-clip: content-box;
+    color: rgb(var(--menu-bg));
   }
 }
 
-.dunas-menu__action:active,
-.dunas-menu__close:active {
+.dunas-menu__action:active {
   background: rgba(var(--menu-ink), 0.1);
+}
+
+.dunas-menu__close:active {
+  background: rgba(var(--menu-ink), 0.14);
+  background-clip: content-box;
 }
 
 .dunas-menu :focus-visible {
@@ -266,6 +310,17 @@ html.dunas-menu-lock {
 .dunas-menu__label {
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+/* Current page: a fine underline under the label. No dot. */
+.dunas-menu__item.is-active > .dunas-menu__row .dunas-menu__label {
+  text-decoration: underline;
+  text-decoration-thickness: 0.1rem;
+  text-underline-offset: 0.6rem;
+}
+
+.dunas-menu__item.is-active > .dunas-menu__row .dunas-menu__chevron {
+  color: rgb(var(--menu-ink));
 }
 
 .dunas-menu__chevron {
@@ -397,16 +452,18 @@ html.dunas-menu-lock {
   display: inline-flex;
   align-items: center;
   min-height: 4.4rem;
-  color: rgb(var(--menu-ink));
-  font-size: 1.5rem;
+  /* same muted tone as the footer's small links; full ink on hover and for the current page */
+  color: var(--menu-muted);
+  font-size: 1.4rem;
   letter-spacing: 0;
   text-decoration: none;
   background: linear-gradient(currentColor, currentColor) left calc(100% - 1rem) / 0 0.1rem no-repeat;
-  transition: background-size 300ms var(--menu-ease);
+  transition: background-size 300ms var(--menu-ease), color 150ms ease;
 }
 
 .dunas-menu__secondary a:hover,
 .dunas-menu__secondary a[aria-current='page'] {
+  color: rgb(var(--menu-ink));
   background-size: 100% 0.1rem;
 }
 
@@ -556,6 +613,8 @@ html.dunas-menu-lock {
     --menu-gutter: 3.2rem;
   }
 
+  /* Desktop: the same frosted cream glass and bright rim as the search panel.
+     Phones stay solid: a full-screen glass menu over a busy page is hard to read. */
   .dunas-menu__sheet {
     right: auto;
     width: 46rem;
@@ -563,6 +622,50 @@ html.dunas-menu-lock {
     border-radius: 0 2.8rem 2.8rem 0;
     overflow: hidden;
     transform: translateX(-2.4rem);
+    background:
+      radial-gradient(120% 50% at 20% -10%, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 60%),
+      rgba(var(--menu-bg), 0.78);
+    -webkit-backdrop-filter: blur(2.8rem) saturate(180%) brightness(1.05);
+    backdrop-filter: blur(2.8rem) saturate(180%) brightness(1.05);
+    box-shadow:
+      inset 0 0.1rem 0.1rem rgba(255, 255, 255, 0.7),
+      inset 0 0 2.4rem rgba(255, 255, 255, 0.18),
+      2.4rem 0 6rem -2rem rgba(var(--dunas-ink), 0.35);
+  }
+
+  .dunas-menu__sheet::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    padding: 0.1rem 0.1rem 0.1rem 0;
+    background: linear-gradient(
+      150deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.3) 20%,
+      rgba(255, 255, 255, 0.06) 50%,
+      rgba(255, 255, 255, 0.3) 80%,
+      rgba(255, 255, 255, 0.75) 100%
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  }
+
+  @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    .dunas-menu__sheet {
+      background: rgb(var(--menu-bg));
+    }
+  }
+
+  /* a lighter veil, so the glass has the page to pick up */
+  .dunas-menu .dunas-menu__backdrop {
+    background: rgba(var(--dunas-ink), 0.22);
+  }
+
+  .dunas-menu .disclosure__list-wrapper {
+    background: rgb(var(--menu-bg));
   }
 
   .dunas-menu__cards > li {
