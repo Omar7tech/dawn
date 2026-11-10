@@ -167,7 +167,11 @@
     Dawn's header--has-account / --has-app / --has-localizations classes drive its own grid and
     hide the search icon on mobile; the DUNAS pill lays itself out, so only has-menu is kept.
   {% endcomment %}
-  <header class="header header--dunas{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}">
+  <header
+    class="header header--dunas{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}"
+    data-liquid-glass
+    data-glass-bend="{{ section.settings.dunas_glass_bend | default: 22 }}"
+  >
     <div class="header__left">
       {%- if section.settings.menu != blank -%}
         {%- render 'header-drawer',
@@ -498,6 +502,17 @@
       "id": "dunas_overlay_home",
       "default": true,
       "label": "Float header over home hero"
+    },
+    {
+      "type": "range",
+      "id": "dunas_glass_bend",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Glass refraction",
+      "info": "How strongly the glass bends the page behind it at its edges. Shown in Chrome, Edge and Android; other browsers show clear glass without bending.",
+      "default": 22
     },
     {
       "type": "checkbox",

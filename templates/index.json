@@ -10,7 +10,8 @@
         "button_label": "Start my journey",
         "button_link": "shopify://collections/all",
         "show_logo": true,
-        "color_scheme": "scheme-1"
+        "color_scheme": "scheme-1",
+        "button_style": "liquid"
       }
     },
     "banner": {
@@ -21,7 +22,8 @@
         "button_label": "Shop now",
         "button_link": "shopify://collections/all",
         "overlap_previous": true,
-        "color_scheme": "scheme-1"
+        "color_scheme": "scheme-1",
+        "button_style": "light"
       }
     },
     "showcase": {
@@ -35,7 +37,8 @@
         "button_link": "shopify://collections/all",
         "color_scheme": "scheme-1",
         "padding_top": 64,
-        "padding_bottom": 120
+        "padding_bottom": 120,
+        "button_style": "muted"
       }
     },
     "brand": {

@@ -1,4 +1,5 @@
 {{ 'section-dunas-hero.css' | asset_url | stylesheet_tag }}
+{%- assign button_style = section.settings.button_style | default: 'liquid' -%}
 
 {%- liquid
   assign tagline = section.settings.tagline | escape | newline_to_br
@@ -60,7 +61,8 @@
           {% else %}
             role="link" aria-disabled="true"
           {% endif %}
-          class="dunas-btn dunas-btn--glass dunas-hero__button"
+          class="dunas-btn dunas-btn--{{ button_style }} dunas-hero__button"
+          {% if button_style == 'liquid' %} data-liquid-glass data-glass-bend="{{ settings.dunas_button_glass_bend | default: 16 }}"{% endif %}
         >
           {{- section.settings.button_label | escape -}}
         </a>
@@ -100,10 +102,22 @@
       "label": "Image focus",
       "default": "50% 30%",
       "options": [
-        { "value": "50% 0%", "label": "Top" },
-        { "value": "50% 30%", "label": "Upper center" },
-        { "value": "50% 50%", "label": "Center" },
-        { "value": "50% 100%", "label": "Bottom" }
+        {
+          "value": "50% 0%",
+          "label": "Top"
+        },
+        {
+          "value": "50% 30%",
+          "label": "Upper center"
+        },
+        {
+          "value": "50% 50%",
+          "label": "Center"
+        },
+        {
+          "value": "50% 100%",
+          "label": "Bottom"
+        }
       ]
     },
     {
@@ -133,6 +147,39 @@
       "id": "button_label",
       "label": "Button label",
       "default": "Start my journey"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "liquid",
+          "label": "Liquid glass"
+        },
+        {
+          "value": "glass",
+          "label": "Frosted glass"
+        },
+        {
+          "value": "solid",
+          "label": "Solid green"
+        },
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "muted",
+          "label": "Soft grey"
+        },
+        {
+          "value": "outline",
+          "label": "Outline"
+        }
+      ],
+      "default": "liquid",
+      "info": "Liquid glass bends the image behind it in Chrome, Edge and Android; other browsers show clear glass."
     },
     {
       "type": "url",

@@ -82,9 +82,89 @@
   width: 100%;
 }
 
-/* Frosted glass, for use on photography */
+/*
+  Button styles (chosen per section in the theme editor):
+  liquid  - Liquid glass: clear, refracting glass with a specular rim
+  glass   - Frosted glass: blurred glass
+  solid   - Solid brand green
+  light   - Light: near-white fill, green text
+  muted   - Soft grey: grey fill, turns green on hover
+  outline - Outline: transparent with a thin border in the text colour
+
+  Glass styles read --btn-ink for text (white by default, for photography);
+  sections on light backgrounds set it to brand green.
+*/
+
+/* Liquid glass */
+.dunas-btn--liquid {
+  --glass-tint: rgba(255, 255, 255, 0.08);
+  --glass-x: 30%;
+  position: relative;
+  isolation: isolate;
+  z-index: 0;
+  color: var(--btn-ink, #fff);
+  background: transparent;
+  border-color: transparent;
+  text-shadow: 0 0.1rem 0.6rem rgba(0, 0, 0, 0.16);
+  transition: transform 450ms var(--dunas-ease), color 300ms ease;
+}
+
+.dunas-btn--liquid::before,
+.dunas-btn--liquid::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.dunas-btn--liquid::before {
+  background:
+    radial-gradient(120% 160% at var(--glass-x) -40%, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 55%),
+    var(--glass-tint);
+  -webkit-backdrop-filter: blur(0.6rem) saturate(180%) brightness(1.06);
+  backdrop-filter: blur(0.6rem) saturate(180%) brightness(1.06);
+  box-shadow:
+    inset 0 0.1rem 0.1rem rgba(255, 255, 255, 0.55),
+    inset 0 -0.1rem 0.1rem rgba(255, 255, 255, 0.18),
+    inset 0 0 1.4rem rgba(255, 255, 255, 0.12),
+    0 1rem 2.6rem -1rem rgba(0, 0, 0, 0.3);
+  transition: background 400ms var(--dunas-ease);
+}
+
+.dunas-btn--liquid::after {
+  padding: 0.1rem;
+  background: linear-gradient(
+    125deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.25) 24%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.25) 76%,
+    rgba(255, 255, 255, 0.75) 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+.dunas-liquid-glass .dunas-btn--liquid[data-glass-ready]::before {
+  -webkit-backdrop-filter: var(--glass-filter) saturate(170%) brightness(1.06);
+  backdrop-filter: var(--glass-filter) saturate(170%) brightness(1.06);
+}
+
+.dunas-btn--liquid:hover {
+  --glass-tint: rgba(255, 255, 255, 0.16);
+  transform: translateY(-0.1rem) scale(1.015);
+}
+
+.dunas-btn--liquid:active {
+  transform: scale(0.985);
+}
+
+/* Frosted glass */
 .dunas-btn--glass {
-  color: #fff;
+  color: var(--btn-ink, #fff);
   background: linear-gradient(100deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.06));
   border-color: rgba(255, 255, 255, 0.55);
   -webkit-backdrop-filter: blur(1.4rem) saturate(140%);
@@ -94,6 +174,45 @@
 
 .dunas-btn--glass:hover {
   background: rgba(255, 255, 255, 0.3);
+}
+
+/* Outline */
+.dunas-btn--outline {
+  color: var(--btn-ink, currentColor);
+  background: transparent;
+  border-color: currentColor;
+}
+
+.dunas-btn--outline:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* On light backgrounds, glass and outline buttons switch to brand-green text */
+.dunas-showcase {
+  --btn-ink: rgb(var(--dunas-green));
+}
+
+.dunas-showcase .dunas-btn--liquid {
+  --glass-tint: rgba(255, 255, 255, 0.45);
+  text-shadow: none;
+}
+
+.dunas-showcase .dunas-btn--liquid::after {
+  background: linear-gradient(
+    125deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(var(--dunas-ink), 0.08) 50%,
+    rgba(255, 255, 255, 0.9) 100%
+  );
+}
+
+.dunas-showcase .dunas-btn--glass {
+  background: rgba(255, 255, 255, 0.5);
+  border-color: rgba(var(--dunas-ink), 0.12);
+}
+
+.dunas-showcase .dunas-btn--outline:hover {
+  background: rgba(var(--dunas-green), 0.08);
 }
 
 .dunas-btn--light {
@@ -166,6 +285,19 @@
   box-shadow: none;
 }
 
+/*
+  Liquid Glass pill.
+  ::before = the glass body: clear, lightly tinted, a touch of brightness/saturation,
+             a specular light that follows the pointer (--glass-x), and inner rim light.
+             In Chromium the backdrop is also refracted (see snippets/dunas-liquid-glass).
+  ::after  = the specular rim: a thin gradient edge that is brightest top-left and
+             bottom-right, like light catching the edge of a lens.
+*/
+.header-wrapper.dunas-header .header.header--dunas {
+  --glass-tint: rgba(var(--color-background), 0.42);
+  --glass-x: 30%;
+}
+
 .header-wrapper.dunas-header .header.header--dunas::before {
   content: '';
   position: absolute;
@@ -173,12 +305,53 @@
   z-index: -1;
   pointer-events: none;
   border-radius: 10rem;
-  border: 0.1rem solid rgba(var(--color-foreground), 0.14);
-  background: rgba(var(--color-background), 0.78);
-  -webkit-backdrop-filter: blur(1.6rem) saturate(150%);
-  backdrop-filter: blur(1.6rem) saturate(150%);
-  box-shadow: 0 0.8rem 2.4rem rgba(var(--dunas-ink), 0.06);
-  transition: background 350ms var(--dunas-ease), border-color 350ms var(--dunas-ease);
+  background:
+    radial-gradient(120% 140% at var(--glass-x) -30%, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 55%),
+    var(--glass-tint);
+  -webkit-backdrop-filter: blur(0.6rem) saturate(180%) brightness(1.05);
+  backdrop-filter: blur(0.6rem) saturate(180%) brightness(1.05);
+  box-shadow:
+    inset 0 0.1rem 0.1rem rgba(255, 255, 255, 0.55),
+    inset 0 -0.1rem 0.1rem rgba(255, 255, 255, 0.18),
+    inset 0 0 1.6rem rgba(255, 255, 255, 0.12),
+    0 1rem 3rem -1.2rem rgba(var(--dunas-ink), 0.35),
+    0 0.2rem 0.6rem rgba(var(--dunas-ink), 0.06);
+  transition: background 400ms var(--dunas-ease);
+}
+
+.header-wrapper.dunas-header .header.header--dunas::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 10rem;
+  padding: 0.1rem;
+  background: linear-gradient(
+    125deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.25) 22%,
+    rgba(255, 255, 255, 0.05) 48%,
+    rgba(255, 255, 255, 0.25) 78%,
+    rgba(255, 255, 255, 0.7) 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+/* Chromium: real refraction of the page behind the glass, with slight dispersion */
+.dunas-liquid-glass .header-wrapper.dunas-header .header.header--dunas[data-glass-ready]::before {
+  -webkit-backdrop-filter: var(--glass-filter) saturate(170%) brightness(1.04);
+  backdrop-filter: var(--glass-filter) saturate(170%) brightness(1.04);
+}
+
+.dunas-glass-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 @media screen and (min-width: 990px) {
@@ -346,11 +519,9 @@
   margin-bottom: calc(-1 * var(--dunas-header-total));
 }
 
-.header-wrapper.dunas-header--overlay .header.header--dunas::before {
-  background: linear-gradient(100deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04)),
-    rgba(var(--dunas-ink), 0.16);
-  border-color: rgba(255, 255, 255, 0.55);
-  box-shadow: inset 0 0.1rem 0 rgba(255, 255, 255, 0.3), 0 0.8rem 2.4rem rgba(0, 0, 0, 0.08);
+/* Over the hero photo: almost clear glass with a whisper of shade for legibility */
+.header-wrapper.dunas-header--overlay .header.header--dunas {
+  --glass-tint: rgba(var(--dunas-ink), 0.1);
 }
 
 .header-wrapper.dunas-header--overlay .header.header--dunas > .header__left,
@@ -401,10 +572,10 @@
 }
 
 /* Once the visitor scrolls past the hero, the pill turns to frosted brand green */
-.scrolled-past-header .dunas-header--overlay .header.header--dunas::before,
-.menu-open .dunas-header--overlay .header.header--dunas::before {
-  background: rgba(var(--dunas-green), 0.86);
-  border-color: rgba(255, 255, 255, 0.25);
+/* Scrolled past the hero, or menu open: brand-green tinted glass */
+.scrolled-past-header .dunas-header--overlay .header.header--dunas,
+.menu-open .dunas-header--overlay .header.header--dunas {
+  --glass-tint: rgba(var(--dunas-green), 0.62);
 }
 
 /* ---------- Search: the pill opens into a floating search card ---------- */

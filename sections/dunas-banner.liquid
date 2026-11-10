@@ -1,4 +1,5 @@
 {{ 'section-dunas-banner.css' | asset_url | stylesheet_tag }}
+{%- assign button_style = section.settings.button_style | default: 'light' -%}
 
 {%- assign heading = section.settings.heading | escape | newline_to_br -%}
 
@@ -41,7 +42,8 @@
           {% else %}
             role="link" aria-disabled="true"
           {% endif %}
-          class="dunas-btn dunas-btn--light dunas-btn--block dunas-banner__button"
+          class="dunas-btn dunas-btn--{{ button_style }} dunas-btn--block dunas-banner__button"
+          {% if button_style == 'liquid' %} data-liquid-glass data-glass-bend="{{ settings.dunas_button_glass_bend | default: 16 }}"{% endif %}
         >
           {{- section.settings.button_label | escape -}}
         </a>
@@ -84,6 +86,39 @@
       "id": "button_label",
       "label": "Button label",
       "default": "Shop now"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "liquid",
+          "label": "Liquid glass"
+        },
+        {
+          "value": "glass",
+          "label": "Frosted glass"
+        },
+        {
+          "value": "solid",
+          "label": "Solid green"
+        },
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "muted",
+          "label": "Soft grey"
+        },
+        {
+          "value": "outline",
+          "label": "Outline"
+        }
+      ],
+      "default": "light",
+      "info": "Liquid glass bends the image behind it in Chrome, Edge and Android; other browsers show clear glass."
     },
     {
       "type": "url",
