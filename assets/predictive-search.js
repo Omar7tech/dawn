@@ -180,7 +180,12 @@ class PredictiveSearch extends SearchForm {
 
     const searchDeferred = this.dispatchSearchUpdateEvent(searchTerm);
 
-    fetch(`${routes.predictive_search_url}?q=${encodeURIComponent(searchTerm)}&section_id=predictive-search`, {
+    // DUNAS: result limit and resource types come from the theme settings (data attributes)
+    let dunasParams = '';
+    if (this.dataset.dunasLimit) dunasParams += `&resources[limit]=${encodeURIComponent(this.dataset.dunasLimit)}`;
+    if (this.dataset.dunasTypes) dunasParams += `&resources[type]=${encodeURIComponent(this.dataset.dunasTypes)}`;
+
+    fetch(`${routes.predictive_search_url}?q=${encodeURIComponent(searchTerm)}&section_id=predictive-search${dunasParams}`, {
       signal: this.abortController.signal,
     })
       .then((response) => {

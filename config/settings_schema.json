@@ -1517,6 +1517,190 @@
     ]
   },
   {
+    "name": "DUNAS search",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Behaviour"
+      },
+      {
+        "type": "select",
+        "id": "dunas_search_layout",
+        "label": "Layout",
+        "options": [
+          { "value": "panel", "label": "Floating panel" },
+          { "value": "fullscreen", "label": "Immersive full screen" }
+        ],
+        "default": "panel"
+      },
+      {
+        "type": "select",
+        "id": "dunas_search_results",
+        "label": "Product results",
+        "options": [
+          { "value": "list", "label": "List rows" },
+          { "value": "cards", "label": "Image cards" }
+        ],
+        "default": "list"
+      },
+      {
+        "type": "range",
+        "id": "dunas_search_columns",
+        "label": "Columns on desktop",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "default": 2,
+        "info": "Image cards look best with 4 or 5 columns in full screen."
+      },
+      {
+        "type": "select",
+        "id": "dunas_search_columns_mobile",
+        "label": "Columns on phones",
+        "options": [
+          { "value": "1", "label": "1" },
+          { "value": "2", "label": "2" }
+        ],
+        "default": "1"
+      },
+      {
+        "type": "range",
+        "id": "dunas_search_limit",
+        "label": "Products shown",
+        "min": 2,
+        "max": 10,
+        "step": 1,
+        "default": 10
+      },
+      {
+        "type": "checkbox",
+        "id": "dunas_search_show_suggestions",
+        "label": "Show suggestions and collections",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "dunas_search_show_pages",
+        "label": "Show pages and articles",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "dunas_search_show_search_for",
+        "label": "Show \"Search for\" button",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "dunas_search_placeholder",
+        "label": "Placeholder",
+        "default": "Search products"
+      },
+      {
+        "type": "text",
+        "id": "dunas_search_popular",
+        "label": "Popular searches",
+        "default": "Cleanser, Serum, Moisturiser, SPF",
+        "info": "Comma separated. Shown as quick picks before the customer types. Leave empty to hide."
+      },
+      {
+        "type": "text",
+        "id": "dunas_search_popular_label",
+        "label": "Popular searches heading",
+        "default": "Popular"
+      },
+      {
+        "type": "header",
+        "content": "Design"
+      },
+      {
+        "type": "select",
+        "id": "dunas_search_style",
+        "label": "Panel style",
+        "options": [
+          { "value": "glass", "label": "Liquid glass" },
+          { "value": "cream", "label": "Solid cream" },
+          { "value": "white", "label": "Solid white" },
+          { "value": "green", "label": "Brand green" }
+        ],
+        "default": "glass"
+      },
+      {
+        "type": "range",
+        "id": "dunas_search_width",
+        "label": "Panel width",
+        "min": 560,
+        "max": 1400,
+        "step": 20,
+        "unit": "px",
+        "default": 840,
+        "info": "Floating panel only."
+      },
+      {
+        "type": "range",
+        "id": "dunas_search_radius",
+        "label": "Corner radius",
+        "min": 0,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "default": 28
+      },
+      {
+        "type": "range",
+        "id": "dunas_search_glass_blur",
+        "label": "Glass blur",
+        "min": 0,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "default": 28,
+        "info": "Liquid glass style only."
+      },
+      {
+        "type": "range",
+        "id": "dunas_search_dim",
+        "label": "Page dim behind search",
+        "min": 0,
+        "max": 80,
+        "step": 5,
+        "unit": "%",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "dunas_search_page_blur",
+        "label": "Page blur behind search",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "unit": "px",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "dunas_search_thumb",
+        "label": "Thumbnail size",
+        "min": 40,
+        "max": 96,
+        "step": 4,
+        "unit": "px",
+        "default": 52,
+        "info": "List rows only."
+      },
+      {
+        "type": "range",
+        "id": "dunas_search_input_size",
+        "label": "Search text size",
+        "min": 14,
+        "max": 32,
+        "step": 1,
+        "unit": "px",
+        "default": 16
+      }
+    ]
+  },
+  {
     "name": "t:settings_schema.currency_format.name",
     "settings": [
       {

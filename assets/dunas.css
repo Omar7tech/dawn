@@ -655,11 +655,77 @@ body,
   --glass-halo: rgba(var(--dunas-ink), 0.45);
 }
 
-/* ---------- Search: a Liquid Glass panel ----------
-   Same glass as the header pill: translucent cream, strong blur and saturation,
-   a bright specular rim. One control to close, no duplicate clear button. */
+/* ---------- Search ----------
+   Driven by Theme settings > DUNAS search. The snippet writes these variables on .dunas-search:
+   --ds-width, --ds-radius, --ds-glass-blur, --ds-dim, --ds-page-blur, --ds-thumb, --ds-input,
+   --ds-cols, --ds-cols-m. Classes pick the style (glass / cream / white / green), the layout
+   (panel / fullscreen) and the result view (list / cards).
+   Rule of thumb: no opacity/filter/transform animation on ancestors of the panel, or the
+   glass backdrop blur stops seeing the page. */
 
-/* The modal layer just spans the viewport; the panel does the visual work */
+/* Navbar: keep the search icon; never swap in Dawn's close X (it broke the pill) */
+.dunas-header .header__search details[open] > summary .header__icon-close,
+.dunas-header .header__search .header__icon-close {
+  display: none !important;
+}
+
+/* ---- Style tokens ---- */
+
+.dunas-header .dunas-search {
+  --ds-ink: var(--dunas-ink);
+  --ds-surface: rgb(var(--dunas-cream));
+  --ds-field: #fff;
+  --ds-field-edge: rgba(var(--dunas-ink), 0.1);
+  --ds-field-edge-focus: rgba(var(--dunas-ink), 0.45);
+  --ds-hover: rgba(var(--dunas-ink), 0.05);
+  --ds-rule: rgba(var(--dunas-ink), 0.08);
+  --ds-muted: rgba(var(--dunas-ink), 0.55);
+  --ds-control: rgba(var(--dunas-ink), 0.07);
+  --ds-pill-bg: rgb(var(--dunas-ink));
+  --ds-pill-ink: rgb(var(--dunas-cream));
+  --ds-chip: rgba(var(--dunas-ink), 0.06);
+  --ds-shadow: 0 2.4rem 6rem -2rem rgba(var(--dunas-ink), 0.3), 0 0.2rem 0.6rem rgba(var(--dunas-ink), 0.06);
+  --ds-pad-y: 0.8rem;
+  --ds-pad-x: 0.8rem;
+}
+
+.dunas-header .dunas-search--glass {
+  --ds-surface: radial-gradient(120% 60% at 20% -10%, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 60%),
+    rgba(var(--dunas-cream), 0.62);
+  --ds-field: rgba(255, 255, 255, 0.72);
+  --ds-field-edge: rgba(255, 255, 255, 0.85);
+  --ds-field-edge-focus: rgba(255, 255, 255, 1);
+  --ds-hover: rgba(255, 255, 255, 0.55);
+  --ds-rule: rgba(255, 255, 255, 0.55);
+  --ds-chip: rgba(255, 255, 255, 0.55);
+  --ds-shadow: inset 0 0.1rem 0.1rem rgba(255, 255, 255, 0.7), inset 0 -0.1rem 0.1rem rgba(255, 255, 255, 0.2),
+    inset 0 0 2.4rem rgba(255, 255, 255, 0.18), 0 2.4rem 6rem -2rem rgba(var(--dunas-ink), 0.35),
+    0 0.2rem 0.6rem rgba(var(--dunas-ink), 0.06);
+}
+
+.dunas-header .dunas-search--white {
+  --ds-surface: #fff;
+  --ds-field: rgba(var(--dunas-ink), 0.04);
+  --ds-field-edge: rgba(var(--dunas-ink), 0.08);
+}
+
+.dunas-header .dunas-search--green {
+  --ds-ink: var(--dunas-cream);
+  --ds-surface: rgb(var(--dunas-green));
+  --ds-field: rgba(255, 255, 255, 0.1);
+  --ds-field-edge: rgba(255, 255, 255, 0.22);
+  --ds-field-edge-focus: rgba(255, 255, 255, 0.6);
+  --ds-hover: rgba(255, 255, 255, 0.08);
+  --ds-rule: rgba(255, 255, 255, 0.16);
+  --ds-muted: rgba(var(--dunas-cream), 0.65);
+  --ds-control: rgba(255, 255, 255, 0.12);
+  --ds-pill-bg: rgb(var(--dunas-cream));
+  --ds-pill-ink: rgb(var(--dunas-green));
+  --ds-chip: rgba(255, 255, 255, 0.1);
+}
+
+/* ---- Layer + backdrop ---- */
+
 .dunas-header .header--dunas .search-modal {
   position: fixed;
   inset: 0;
@@ -672,15 +738,9 @@ body,
   pointer-events: none;
 }
 
-/* No animation on this layer: a running or filled opacity animation on an ancestor
-   would stop the panel's backdrop blur from seeing the page. */
 .dunas-header .header--dunas details[open] > .search-modal {
   pointer-events: auto;
   animation: none;
-}
-
-.dunas-header .header--dunas details[open] .search-modal__content {
-  animation: dunas-fade-in 180ms ease;
 }
 
 .dunas-header .header--dunas details[open] .modal-overlay::after {
@@ -688,8 +748,12 @@ body,
   inset: 0;
   top: 0;
   height: auto;
-  background: rgba(var(--dunas-ink), 0.18);
+  background: rgba(var(--dunas-ink), var(--ds-dim, 0.2));
+  -webkit-backdrop-filter: blur(var(--ds-page-blur, 0px));
+  backdrop-filter: blur(var(--ds-page-blur, 0px));
 }
+
+/* ---- Panel ---- */
 
 .dunas-header .header--dunas .search-modal__content {
   position: fixed;
@@ -698,31 +762,34 @@ body,
   right: 1.2rem;
   bottom: auto;
   width: auto;
-  max-width: 64rem;
+  max-width: none;
   height: auto;
+  max-height: calc(100% - var(--dunas-header-pad-y) - 2.4rem);
   margin: 0 auto;
-  padding: 0.8rem;
-  display: block;
+  padding: var(--ds-pad-y) var(--ds-pad-x);
+  display: flex;
+  flex-direction: column;
   border: 0;
-  border-radius: 2.8rem;
-  background:
-    radial-gradient(120% 60% at 20% -10%, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 60%),
-    rgba(var(--dunas-cream), 0.62);
-  -webkit-backdrop-filter: blur(2.8rem) saturate(180%) brightness(1.05);
-  backdrop-filter: blur(2.8rem) saturate(180%) brightness(1.05);
-  color: rgb(var(--dunas-ink));
-  box-shadow:
-    inset 0 0.1rem 0.1rem rgba(255, 255, 255, 0.7),
-    inset 0 -0.1rem 0.1rem rgba(255, 255, 255, 0.2),
-    inset 0 0 2.4rem rgba(255, 255, 255, 0.18),
-    0 2.4rem 6rem -2rem rgba(var(--dunas-ink), 0.35),
-    0 0.2rem 0.6rem rgba(var(--dunas-ink), 0.06);
+  border-radius: var(--ds-radius, 28px);
+  background: var(--ds-surface);
+  color: rgb(var(--ds-ink));
+  box-shadow: var(--ds-shadow);
   text-shadow: none;
   line-height: 1.4;
   font-family: var(--font-body-family);
 }
 
-.dunas-header .header--dunas .search-modal__content::after {
+.dunas-header .header--dunas details[open] .search-modal__content {
+  animation: dunas-fade-in 180ms ease;
+}
+
+.dunas-header .dunas-search--glass .search-modal__content {
+  -webkit-backdrop-filter: blur(var(--ds-glass-blur, 28px)) saturate(180%) brightness(1.05);
+  backdrop-filter: blur(var(--ds-glass-blur, 28px)) saturate(180%) brightness(1.05);
+}
+
+/* specular rim on the glass style */
+.dunas-header .dunas-search--glass .search-modal__content::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -742,9 +809,8 @@ body,
   mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
 }
 
-/* Browsers without backdrop-filter get a solid cream panel instead of see-through */
 @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-  .dunas-header .header--dunas .search-modal__content {
+  .dunas-header .dunas-search--glass .search-modal__content {
     background: rgb(var(--dunas-cream));
   }
 }
@@ -756,41 +822,142 @@ body,
   }
 }
 
-.dunas-header .header--dunas .search-modal__form {
+@media screen and (min-width: 990px) {
+  .dunas-header .dunas-search--panel .search-modal__content {
+    max-width: var(--ds-width, 840px);
+    --ds-pad-y: 1rem;
+    --ds-pad-x: 1rem;
+  }
+}
+
+/* Immersive full screen: the panel fills the window with an even margin */
+.dunas-header .dunas-search--fullscreen .search-modal__content {
+  bottom: var(--dunas-header-pad-y);
+  max-height: none;
+  --ds-pad-y: 1.2rem;
+  --ds-pad-x: 1.2rem;
+}
+
+@media screen and (min-width: 750px) {
+  .dunas-header .dunas-search--fullscreen .search-modal__content {
+    --ds-pad-y: 2.4rem;
+    --ds-pad-x: 2.4rem;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .dunas-header .dunas-search--fullscreen .search-modal__content {
+    --ds-pad-y: 3.2rem;
+    --ds-pad-x: 4rem;
+  }
+}
+
+/* ---- Flex chain: panel > predictive-search > form > results. Only the result groups scroll;
+   the "Search for" button sits outside the scroll area, so nothing passes under it. ---- */
+
+.dunas-header .header--dunas .search-modal__content > .search-modal__form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
   max-width: none;
   width: 100%;
 }
 
-/* Input row: white pill, icon left, room for the close control */
-.dunas-header .header--dunas .search-modal .field {
-  margin-right: 0;
+.dunas-header .header--dunas .search-modal__content form.search-modal__form {
+  display: flex;
+  flex-direction: column;
+  flex: 0 1 auto;
+  min-height: 0;
+  max-width: none;
+  width: 100%;
 }
 
-.dunas-header .header--dunas .search-modal .field::before,
+.dunas-header .header--dunas .search-modal__content form.search-modal__form > .field {
+  flex: 0 0 auto;
+}
+
+.dunas-header .header--dunas .predictive-search {
+  position: static;
+  width: auto;
+  min-height: 0;
+  max-height: none;
+  margin: 0.4rem 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.dunas-header .header--dunas predictive-search[open] .predictive-search,
+.dunas-header .header--dunas predictive-search[loading] .predictive-search {
+  display: flex;
+  flex-direction: column;
+  flex: 0 1 auto;
+}
+
+.dunas-header .header--dunas .predictive-search #predictive-search-results {
+  display: flex;
+  flex-direction: column;
+  flex: 0 1 auto;
+  min-height: 0;
+}
+
+.dunas-header .header--dunas .predictive-search__results-groups-wrapper {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-bottom: 0;
+  padding-bottom: 0.4rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--ds-ink), 0.2) transparent;
+}
+
+.dunas-header .header--dunas .predictive-search__results-groups-wrapper::-webkit-scrollbar {
+  width: 0.6rem;
+}
+
+.dunas-header .header--dunas .predictive-search__results-groups-wrapper::-webkit-scrollbar-thumb {
+  border-radius: 1rem;
+  background: rgba(var(--ds-ink), 0.2);
+}
+
+.dunas-header .header--dunas .predictive-search__loading-state {
+  color: var(--ds-muted);
+}
+
+/* ---- Input row ---- */
+
+.dunas-header .header--dunas .search-modal .field {
+  margin: 0;
+}
+
+.dunas-header .header--dunas .search-modal .field::before {
+  display: none;
+}
+
 .dunas-header .header--dunas .search-modal .field::after {
   border-radius: 10rem;
-}
-
-.dunas-header .header--dunas .search-modal .field::after {
-  box-shadow: 0 0 0 0.1rem rgba(255, 255, 255, 0.85), 0 0.2rem 0.8rem rgba(var(--dunas-ink), 0.06);
+  box-shadow: 0 0 0 0.1rem var(--ds-field-edge);
   transition: box-shadow 150ms ease;
 }
 
 .dunas-header .header--dunas .search-modal .field:focus-within::after {
-  box-shadow: 0 0 0 0.1rem rgba(255, 255, 255, 1), 0 0 0 0.4rem rgba(255, 255, 255, 0.35),
-    0 0.2rem 0.8rem rgba(var(--dunas-ink), 0.06);
+  box-shadow: 0 0 0 0.1rem var(--ds-field-edge-focus);
 }
 
 .dunas-header .header--dunas .search-modal .search__input.field__input {
-  height: 5.2rem;
-  min-height: 5.2rem;
+  height: calc(var(--ds-input, 16px) * 2 + 2rem);
+  min-height: 0;
   border-radius: 10rem;
-  background: rgba(255, 255, 255, 0.72);
-  color: rgb(var(--dunas-ink));
+  background: var(--ds-field);
+  color: rgb(var(--ds-ink));
   font-family: var(--font-body-family);
-  font-size: 1.6rem;
+  font-size: var(--ds-input, 16px);
   letter-spacing: 0;
-  padding: 0 6rem 0 4.8rem;
+  padding: 0 calc(var(--ds-input, 16px) * 2 + 3rem) 0 calc(var(--ds-input, 16px) + 3.2rem);
 }
 
 .dunas-header .header--dunas .search-modal .search__input.field__input:focus,
@@ -800,65 +967,63 @@ body,
 }
 
 .dunas-header .header--dunas .search-modal .search__input.field__input::placeholder {
-  color: rgba(var(--dunas-ink), 0.45);
+  opacity: 1;
+  color: var(--ds-muted);
 }
 
-.dunas-header .header--dunas .search-modal .field__label {
-  display: none;
-}
-
-.dunas-header .header--dunas .search-modal .search__button {
-  left: 0.6rem;
-  right: auto;
-  top: 0.4rem;
-  width: 4.4rem;
-  height: 4.4rem;
-  color: rgba(var(--dunas-ink), 0.55);
-}
-
-.dunas-header .header--dunas .search-modal .search__button .icon {
-  width: 1.7rem;
-  height: 1.7rem;
-}
-
-/* Only one X: the close control. Dawn's clear button is hidden (the field clears with Esc or select-all). */
+.dunas-header .header--dunas .search-modal .field__label,
 .dunas-header .header--dunas .search-modal .reset__button {
   display: none;
 }
 
-/* Close: a small glass circle inside the pill */
+.dunas-header .header--dunas .search-modal .search__button {
+  left: 0.8rem;
+  right: auto;
+  top: 50%;
+  width: 4.4rem;
+  height: 4.4rem;
+  transform: translateY(-50%);
+  color: var(--ds-muted);
+}
+
+.dunas-header .header--dunas .search-modal .search__button .icon {
+  width: calc(var(--ds-input, 16px) * 0.5 + 1rem);
+  height: calc(var(--ds-input, 16px) * 0.5 + 1rem);
+}
+
+/* One close control, a small circle at the end of the input */
 .dunas-header .header--dunas .search-modal__close-button {
   position: absolute;
-  top: 1.7rem;
-  right: 1.7rem;
+  /* centred on the input row: panel padding + half the input height - half the button */
+  top: calc(var(--ds-pad-y) + var(--ds-input, 16px) + 1rem - 1.7rem);
+  right: calc(var(--ds-pad-x) + 0.9rem);
   z-index: 2;
   width: 3.4rem;
   height: 3.4rem;
   margin: 0;
   border: 0;
   border-radius: 50%;
-  background: rgba(var(--dunas-ink), 0.07);
-  color: rgba(var(--dunas-ink), 0.75);
+  background: var(--ds-control);
+  color: rgb(var(--ds-ink));
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.dunas-header .header--dunas .search-modal__close-button:active {
+  background: rgba(var(--ds-ink), 0.14);
 }
 
 @media (hover: hover) {
   .dunas-header .header--dunas .search-modal__close-button:hover {
-    border-color: rgb(var(--dunas-ink));
-    background: rgb(var(--dunas-ink));
-    color: rgb(var(--dunas-cream));
+    background: var(--ds-pill-bg);
+    color: var(--ds-pill-ink);
   }
 }
 
-.dunas-header .header--dunas .search-modal__close-button:active {
-  background: rgba(var(--dunas-ink), 0.08);
-}
-
 .dunas-header .header--dunas .search-modal__close-button:focus-visible {
-  outline: 0.2rem solid rgb(var(--dunas-ink));
+  outline: 0.2rem solid rgb(var(--ds-ink));
   outline-offset: 0.2rem;
 }
 
@@ -868,57 +1033,80 @@ body,
   color: currentColor;
 }
 
-/* Results live inside the panel and scroll there */
-.dunas-header .header--dunas .predictive-search {
-  position: static;
-  width: auto;
-  margin: 0.4rem 0 0;
-  max-height: calc(100vh - var(--dunas-header-pad-y) - 12rem);
-  max-height: calc(100dvh - var(--dunas-header-pad-y) - 12rem);
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(var(--dunas-ink), 0.2) transparent;
+/* ---- Popular searches (before typing) ---- */
+
+.dunas-search__popular {
+  flex: 0 0 auto;
+  padding: 1.6rem 0.8rem 0.6rem;
 }
 
-.dunas-header .header--dunas .predictive-search::-webkit-scrollbar {
-  width: 0.6rem;
+.dunas-header predictive-search[open] .dunas-search__popular,
+.dunas-header predictive-search[loading] .dunas-search__popular {
+  display: none;
 }
 
-.dunas-header .header--dunas .predictive-search::-webkit-scrollbar-thumb {
-  border-radius: 1rem;
-  background: rgba(var(--dunas-ink), 0.2);
+.dunas-search__popular-label {
+  margin: 0 0 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--ds-muted);
 }
 
-.dunas-header .header--dunas .predictive-search__results-groups-wrapper {
-  border-bottom: 0;
-  padding-bottom: 0.4rem;
+.dunas-search__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin: 0;
 }
+
+.dunas-search__chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 3.6rem;
+  padding: 0 1.6rem;
+  border-radius: 10rem;
+  background: var(--ds-chip);
+  color: rgb(var(--ds-ink));
+  font-size: 1.3rem;
+  text-decoration: none;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+@media (hover: hover) {
+  .dunas-search__chip:hover {
+    background: var(--ds-pill-bg);
+    color: var(--ds-pill-ink);
+  }
+}
+
+.dunas-search__chip:focus-visible {
+  outline: 0.2rem solid rgb(var(--ds-ink));
+  outline-offset: 0.2rem;
+}
+
+/* ---- Results: headings + rows ---- */
 
 .dunas-header .header--dunas .predictive-search__heading {
   margin: 0 1.2rem;
   padding: 1.6rem 0 0.8rem;
-  border-bottom: 0.1rem solid rgba(255, 255, 255, 0.55);
+  border-bottom: 0.1rem solid var(--ds-rule);
   font-family: var(--font-body-family);
   font-size: 1.2rem;
   font-weight: 600;
   letter-spacing: 0;
   text-transform: none;
-  color: rgba(var(--dunas-ink), 0.55);
+  color: var(--ds-muted);
 }
 
-.dunas-header .header--dunas .predictive-search__list-item:first-child {
+.dunas-header .header--dunas .predictive-search__results-list {
   margin-top: 0.6rem;
 }
 
 .dunas-header .header--dunas .predictive-search__item {
   padding: 0.8rem 1.2rem;
-  border-radius: 1.4rem;
-  color: rgb(var(--dunas-ink));
+  border-radius: calc(var(--ds-radius, 28px) / 2);
+  color: rgb(var(--ds-ink));
   transition: background-color 150ms ease;
 }
 
@@ -926,29 +1114,29 @@ body,
 .dunas-header .header--dunas .predictive-search__list-item:hover > *,
 .dunas-header .header--dunas .predictive-search__item[aria-selected='true'],
 .dunas-header .header--dunas .predictive-search__item:hover {
-  background-color: rgba(255, 255, 255, 0.55);
-  color: rgb(var(--dunas-ink));
+  background-color: var(--ds-hover);
+  color: rgb(var(--ds-ink));
 }
 
 .dunas-header .header--dunas .predictive-search__list-item[aria-selected='true'] .predictive-search__item-heading,
 .dunas-header .header--dunas .predictive-search__list-item:hover .predictive-search__item-heading {
   text-decoration: none;
-  color: rgb(var(--dunas-ink));
+  color: rgb(var(--ds-ink));
 }
 
 .dunas-header .header--dunas .predictive-search__item--link-with-thumbnail {
-  grid-template-columns: 5.2rem 1fr;
+  grid-template-columns: var(--ds-thumb, 52px) 1fr;
   grid-column-gap: 1.4rem;
   align-items: center;
 }
 
 .dunas-header .header--dunas .predictive-search__image {
-  width: 5.2rem;
-  height: 5.2rem;
+  width: var(--ds-thumb, 52px);
+  height: var(--ds-thumb, 52px);
   object-fit: cover;
   border-radius: 1rem;
   background: #fff;
-  border: 0.1rem solid rgba(255, 255, 255, 0.9);
+  border: 0.1rem solid var(--ds-rule);
 }
 
 .dunas-header .header--dunas .predictive-search__item-heading {
@@ -957,55 +1145,117 @@ body,
   font-weight: 500;
   line-height: 1.4;
   letter-spacing: 0;
+  color: rgb(var(--ds-ink));
+}
+
+.dunas-header .header--dunas .predictive-search__item-vendor {
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+  color: var(--ds-muted);
 }
 
 .dunas-header .header--dunas .predictive-search__item-query-result *:not(mark) {
   font-weight: 600;
 }
 
-.dunas-header .header--dunas .predictive-search__item .price {
+.dunas-header .header--dunas .predictive-search__item .price,
+.dunas-header .header--dunas .predictive-search__item .price-item {
   margin-top: 0.2rem;
   font-size: 1.3rem;
   font-weight: 400;
   letter-spacing: 0;
-  color: rgba(var(--dunas-ink), 0.6);
+  color: var(--ds-muted);
 }
 
 .dunas-header .header--dunas .predictive-search__item .price .price-item--sale {
-  color: rgb(var(--dunas-ink));
+  color: rgb(var(--ds-ink));
 }
 
-/* "Search for ..." : a full-width outlined pill, filled on hover */
+/* Columns (list rows and cards) */
+.dunas-header .header--dunas .predictive-search__results-list {
+  display: grid;
+  grid-template-columns: repeat(var(--ds-cols-m, 1), minmax(0, 1fr));
+  gap: 0.2rem 0.8rem;
+}
+
+#predictive-search-results-queries-list,
+#predictive-search-results-pages-list,
+#predictive-search-results-pages-list-mobile {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+@media screen and (min-width: 990px) {
+  .dunas-header .header--dunas .predictive-search__results-list {
+    grid-template-columns: repeat(var(--ds-cols, 2), minmax(0, 1fr));
+  }
+}
+
+/* Image cards: picture on top, name and price under it */
+.dunas-header .dunas-search--cards .predictive-search__results-list {
+  gap: 1.2rem;
+  padding: 0.4rem 0.4rem 0;
+}
+
+.dunas-header .dunas-search--cards .predictive-search__item--link-with-thumbnail {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+  padding: 0.8rem;
+}
+
+.dunas-header .dunas-search--cards .predictive-search__image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  border-radius: calc(var(--ds-radius, 28px) / 2);
+}
+
+.dunas-header .dunas-search--cards .predictive-search__item-content {
+  padding: 0 0.4rem 0.4rem;
+}
+
+/* ---- "Search for ..." : a rounded pill below the scroll area ---- */
+
 .dunas-header .header--dunas .predictive-search__search-for-button {
-  display: block;
-  padding: 0.8rem 0 0;
-  border-top: 0.1rem solid rgba(255, 255, 255, 0.55);
-  margin: 0.4rem 0 0;
+  position: static;
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  padding: 1rem 0 0;
+  border-top: 0.1rem solid var(--ds-rule);
+  background: transparent;
+}
+
+.dunas-header .dunas-search--no-search-for .predictive-search__search-for-button {
+  display: none !important;
 }
 
 .dunas-header .header--dunas .predictive-search__item--term {
   justify-content: center;
   gap: 0.8rem;
+  width: 100%;
   min-height: 4.8rem;
-  padding: 1rem 2rem;
-  border: 0.1rem solid rgba(255, 255, 255, 0.85);
+  padding: 1rem 2.8rem;
+  border: 0;
   border-radius: 10rem;
-  background: rgba(255, 255, 255, 0.5);
-  color: rgb(var(--dunas-ink));
+  background: var(--ds-pill-bg);
+  color: var(--ds-pill-ink);
   font-family: var(--font-body-family);
   font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   word-break: normal;
-  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+  transition: opacity 150ms ease;
 }
 
 .dunas-header .header--dunas .predictive-search__item--term:hover,
 .dunas-header .header--dunas .predictive-search__item--term[aria-selected='true'] {
-  border-color: rgb(var(--dunas-ink));
-  background: rgb(var(--dunas-ink));
-  color: rgb(var(--dunas-cream));
+  background: var(--ds-pill-bg);
+  color: var(--ds-pill-ink);
+  opacity: 0.88;
 }
 
 .dunas-header .header--dunas .predictive-search__item--term .icon-arrow {
@@ -1018,6 +1268,29 @@ body,
   background: transparent;
   color: inherit;
   font-weight: inherit;
+}
+
+@media screen and (min-width: 990px) {
+  .dunas-header .header--dunas .predictive-search__item--term {
+    width: auto;
+  }
+}
+
+/* ---- Full screen extras: bigger type, more air ---- */
+
+@media screen and (min-width: 990px) {
+  .dunas-header .dunas-search--fullscreen .predictive-search__heading {
+    margin: 0 1.2rem;
+    padding-top: 2.4rem;
+  }
+
+  .dunas-header .dunas-search--fullscreen .dunas-search__popular {
+    padding: 3.2rem 0.4rem 0;
+  }
+
+  .dunas-header .dunas-search--fullscreen .predictive-search__result-group:first-child {
+    flex-basis: 28rem;
+  }
 }
 
 /* ---------- Menu drawer: floating card under the pill ---------- */

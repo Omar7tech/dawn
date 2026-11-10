@@ -7,6 +7,20 @@
   {% render 'header-search', input_id: 'Search-In-Modal' %}
 {% enddoc %}
 
+{%- liquid
+  assign ds_types = 'product'
+  if settings.dunas_search_show_suggestions
+    assign ds_types = ds_types | append: ',query,collection'
+  endif
+  if settings.dunas_search_show_pages
+    assign ds_types = ds_types | append: ',page,article'
+  endif
+  assign ds_dim = settings.dunas_search_dim | divided_by: 100.0
+  assign ds_placeholder = 'general.search.search' | t
+  if settings.dunas_search_placeholder != blank
+    assign ds_placeholder = settings.dunas_search_placeholder
+  endif
+-%}
 <details-modal class="header__search">
   <details>
     <summary
@@ -24,7 +38,8 @@
       </span>
     </summary>
     <div
-      class="search-modal modal__content gradient"
+      class="search-modal modal__content gradient dunas-search dunas-search--{{ settings.dunas_search_style | default: 'glass' }} dunas-search--{{ settings.dunas_search_layout | default: 'panel' }} dunas-search--{{ settings.dunas_search_results | default: 'list' }}{% unless settings.dunas_search_show_search_for %} dunas-search--no-search-for{% endunless %}"
+      style="--ds-width: {{ settings.dunas_search_width | default: 840 }}px; --ds-radius: {{ settings.dunas_search_radius | default: 28 }}px; --ds-glass-blur: {{ settings.dunas_search_glass_blur | default: 28 }}px; --ds-dim: {{ ds_dim }}; --ds-page-blur: {{ settings.dunas_search_page_blur | default: 0 }}px; --ds-thumb: {{ settings.dunas_search_thumb | default: 52 }}px; --ds-input: {{ settings.dunas_search_input_size | default: 16 }}px; --ds-cols: {{ settings.dunas_search_columns | default: 2 }}; --ds-cols-m: {{ settings.dunas_search_columns_mobile | default: 1 }};"
       role="dialog"
       aria-modal="true"
       aria-label="{{ 'general.search.search' | t }}"
@@ -35,7 +50,12 @@
         tabindex="-1"
       >
         {%- if settings.predictive_search_enabled -%}
-          <predictive-search class="search-modal__form" data-loading-text="{{ 'accessibility.loading' | t }}">
+          <predictive-search
+            class="search-modal__form"
+            data-loading-text="{{ 'accessibility.loading' | t }}"
+            data-dunas-limit="{{ settings.dunas_search_limit | default: 10 }}"
+            data-dunas-types="{{ ds_types }}"
+          >
         {%- else -%}
           <search-form class="search-modal__form">
         {%- endif -%}
@@ -47,7 +67,7 @@
               type="search"
               name="q"
               value="{{ search.terms | escape }}"
-              placeholder="{{ 'general.search.search' | t }}"
+              placeholder="{{ ds_placeholder | escape }}"
               {%- if settings.predictive_search_enabled -%}
                 role="combobox"
                 aria-expanded="false"
@@ -87,6 +107,30 @@
             <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
           {%- endif -%}
         </form>
+        {%- if settings.dunas_search_popular != blank -%}
+          <div class="dunas-search__popular">
+            {%- if settings.dunas_search_popular_label != blank -%}
+              <p class="dunas-search__popular-label">{{ settings.dunas_search_popular_label | escape }}</p>
+            {%- endif -%}
+            <ul class="dunas-search__chips list-unstyled" role="list">
+              {%- assign ds_terms = settings.dunas_search_popular | split: ',' -%}
+              {%- for term in ds_terms -%}
+                {%- assign term_clean = term | strip -%}
+                {%- if term_clean != blank -%}
+                  <li>
+                    <a
+                      class="dunas-search__chip"
+                      href="{{ routes.search_url }}?q={{ term_clean | url_encode }}"
+                      data-dunas-search-term="{{ term_clean | escape }}"
+                    >
+                      {{- term_clean | escape -}}
+                    </a>
+                  </li>
+                {%- endif -%}
+              {%- endfor -%}
+            </ul>
+          </div>
+        {%- endif -%}
         {%- if settings.predictive_search_enabled -%}
           </predictive-search>
         {%- else -%}
@@ -105,3 +149,18 @@
     </div>
   </details>
 </details-modal>
+{%- if settings.dunas_search_popular != blank and settings.predictive_search_enabled -%}
+  <script>
+    document.addEventListener('click', function (event) {
+      var chip = event.target.closest('[data-dunas-search-term]');
+      if (!chip) return;
+      var form = chip.closest('.search-modal__content');
+      var input = form && form.querySelector('input[type="search"]');
+      if (!input) return;
+      event.preventDefault();
+      input.value = chip.getAttribute('data-dunas-search-term');
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.focus();
+    });
+  </script>
+{%- endif -%}
