@@ -19,8 +19,7 @@
         "padding_top": 20,
         "padding_bottom": 20,
         "dunas_overlay_home": true,
-        "dunas_show_locale": true,
-        "dunas_login_label": "Login"
+        "dunas_show_locale": true
       }
     }
   },

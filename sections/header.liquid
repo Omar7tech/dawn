@@ -189,57 +189,34 @@
     </div>
 
     <div class="header__center">
-      {%- if dunas_overlay -%}
-        <h1 class="visually-hidden">{{ shop.name }}</h1>
-        {%- if shop.customer_accounts_enabled -%}
-          <a
-            href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
-            class="header__account link focus-inset"
-          >
-            <span class="svg-wrapper" aria-hidden="true">{{ 'icon-account.svg' | inline_asset_content }}</span>
-            {%- if customer -%}
-              {{ 'customer.account.title' | t }}
-            {%- elsif section.settings.dunas_login_label != blank -%}
-              {{ section.settings.dunas_login_label | escape }}
-            {%- else -%}
-              {{ 'customer.log_in' | t }}
-            {%- endif -%}
-          </a>
+      {%- if request.page_type == 'index' -%}
+        <h1 class="header__heading">
+      {%- endif -%}
+      <a href="{{ routes.root_url }}" class="header__brand header__heading-link link focus-inset">
+        {%- if settings.logo != blank -%}
+          {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
+          {{
+            settings.logo
+            | image_url: width: 600
+            | image_tag:
+              class: 'header__heading-logo',
+              widths: '150, 300, 450',
+              width: settings.logo_width,
+              alt: logo_alt,
+              sizes: '(min-width: 990px) 150px, 120px',
+              preload: true
+          }}
         {%- else -%}
-          <a href="{{ routes.root_url }}" class="header__brand link focus-inset">
-            {%- render 'dunas-logo' -%}
-          </a>
+          {%- render 'dunas-logo' -%}
         {%- endif -%}
-      {%- else -%}
-        {%- if request.page_type == 'index' -%}
-          <h1 class="header__heading">
-        {%- endif -%}
-        <a href="{{ routes.root_url }}" class="header__brand header__heading-link link focus-inset">
-          {%- if settings.logo != blank -%}
-            {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
-            {{
-              settings.logo
-              | image_url: width: 600
-              | image_tag:
-                class: 'header__heading-logo',
-                widths: '150, 300, 450',
-                width: settings.logo_width,
-                alt: logo_alt,
-                sizes: '(min-width: 990px) 150px, 120px',
-                preload: true
-            }}
-          {%- else -%}
-            {%- render 'dunas-logo' -%}
-          {%- endif -%}
-        </a>
-        {%- if request.page_type == 'index' -%}
-          </h1>
-        {%- endif -%}
+      </a>
+      {%- if request.page_type == 'index' -%}
+        </h1>
       {%- endif -%}
     </div>
 
     <div class="header__icons">
-      {%- if shop.customer_accounts_enabled and dunas_overlay == false -%}
+      {%- if shop.customer_accounts_enabled -%}
         <a
           href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
           class="header__icon header__icon--account link focus-inset small-hide"
@@ -527,12 +504,6 @@
       "id": "dunas_show_locale",
       "default": true,
       "label": "Show language code next to menu"
-    },
-    {
-      "type": "text",
-      "id": "dunas_login_label",
-      "default": "Login",
-      "label": "Login label"
     },
     {
       "type": "select",

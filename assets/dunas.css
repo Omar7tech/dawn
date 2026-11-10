@@ -156,13 +156,29 @@
   max-width: var(--page-width);
   margin: 0 auto;
   padding: 0 1.2rem 0 1.6rem;
+  /*
+    No filter/backdrop-filter on the pill itself: that would trap the menu's
+    full-screen backdrop and fixed panel inside the pill. The glass lives on ::before.
+  */
+  position: relative;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+
+.header-wrapper.dunas-header .header.header--dunas::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   border-radius: 10rem;
   border: 0.1rem solid rgba(var(--color-foreground), 0.14);
   background: rgba(var(--color-background), 0.78);
   -webkit-backdrop-filter: blur(1.6rem) saturate(150%);
   backdrop-filter: blur(1.6rem) saturate(150%);
   box-shadow: 0 0.8rem 2.4rem rgba(var(--dunas-ink), 0.06);
-  transition: background-color 350ms var(--dunas-ease), border-color 350ms var(--dunas-ease);
+  transition: background 350ms var(--dunas-ease), border-color 350ms var(--dunas-ease);
 }
 
 @media screen and (min-width: 990px) {
@@ -225,29 +241,6 @@
   .header--dunas .header__locale {
     margin-top: 1.4rem;
   }
-}
-
-.header--dunas .header__account {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: rgb(var(--color-foreground));
-  text-decoration: none;
-  font-family: var(--font-heading-family);
-  font-size: 1.9rem;
-  font-weight: 300;
-  letter-spacing: 0.01em;
-  padding: 0.6rem 0.8rem;
-}
-
-.header--dunas .header__account .svg-wrapper {
-  width: 2.2rem;
-  height: 2.2rem;
-}
-
-.header--dunas .header__account svg {
-  width: 2.2rem;
-  height: 2.2rem;
 }
 
 .header--dunas .header__brand {
@@ -353,19 +346,22 @@
   margin-bottom: calc(-1 * var(--dunas-header-total));
 }
 
-.header-wrapper.dunas-header--overlay .header.header--dunas {
+.header-wrapper.dunas-header--overlay .header.header--dunas::before {
   background: linear-gradient(100deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04)),
     rgba(var(--dunas-ink), 0.16);
   border-color: rgba(255, 255, 255, 0.55);
   box-shadow: inset 0 0.1rem 0 rgba(255, 255, 255, 0.3), 0 0.8rem 2.4rem rgba(0, 0, 0, 0.08);
+}
+
+.header-wrapper.dunas-header--overlay .header.header--dunas > .header__left,
+.header-wrapper.dunas-header--overlay .header.header--dunas > .header__center,
+.header-wrapper.dunas-header--overlay .header.header--dunas > .header__icons {
   text-shadow: 0 0.1rem 0.6rem rgba(0, 0, 0, 0.18);
 }
 
 @media screen and (min-width: 990px) {
   .header--dunas .header__icon .svg-wrapper,
-  .header--dunas .header__icon svg,
-  .header--dunas .header__account .svg-wrapper,
-  .header--dunas .header__account svg {
+  .header--dunas .header__icon svg {
     width: 2.4rem;
     height: 2.4rem;
   }
@@ -376,10 +372,6 @@
     height: 4rem;
   }
 
-  .header--dunas .header__account {
-    font-size: 2.1rem;
-  }
-
   .header--dunas .header__locale {
     font-size: 1.3rem;
   }
@@ -387,8 +379,7 @@
 
 .dunas-header--overlay .header--dunas > .header__left > .header__locale,
 .dunas-header--overlay .header--dunas > .header__left header-drawer > details > .header__icon,
-.dunas-header--overlay .header--dunas > .header__center > .header__account,
-.dunas-header--overlay .header--dunas > .header__center > .header__brand,
+.dunas-header--overlay .header--dunas > .header__center .header__brand,
 .dunas-header--overlay .header--dunas > .header__icons > .header__icon,
 .dunas-header--overlay .header--dunas > .header__icons > details-modal > details > .header__icon {
   color: #fff;
@@ -410,9 +401,9 @@
 }
 
 /* Once the visitor scrolls past the hero, the pill turns to frosted brand green */
-.scrolled-past-header .dunas-header--overlay .header.header--dunas,
-.menu-open .dunas-header--overlay .header.header--dunas {
-  background: rgba(var(--dunas-green), 0.82);
+.scrolled-past-header .dunas-header--overlay .header.header--dunas::before,
+.menu-open .dunas-header--overlay .header.header--dunas::before {
+  background: rgba(var(--dunas-green), 0.86);
   border-color: rgba(255, 255, 255, 0.25);
 }
 
@@ -428,27 +419,95 @@
   padding: 0 1.6rem;
 }
 
-/* ---------- Menu drawer: a rounded cream panel under the pill ---------- */
+/* ---------- Menu drawer: floating card under the pill ---------- */
+
+/* Soft round focus ring for the pill's icon buttons instead of Dawn's square inset outline */
+.header--dunas .header__icon.focus-inset:focus-visible,
+.header--dunas .header__brand.focus-inset:focus-visible {
+  outline: none;
+  border-radius: 10rem;
+  box-shadow: 0 0 0 0.2rem rgba(var(--color-foreground), 0.35);
+}
+
+.dunas-header--overlay .header--dunas .header__icon.focus-inset:focus-visible,
+.dunas-header--overlay .header--dunas .header__brand.focus-inset:focus-visible {
+  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.6);
+}
+
+/* Full-screen soft backdrop (replaces Dawn's hard-edged grey box) */
+.dunas-header .header__icon--menu[aria-expanded='true']::before {
+  position: fixed;
+  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  background: rgba(var(--dunas-ink), 0.28);
+  -webkit-backdrop-filter: blur(0.6rem);
+  backdrop-filter: blur(0.6rem);
+  animation: dunas-fade-in 350ms ease both;
+}
 
 .js .dunas-header .menu-drawer {
-  margin-top: 0.8rem;
-  height: calc(var(--viewport-height, 100vh) - var(--header-bottom-position, 100%) - 2rem);
-  border-radius: 2.4rem;
-  border: 0.1rem solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 2.4rem 6rem rgba(var(--dunas-ink), 0.18);
+  --dunas-drawer-top: calc(var(--header-bottom-position, 8rem) - var(--dunas-header-pad-y) + 1rem);
+  position: fixed;
+  top: var(--dunas-drawer-top);
+  left: 1.6rem;
+  right: 1.6rem;
+  width: auto;
+  height: auto;
+  max-height: calc(100vh - var(--dunas-drawer-top) - 1.6rem);
+  max-height: calc(100dvh - var(--dunas-drawer-top) - 1.6rem);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 2.8rem;
+  border: 0.1rem solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 3rem 8rem -1.6rem rgba(var(--dunas-ink), 0.35);
   filter: none;
+  opacity: 0;
+  transform: translateY(-1.2rem) scale(0.98);
+  transform-origin: top center;
+  transition: opacity 250ms ease, transform 450ms var(--dunas-ease), visibility 0s linear 450ms;
+}
+
+.js .dunas-header details[open].menu-opening > .menu-drawer {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  transition: opacity 250ms ease, transform 450ms var(--dunas-ease), visibility 0s;
+}
+
+.dunas-header .menu-drawer__inner-container {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.dunas-header .menu-drawer__navigation-container {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
 }
 
 .dunas-header .menu-drawer__submenu {
-  border-radius: 2.4rem;
+  border-radius: 0;
 }
 
 .dunas-header .menu-drawer__navigation {
-  padding: 2.4rem 0 1.6rem;
+  padding: 1.6rem 0 2.4rem;
+}
+
+.dunas-header .menu-drawer__menu > li {
+  margin: 0 2rem;
 }
 
 .dunas-header .menu-drawer__menu > li + li {
-  border-top: 0.1rem solid rgba(var(--color-foreground), 0.07);
+  border-top: 0.1rem solid rgba(var(--color-foreground), 0.08);
 }
 
 .dunas-header .menu-drawer__menu-item {
@@ -457,23 +516,25 @@
   font-weight: 300;
   letter-spacing: 0.01em;
   line-height: 1.2;
-  padding: 1.6rem 2.8rem;
+  padding: 1.7rem 0.8rem;
   position: relative;
   color: rgb(var(--color-foreground));
-  transition: color 250ms ease, padding-left 350ms var(--dunas-ease);
+  background-color: transparent;
+  transition: color 250ms ease, padding-left 400ms var(--dunas-ease);
 }
 
 .dunas-header .menu-drawer__menu-item:hover,
+.dunas-header .menu-drawer__menu-item:focus-visible,
 .dunas-header .menu-drawer__menu-item--active {
   color: rgb(var(--dunas-green));
   background-color: transparent;
-  padding-left: 3.4rem;
+  padding-left: 2.2rem;
 }
 
 .dunas-header .menu-drawer__menu-item--active::before {
   content: '';
   position: absolute;
-  left: 2.2rem;
+  left: 0.6rem;
   top: 50%;
   width: 0.6rem;
   height: 0.6rem;
@@ -483,26 +544,34 @@
 }
 
 .dunas-header .menu-drawer__menu-item .svg-wrapper {
-  color: rgba(var(--color-foreground), 0.5);
+  color: rgba(var(--color-foreground), 0.45);
+  right: 0.4rem;
 }
 
 .dunas-header .menu-drawer__close-button {
   font-family: var(--font-body-family);
   font-size: 1.3rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  padding: 1.6rem 2.8rem;
+  padding: 2rem 2.8rem 1.2rem;
+  margin: 0;
+  background: transparent;
+  color: rgba(var(--color-foreground), 0.7);
 }
 
 .dunas-header .menu-drawer__utility-links {
-  padding: 2rem 2.8rem 2.4rem;
+  padding: 1.8rem 2.8rem 2rem;
   margin: 0;
-  background-color: rgba(var(--dunas-green), 0.07);
+  background-color: rgba(var(--dunas-green), 0.08);
+  border-top: 0.1rem solid rgba(var(--dunas-green), 0.08);
 }
 
 .dunas-header .menu-drawer__account {
   font-family: var(--font-body-family);
   font-size: 1.5rem;
+  padding: 0.6rem 0;
+  margin-bottom: 0.4rem;
 }
 
 .dunas-header .menu-drawer__localization {
@@ -514,8 +583,54 @@
   padding-left: 0;
 }
 
+.dunas-header .menu-drawer__utility-links .list-social {
+  margin-left: -1.2rem;
+}
+
+@keyframes dunas-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dunas-menu-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.2rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dunas-header details.menu-opening > .menu-drawer .menu-drawer__navigation > .menu-drawer__menu > li {
+    animation: dunas-menu-item-in 600ms var(--dunas-ease) both;
+  }
+
+  .dunas-header details.menu-opening > .menu-drawer .menu-drawer__navigation > .menu-drawer__menu > li:nth-child(1) { animation-delay: 80ms; }
+  .dunas-header details.menu-opening > .menu-drawer .menu-drawer__navigation > .menu-drawer__menu > li:nth-child(2) { animation-delay: 130ms; }
+  .dunas-header details.menu-opening > .menu-drawer .menu-drawer__navigation > .menu-drawer__menu > li:nth-child(3) { animation-delay: 180ms; }
+  .dunas-header details.menu-opening > .menu-drawer .menu-drawer__navigation > .menu-drawer__menu > li:nth-child(4) { animation-delay: 230ms; }
+  .dunas-header details.menu-opening > .menu-drawer .menu-drawer__navigation > .menu-drawer__menu > li:nth-child(5) { animation-delay: 280ms; }
+  .dunas-header details.menu-opening > .menu-drawer .menu-drawer__navigation > .menu-drawer__menu > li:nth-child(n + 6) { animation-delay: 330ms; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .dunas-header .menu-drawer {
+    transform: none;
+  }
+}
+
+/* Drawer-only desktop menu: a narrower card on the left */
 @media screen and (min-width: 750px) {
   .js .dunas-header .menu-drawer {
+    left: max(3.2rem, calc((100vw - var(--page-width)) / 2 + 3.2rem));
+    right: auto;
     width: 42rem;
   }
 }
