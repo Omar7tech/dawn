@@ -1,0 +1,42 @@
+{{ 'section-dunas-brand-block.css' | asset_url | stylesheet_tag }}
+
+{%- assign tagline = section.settings.tagline | escape | newline_to_br -%}
+
+<section class="dunas-brand color-{{ section.settings.color_scheme }} gradient">
+  <div class="dunas-brand__inner page-width">
+    {%- if section.settings.tagline != blank -%}
+      <p class="dunas-brand__tagline dunas-display">{{ tagline }}</p>
+    {%- endif -%}
+    <div class="dunas-brand__logo">
+      {%- render 'dunas-logo', vertical: true -%}
+    </div>
+  </div>
+</section>
+
+
+{% schema %}
+{
+  "name": "DUNAS brand block",
+  "tag": "div",
+  "class": "section-dunas-brand",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Every Skin.\nEvery Day."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-3"
+    }
+  ],
+  "presets": [
+    {
+      "name": "DUNAS brand block"
+    }
+  ]
+}
+{% endschema %}

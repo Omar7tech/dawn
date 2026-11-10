@@ -143,6 +143,17 @@
         "unit": "%",
         "label": "t:settings_schema.typography.settings.body_scale.label",
         "default": 100
+      },
+      {
+        "type": "header",
+        "content": "DUNAS display font"
+      },
+      {
+        "type": "checkbox",
+        "id": "dunas_use_antipasto",
+        "default": false,
+        "label": "Use Antipasto Pro for display headlines",
+        "info": "Turn on only after uploading licensed web font files named antipasto-pro-extralight.woff2 and antipasto-pro-light.woff2 to Content > Files. Otherwise the heading font above is used."
       }
     ]
   },

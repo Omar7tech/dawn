@@ -1,0 +1,158 @@
+.dunas-hero {
+  position: relative;
+  max-width: 100%;
+  isolation: isolate;
+  min-height: 100vh;
+  min-height: 100svh;
+  color: #fff;
+  overflow: hidden;
+  background: rgb(var(--color-background));
+}
+
+.dunas-hero__media,
+.dunas-hero__media picture {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.dunas-hero__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--dunas-hero-focus, 50% 30%);
+}
+
+.dunas-hero__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, calc(var(--dunas-hero-overlay) + 0.08)) 0%,
+      rgba(0, 0, 0, 0) 30%,
+      rgba(0, 0, 0, 0) 55%,
+      rgba(0, 0, 0, calc(var(--dunas-hero-overlay) + 0.18)) 100%
+    ),
+    rgba(0, 0, 0, var(--dunas-hero-overlay));
+}
+
+.dunas-hero__inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto 1fr auto auto;
+  grid-template-areas:
+    'tagline tagline'
+    '. logo'
+    'text logo'
+    'button button';
+  column-gap: 1.6rem;
+  min-height: inherit;
+  padding: calc(var(--dunas-header-total, 8rem) + 2rem) 1.6rem 3.2rem 2.4rem;
+  max-width: var(--page-width);
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.dunas-hero__tagline {
+  grid-area: tagline;
+  font-size: clamp(3.6rem, 10vw, 9.6rem);
+  max-width: 14ch;
+  color: #fff;
+}
+
+.dunas-hero__logo {
+  grid-area: logo;
+  align-self: end;
+  justify-self: end;
+  margin-top: 2.4rem;
+  color: #fff;
+}
+
+.dunas-hero__logo .dunas-logo {
+  display: block;
+  height: min(90vw, 50vh);
+  width: auto;
+  overflow: visible;
+}
+
+.dunas-hero__bottom {
+  display: contents;
+}
+
+.dunas-hero__text {
+  grid-area: text;
+  align-self: end;
+  margin: 0 0 0.4rem;
+  font-family: var(--font-body-family);
+  font-weight: 300;
+  font-size: clamp(2rem, 5.6vw, 3.4rem);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  color: #fff;
+}
+
+.dunas-hero .dunas-hero__button {
+  grid-area: button;
+  width: 100%;
+  margin-top: 3.2rem;
+  min-height: 6rem;
+  font-size: clamp(1.7rem, 4.8vw, 2rem);
+}
+
+@media screen and (min-width: 750px) {
+  .dunas-hero__inner {
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      'tagline logo'
+      '. logo'
+      'bottom logo';
+    column-gap: 4rem;
+    padding: calc(var(--dunas-header-total, 10rem) + 4.8rem) 5rem 6.4rem;
+  }
+
+  .dunas-hero__logo {
+    margin: 0;
+  }
+
+  .dunas-hero__logo .dunas-logo {
+    height: min(76vh, 72rem);
+  }
+
+  .dunas-hero__bottom {
+    grid-area: bottom;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3.2rem;
+    max-width: 52rem;
+  }
+
+  .dunas-hero__text {
+    align-self: auto;
+    margin: 0;
+  }
+
+  .dunas-hero .dunas-hero__button {
+    width: auto;
+    margin-top: 0;
+    padding-left: 5.6rem;
+    padding-right: 5.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dunas-hero__img {
+    animation: dunas-hero-settle 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes dunas-hero-settle {
+    from {
+      transform: scale(1.06);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+}

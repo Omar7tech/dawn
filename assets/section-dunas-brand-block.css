@@ -1,0 +1,48 @@
+.dunas-brand {
+  overflow: hidden;
+}
+
+.dunas-brand__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 2.4rem;
+  min-height: min(150vw, 96rem);
+  padding-top: 12rem;
+  padding-bottom: 3.2rem;
+  box-sizing: border-box;
+  color: rgb(var(--color-foreground));
+}
+
+.dunas-brand__tagline {
+  font-size: clamp(3.6rem, 10vw, 8rem);
+  text-align: left;
+}
+
+.dunas-brand__logo {
+  margin-right: -0.4rem;
+}
+
+.dunas-brand__logo .dunas-logo {
+  display: block;
+  width: auto;
+  height: min(92vw, 64rem);
+  overflow: visible;
+}
+
+@media screen and (min-width: 750px) {
+  .dunas-brand__inner {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 5.6rem;
+    min-height: 72rem;
+    padding-top: 10rem;
+    padding-bottom: 8rem;
+  }
+
+  .dunas-brand__tagline {
+    margin-bottom: auto;
+    margin-top: auto;
+  }
+}

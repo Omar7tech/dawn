@@ -1,0 +1,164 @@
+{{ 'section-dunas-product-showcase.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign showcase_collection = section.settings.collection
+  assign limit = section.settings.products_to_show
+  assign button_link = section.settings.button_link
+  if button_link == blank and showcase_collection != blank
+    assign button_link = showcase_collection.url
+  endif
+-%}
+
+<section
+  class="dunas-showcase color-{{ section.settings.color_scheme }} gradient"
+  style="--dunas-pad-top: {{ section.settings.padding_top }}px; --dunas-pad-bottom: {{ section.settings.padding_bottom }}px;"
+>
+  <div class="dunas-showcase__inner page-width">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="dunas-showcase__heading dunas-display">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+
+    <ul class="dunas-showcase__grid" role="list">
+      {%- if showcase_collection != blank and showcase_collection.products_count > 0 -%}
+        {%- for product in showcase_collection.products limit: limit -%}
+          <li class="dunas-showcase__item">
+            <a href="{{ product.url }}" class="dunas-showcase__card">
+              <span class="dunas-showcase__media">
+                {%- if product.featured_media -%}
+                  {%- assign media_alt = product.featured_media.alt | default: product.title | escape -%}
+                  {{
+                    product.featured_media
+                    | image_url: width: 1200
+                    | image_tag:
+                      widths: '360, 540, 720, 900, 1200',
+                      sizes: '(min-width: 990px) 25vw, 56vw',
+                      loading: 'lazy',
+                      alt: media_alt,
+                      class: 'dunas-showcase__img'
+                  }}
+                {%- else -%}
+                  {{ 'product-apparel-1' | placeholder_svg_tag: 'dunas-showcase__img placeholder-svg' }}
+                {%- endif -%}
+              </span>
+              <span class="dunas-showcase__info{% unless section.settings.show_info %} visually-hidden{% endunless %}">
+                <span class="dunas-showcase__title">{{ product.title | escape }}</span>
+                <span class="dunas-showcase__price">
+                  {%- if product.price_varies -%}
+                    {{ 'products.product.price.from_price_html' | t: price: product.price_min | money }}
+                  {%- else -%}
+                    {{ product.price | money }}
+                  {%- endif -%}
+                </span>
+              </span>
+            </a>
+          </li>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for i in (1..4) -%}
+          <li class="dunas-showcase__item">
+            <div class="dunas-showcase__card">
+              <span class="dunas-showcase__media">
+                {%- capture placeholder -%}product-{{ i }}{%- endcapture -%}
+                {{ placeholder | placeholder_svg_tag: 'dunas-showcase__img placeholder-svg' }}
+              </span>
+            </div>
+          </li>
+        {%- endfor -%}
+      {%- endif -%}
+    </ul>
+
+    {%- if section.settings.button_label != blank -%}
+      <div class="dunas-showcase__actions">
+        <a
+          {% if button_link != blank %}
+            href="{{ button_link }}"
+          {% else %}
+            role="link" aria-disabled="true"
+          {% endif %}
+          class="dunas-btn dunas-btn--muted dunas-showcase__button"
+        >
+          {{- section.settings.button_label | escape -}}
+        </a>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+
+{% schema %}
+{
+  "name": "DUNAS product showcase",
+  "tag": "div",
+  "class": "section-dunas-showcase",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "label": "Products to show",
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_info",
+      "label": "Show product name and price on cards",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Explore your skin need"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link",
+      "info": "Defaults to the selected collection."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 120
+    }
+  ],
+  "presets": [
+    {
+      "name": "DUNAS product showcase"
+    }
+  ]
+}
+{% endschema %}

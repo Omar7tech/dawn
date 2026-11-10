@@ -1,0 +1,113 @@
+{{ 'section-dunas-banner.css' | asset_url | stylesheet_tag }}
+
+{%- assign heading = section.settings.heading | escape | newline_to_br -%}
+
+<section
+  class="dunas-banner color-{{ section.settings.color_scheme }}{% if section.settings.overlap_previous %} dunas-banner--overlap{% endif %}"
+  style="--dunas-banner-overlay: {{ section.settings.overlay_opacity | divided_by: 100.0 }};"
+>
+  <div class="dunas-banner__card">
+    <div class="dunas-banner__media">
+      {%- if section.settings.image != blank -%}
+        {{
+          section.settings.image
+          | image_url: width: 2400
+          | image_tag:
+            widths: '600, 900, 1200, 1600, 2000, 2400',
+            sizes: '(min-width: 1200px) 1200px, 100vw',
+            loading: 'lazy',
+            class: 'dunas-banner__img'
+        }}
+      {%- else -%}
+        <img
+          src="{{ 'dunas-banner.jpg' | asset_url }}"
+          alt=""
+          width="1800"
+          height="1009"
+          loading="lazy"
+          class="dunas-banner__img"
+        >
+      {%- endif -%}
+    </div>
+
+    <div class="dunas-banner__content">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="dunas-banner__heading dunas-eyebrow">{{ heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.button_label != blank -%}
+        <a
+          {% if section.settings.button_link != blank %}
+            href="{{ section.settings.button_link }}"
+          {% else %}
+            role="link" aria-disabled="true"
+          {% endif %}
+          class="dunas-btn dunas-btn--light dunas-btn--block dunas-banner__button"
+        >
+          {{- section.settings.button_label | escape -}}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+
+{% schema %}
+{
+  "name": "DUNAS banner",
+  "tag": "div",
+  "class": "section-dunas-banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "Leave empty to use the DUNAS desert photo."
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "%",
+      "label": "Image overlay",
+      "default": 6
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Start with what\nyour skin needs\ntoday."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link",
+      "default": "/collections/all"
+    },
+    {
+      "type": "checkbox",
+      "id": "overlap_previous",
+      "label": "Overlap the section above",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "DUNAS banner"
+    }
+  ]
+}
+{% endschema %}

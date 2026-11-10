@@ -77,6 +77,32 @@
       {{ body_font_italic | font_face: font_display: 'swap' }}
       {{ body_font_bold_italic | font_face: font_display: 'swap' }}
       {{ settings.type_header_font | font_face: font_display: 'swap' }}
+      {%- liquid
+        assign dunas_display_font = settings.type_header_font | font_modify: 'weight', '200'
+        if dunas_display_font
+          echo dunas_display_font | font_face: font_display: 'swap'
+        endif
+        assign dunas_body_light = settings.type_body_font | font_modify: 'weight', '300'
+        if dunas_body_light
+          echo dunas_body_light | font_face: font_display: 'swap'
+        endif
+      -%}
+      {%- if settings.dunas_use_antipasto -%}
+        @font-face {
+          font-family: 'Antipasto Pro';
+          src: url('{{ 'antipasto-pro-extralight.woff2' | file_url }}') format('woff2');
+          font-weight: 200;
+          font-style: normal;
+          font-display: swap;
+        }
+        @font-face {
+          font-family: 'Antipasto Pro';
+          src: url('{{ 'antipasto-pro-light.woff2' | file_url }}') format('woff2');
+          font-weight: 300;
+          font-style: normal;
+          font-display: swap;
+        }
+      {%- endif -%}
 
       {% for scheme in settings.color_schemes -%}
         {% assign scheme_classes = scheme_classes | append: ', .color-' | append: scheme.id %}
@@ -132,6 +158,15 @@
         --font-heading-family: {{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }};
         --font-heading-style: {{ settings.type_header_font.style }};
         --font-heading-weight: {{ settings.type_header_font.weight }};
+
+        {%- if settings.dunas_use_antipasto %}
+          --dunas-display-font: 'Antipasto Pro', {{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }};
+          --dunas-display-weight: 200;
+        {%- elsif dunas_display_font %}
+          --dunas-display-weight: 200;
+        {%- else %}
+          --dunas-display-weight: {{ settings.type_header_font.weight }};
+        {%- endif %}
 
         --font-body-scale: {{ settings.body_scale | divided_by: 100.0 }};
         --font-heading-scale: {{ settings.heading_scale | times: 1.0 | divided_by: settings.body_scale }};
@@ -279,6 +314,7 @@
     {% endstyle %}
 
     {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'dunas.css' | asset_url | stylesheet_tag }}
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 
     {%- if settings.cart_type == 'drawer' -%}
