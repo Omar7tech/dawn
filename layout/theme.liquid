@@ -7,6 +7,24 @@
     <meta name="theme-color" content="">
     <link rel="canonical" href="{{ canonical_url }}">
 
+    {%- assign dunas_intro_mode = settings.dunas_intro | default: 'once_per_visit' -%}
+    {%- if request.design_mode == false -%}
+      {%- if dunas_intro_mode == 'once_per_visit' or dunas_intro_mode == 'first_visit' -%}
+        <script>
+          try {
+            {%- if dunas_intro_mode == 'once_per_visit' %}
+              if (sessionStorage.getItem('dunasIntroSeen')) document.documentElement.classList.add('dunas-skip-intro');
+            {%- else %}
+              var dunasSeenAt = Number(localStorage.getItem('dunasIntroSeenAt'));
+              if (dunasSeenAt && Date.now() - dunasSeenAt < {{ settings.dunas_intro_days | default: 30 }} * 86400000) {
+                document.documentElement.classList.add('dunas-skip-intro');
+              }
+            {%- endif %}
+          } catch (e) {}
+        </script>
+      {%- endif -%}
+    {%- endif -%}
+
     {%- if settings.favicon != blank -%}
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
       <link rel="apple-touch-icon" href="{{ settings.favicon | image_url: width: 180, height: 180 }}">
@@ -364,6 +382,7 @@
   </head>
 
   <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
+    {%- render 'dunas-intro' -%}
     <a class="skip-to-content-link button visually-hidden" href="#MainContent">
       {{ 'accessibility.skip_to_text' | t }}
     </a>

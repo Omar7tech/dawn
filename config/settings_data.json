@@ -190,7 +190,14 @@
             "color_scheme": "scheme-1"
           }
         }
-      }
+      },
+      "dunas_intro": "once_per_visit",
+      "dunas_intro_tagline": "Every Skin. Every Day.",
+      "dunas_intro_days": 30,
+      "dunas_intro_speed": "balanced",
+      "dunas_intro_bg": "#556361",
+      "dunas_intro_ink": "#F1EFE7",
+      "dunas_intro_logo_width": 340
     }
   }
 }

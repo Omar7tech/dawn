@@ -158,6 +158,107 @@
     ]
   },
   {
+    "name": "DUNAS intro",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "The animated DUNAS logo screen. Visitors can end it at any time with a tap, click, scroll or key press. It never shows inside the theme editor; preview your store to see it."
+      },
+      {
+        "type": "select",
+        "id": "dunas_intro",
+        "label": "When to show",
+        "options": [
+          {
+            "value": "once_per_visit",
+            "label": "Once per visit (recommended)"
+          },
+          {
+            "value": "first_visit",
+            "label": "First visit only"
+          },
+          {
+            "value": "home_page",
+            "label": "Every time the home page loads"
+          },
+          {
+            "value": "every_page",
+            "label": "On every page load"
+          },
+          {
+            "value": "off",
+            "label": "Off"
+          }
+        ],
+        "default": "once_per_visit",
+        "info": "Once per visit plays on the first page someone opens, then not again until they come back another day or reopen the browser."
+      },
+      {
+        "type": "range",
+        "id": "dunas_intro_days",
+        "label": "First visit only: show again after",
+        "min": 1,
+        "max": 90,
+        "step": 1,
+        "unit": "d",
+        "default": 30
+      },
+      {
+        "type": "select",
+        "id": "dunas_intro_speed",
+        "label": "Speed",
+        "options": [
+          {
+            "value": "quick",
+            "label": "Quick (about 2 seconds)"
+          },
+          {
+            "value": "balanced",
+            "label": "Balanced (about 3 seconds)"
+          },
+          {
+            "value": "relaxed",
+            "label": "Relaxed (about 4 seconds)"
+          }
+        ],
+        "default": "balanced"
+      },
+      {
+        "type": "header",
+        "content": "Look"
+      },
+      {
+        "type": "color",
+        "id": "dunas_intro_bg",
+        "label": "Background",
+        "default": "#556361"
+      },
+      {
+        "type": "color",
+        "id": "dunas_intro_ink",
+        "label": "Logo and text",
+        "default": "#F1EFE7"
+      },
+      {
+        "type": "range",
+        "id": "dunas_intro_logo_width",
+        "label": "Logo width",
+        "min": 200,
+        "max": 520,
+        "step": 20,
+        "unit": "px",
+        "default": 340
+      },
+      {
+        "type": "text",
+        "id": "dunas_intro_tagline",
+        "label": "Tagline",
+        "default": "Every Skin. Every Day.",
+        "info": "Leave empty to show only the logo."
+      }
+    ]
+  },
+  {
     "name": "t:settings_schema.layout.name",
     "settings": [
       {
