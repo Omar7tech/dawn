@@ -1,6 +1,8 @@
 <link rel="stylesheet" href="{{ 'component-list-menu.css' | asset_url }}" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="{{ 'component-search.css' | asset_url }}" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="{{ 'component-menu-drawer.css' | asset_url }}" media="print" onload="this.media='all'">
+{{ 'component-dunas-menu.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'dunas-menu.js' | asset_url }}" defer="defer"></script>
 <link
   rel="stylesheet"
   href="{{ 'component-cart-notification.css' | asset_url }}"
@@ -174,7 +176,7 @@
   >
     <div class="header__left">
       {%- if section.settings.menu != blank -%}
-        {%- render 'header-drawer',
+        {%- render 'dunas-menu',
           show_country_selector: country_selector,
           show_language_selector: language_selector,
           show_social_links: social_links
@@ -515,6 +517,13 @@
       "default": 22
     },
     {
+      "type": "text",
+      "id": "dunas_menu_tagline",
+      "default": "Every Skin. Every Day.",
+      "label": "Menu tagline",
+      "info": "Shown at the bottom of the full-screen menu. Leave empty to hide."
+    },
+    {
       "type": "checkbox",
       "id": "dunas_show_locale",
       "default": true,
@@ -561,7 +570,7 @@
           "label": "t:sections.header.settings.sticky_header_type.options__4.label"
         }
       ],
-      "default": "on-scroll-up",
+      "default": "always",
       "label": "t:sections.header.settings.sticky_header_type.label"
     },
     {

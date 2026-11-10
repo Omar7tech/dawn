@@ -1,0 +1,178 @@
+{% doc %}
+  DUNAS branded menu: a toggle button for the header pill plus a full-screen menu that
+  is revealed with a GSAP timeline (see assets/dunas-menu.js and component-dunas-menu.css).
+
+  @param {boolean} [show_country_selector] - Show the country/currency selector. Defaults to `false`.
+  @param {boolean} [show_language_selector] - Show the language selector. Defaults to `false`.
+  @param {boolean} [show_social_links] - Show social links. Defaults to `false`.
+  @param {object} [section] - The header section, supplied implicitly; used for the menu and tagline settings.
+
+  @example
+  {% render 'dunas-menu', show_country_selector: true, show_language_selector: false, show_social_links: true %}
+{% enddoc %}
+{%- assign menu = section.settings.menu -%}
+
+<button
+  type="button"
+  class="header__icon dunas-menu-toggle"
+  aria-expanded="false"
+  aria-controls="DunasMenu"
+  aria-label="{{ 'sections.header.menu' | t }}"
+>
+  <span class="svg-wrapper dunas-menu-toggle__icon" aria-hidden="true">
+    {{- 'icon-hamburger.svg' | inline_asset_content -}}
+  </span>
+</button>
+
+<div
+  id="DunasMenu"
+  class="dunas-menu"
+  role="dialog"
+  aria-modal="true"
+  aria-label="{{ 'sections.header.menu' | t }}"
+  hidden
+>
+  <div class="dunas-menu__panel"></div>
+
+  <div class="dunas-menu__mark" aria-hidden="true">
+    {%- render 'dunas-logo', vertical: true -%}
+  </div>
+
+  <div class="dunas-menu__inner">
+    <div class="dunas-menu__top">
+      <button type="button" class="dunas-menu__close" aria-label="{{ 'accessibility.close' | t }}">
+        <span class="dunas-menu__close-lines" aria-hidden="true"><span></span><span></span></span>
+      </button>
+      <a href="{{ routes.root_url }}" class="dunas-menu__brand">
+        {%- render 'dunas-logo' -%}
+      </a>
+      <a href="{{ routes.cart_url }}" class="dunas-menu__cart">
+        <span class="svg-wrapper" aria-hidden="true">{{ 'icon-cart-empty.svg' | inline_asset_content }}</span>
+        <span class="visually-hidden">{{ 'templates.cart.cart' | t }}</span>
+        {%- if cart.item_count > 0 -%}
+          <span class="dunas-menu__count" aria-hidden="true">{{ cart.item_count }}</span>
+        {%- endif -%}
+      </a>
+    </div>
+
+    <nav class="dunas-menu__nav" aria-label="{{ 'sections.header.menu' | t }}">
+      <ol class="dunas-menu__list" role="list">
+        {%- for link in menu.links -%}
+          <li class="dunas-menu__item{% if link.active or link.child_active %} is-active{% endif %}">
+            <div class="dunas-menu__row">
+              <span class="dunas-menu__num" aria-hidden="true">
+                {%- if forloop.index < 10 -%}0{%- endif -%}
+                {{- forloop.index -}}
+              </span>
+              <a
+                href="{{ link.url }}"
+                class="dunas-menu__link"
+                {% if link.current %}
+                  aria-current="page"
+                {% endif %}
+              >
+                <span class="dunas-menu__mask"><span class="dunas-menu__label">{{ link.title | escape }}</span></span>
+              </a>
+              {%- if link.links != blank -%}
+                <button
+                  type="button"
+                  class="dunas-menu__expand"
+                  aria-expanded="false"
+                  aria-controls="DunasMenuSub-{{ forloop.index }}"
+                  aria-label="{{ link.title | escape }}"
+                >
+                  <span aria-hidden="true"></span>
+                </button>
+              {%- endif -%}
+            </div>
+
+            {%- if link.links != blank -%}
+              <ul id="DunasMenuSub-{{ forloop.index }}" class="dunas-menu__sub" role="list" hidden>
+                {%- for childlink in link.links -%}
+                  <li>
+                    <a
+                      href="{{ childlink.url }}"
+                      class="dunas-menu__sublink"
+                      {% if childlink.current %}
+                        aria-current="page"
+                      {% endif %}
+                    >
+                      {{- childlink.title | escape -}}
+                    </a>
+                    {%- if childlink.links != blank -%}
+                      <ul class="dunas-menu__subsub" role="list">
+                        {%- for grandchildlink in childlink.links -%}
+                          <li>
+                            <a
+                              href="{{ grandchildlink.url }}"
+                              class="dunas-menu__sublink dunas-menu__sublink--small"
+                              {% if grandchildlink.current %}
+                                aria-current="page"
+                              {% endif %}
+                            >
+                              {{- grandchildlink.title | escape -}}
+                            </a>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    {%- endif -%}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+
+            <span class="dunas-menu__rule" aria-hidden="true"></span>
+          </li>
+        {%- endfor -%}
+      </ol>
+    </nav>
+
+    <div class="dunas-menu__foot">
+      {%- if section.settings.dunas_menu_tagline != blank -%}
+        <p class="dunas-menu__tagline">{{ section.settings.dunas_menu_tagline | escape }}</p>
+      {%- endif -%}
+
+      <div class="dunas-menu__utility">
+        {%- if shop.customer_accounts_enabled -%}
+          <a
+            href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
+            class="dunas-menu__account"
+          >
+            <span class="svg-wrapper" aria-hidden="true">{{ 'icon-account.svg' | inline_asset_content }}</span>
+            {%- if customer -%}
+              {{ 'customer.account.title' | t }}
+            {%- else -%}
+              {{ 'customer.log_in' | t }}
+            {%- endif -%}
+          </a>
+        {%- endif -%}
+
+        {%- if show_country_selector -%}
+          <localization-form class="dunas-menu__localization">
+            {%- form 'localization', id: 'DunasMenuCountryForm', class: 'localization-form' -%}
+              <div>
+                <h2 class="visually-hidden" id="DunasMenuCountryLabel">{{ 'localization.country_label' | t }}</h2>
+                {%- render 'country-localization', localPosition: 'DunasMenuCountry' -%}
+              </div>
+            {%- endform -%}
+          </localization-form>
+        {%- endif -%}
+
+        {%- if show_language_selector -%}
+          <localization-form class="dunas-menu__localization">
+            {%- form 'localization', id: 'DunasMenuLanguageForm', class: 'localization-form' -%}
+              <div>
+                <h2 class="visually-hidden" id="DunasMenuLanguageLabel">{{ 'localization.language_label' | t }}</h2>
+                {%- render 'language-localization', localPosition: 'DunasMenuLanguage' -%}
+              </div>
+            {%- endform -%}
+          </localization-form>
+        {%- endif -%}
+      </div>
+
+      {%- if show_social_links -%}
+        {%- render 'social-icons', class: 'dunas-menu__social' -%}
+      {%- endif -%}
+    </div>
+  </div>
+</div>
