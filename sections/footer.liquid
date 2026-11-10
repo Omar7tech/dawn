@@ -28,7 +28,7 @@
   }
 {%- endstyle -%}
 
-<footer class="footer dunas-footer color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding">
+<footer class="footer dunas-footer{% if section.settings.dunas_footer_tall_logo %} dunas-footer--tall-logo{% endif %} color-{{ section.settings.color_scheme }} gradient section-{{ section.id }}-padding">
   {%- liquid
     assign has_social_icons = true
     if settings.social_facebook_link == blank and settings.social_instagram_link == blank and settings.social_youtube_link == blank and settings.social_tiktok_link == blank and settings.social_twitter_link == blank and settings.social_pinterest_link == blank and settings.social_snapchat_link == blank and settings.social_tumblr_link == blank and settings.social_vimeo_link == blank
@@ -51,14 +51,28 @@
   -%}
     {%- unless only_empty_brand -%}
       <div class="footer__content-top page-width">
+        {%- comment -%}
+          DUNAS: the brand block from the home design. The statement set large, with the tall
+          vertical wordmark on the right, the same composition as the hero.
+        {%- endcomment -%}
         <div class="dunas-footer__brand">
-          <a href="{{ routes.root_url }}" class="dunas-footer__logo" aria-label="{{ shop.name | escape }}">
-            {%- render 'dunas-logo' -%}
-          </a>
           {%- if section.settings.dunas_footer_tagline != blank -%}
-            <p class="dunas-footer__tagline">{{ section.settings.dunas_footer_tagline | escape | newline_to_br }}</p>
+            {%- assign dunas_lines = section.settings.dunas_footer_tagline | newline_to_br | split: '<br />' -%}
+            <p class="dunas-footer__statement dunas-display">
+              {%- for line in dunas_lines -%}
+                {%- assign line_text = line | strip -%}
+                {%- if line_text != blank -%}
+                  <span class="dunas-footer__line">{{ line_text | escape }}</span>
+                {%- endif -%}
+              {%- endfor -%}
+            </p>
           {%- endif -%}
         </div>
+        {%- if section.settings.dunas_footer_tall_logo -%}
+          <a href="{{ routes.root_url }}" class="dunas-footer__mark" aria-label="{{ shop.name | escape }}">
+            {%- render 'dunas-logo', vertical: true -%}
+          </a>
+        {%- endif -%}
         {%- if section.blocks.size > 0 -%}
           {%- liquid
             if section.blocks.size == 9
@@ -433,9 +447,15 @@
     {
       "type": "textarea",
       "id": "dunas_footer_tagline",
-      "label": "Footer tagline",
+      "label": "Footer statement",
       "default": "Every Skin.\nEvery Day.",
-      "info": "Small line under the DUNAS logo. Leave empty to hide."
+      "info": "Set large beside the tall DUNAS logo. Every second line is shown in brand sand. Leave empty to hide."
+    },
+    {
+      "type": "checkbox",
+      "id": "dunas_footer_tall_logo",
+      "label": "Show tall DUNAS logo",
+      "default": true
     },
     {
       "type": "text",

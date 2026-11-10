@@ -1,9 +1,9 @@
 /*
-  DUNAS footer: Swiss grid, Apple restraint.
-  A strict 12-column grid, everything flush-left. Small, even type in two sizes only,
-  hierarchy through weight and opacity rather than size. One hairline rule.
-  Boxed email field with a solid Subscribe button. No animation, no ornament.
-  Loaded from sections/footer.liquid after Dawn's footer, newsletter and payment CSS.
+  DUNAS footer: the brand block as the finale.
+  The statement set large beside the tall vertical DUNAS wordmark, the same composition as
+  the hero, so the page ends the way it begins. Under it the quiet Swiss system: pill
+  newsletter, small even link columns, one hairline, a plain legal bar.
+  No animation, no ornament. Loaded from sections/footer.liquid after Dawn's footer CSS.
 */
 
 .footer.dunas-footer {
@@ -17,47 +17,90 @@
   font-family: var(--font-body-family);
 }
 
-/* ---------- Grid ---------- */
+/* ---------- Grid ----------
+   Phones: statement + tall logo side by side, then newsletter, then links.
+   Desktop: statement top-left, newsletter top-right, links below, the tall logo running
+   down the right edge across both rows. */
 
 .dunas-footer .footer__content-top {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'brand mark'
+    'news news'
+    'links links';
   column-gap: 2.4rem;
   row-gap: 4.8rem;
   padding-bottom: 6.4rem;
 }
 
+.dunas-footer:not(.dunas-footer--tall-logo) .footer__content-top {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'brand'
+    'news'
+    'links';
+}
+
 .dunas-footer__brand {
-  grid-column: 1 / -1;
+  grid-area: brand;
+  align-self: center;
+  min-width: 0;
 }
 
 .dunas-footer .footer-block--newsletter {
-  grid-column: 1 / -1;
+  grid-area: news;
 }
 
 .dunas-footer .footer__blocks-wrapper {
-  grid-column: 1 / -1;
+  grid-area: links;
 }
 
-/* ---------- Brand ---------- */
+/* ---------- Brand: statement + tall wordmark ---------- */
 
-.dunas-footer__logo {
-  display: inline-block;
+.dunas-footer__statement {
+  margin: 0;
+  font-size: clamp(4rem, 11vw, 5.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: rgb(var(--ink));
+}
+
+.dunas-footer__line {
+  display: block;
+}
+
+.dunas-footer__line:nth-child(2n) {
+  color: rgb(var(--accent));
+}
+
+.dunas-footer__mark {
+  grid-area: mark;
+  align-self: start;
+  display: block;
+  width: 6.4rem;
   color: rgb(var(--ink));
   line-height: 0;
+  transition: color 300ms ease;
 }
 
-.dunas-footer__logo .dunas-logo {
-  width: 11.2rem;
+.dunas-footer__mark .dunas-logo {
+  display: block;
+  width: 100%;
   height: auto;
+  overflow: visible;
 }
 
-.dunas-footer__tagline {
-  margin: 2rem 0 0;
-  font-size: 1.3rem;
-  line-height: 1.6;
-  letter-spacing: 0;
-  color: var(--ink-2);
+@media (hover: hover) {
+  .dunas-footer__mark:hover {
+    color: rgb(var(--accent));
+  }
+}
+
+.dunas-footer__mark:focus-visible {
+  outline: 0.2rem solid rgb(var(--ink));
+  outline-offset: 0.6rem;
+  border-radius: 0.4rem;
 }
 
 /* ---------- Shared type: two sizes only ---------- */
@@ -418,22 +461,45 @@
 
 @media screen and (min-width: 750px) {
   .dunas-footer .footer__content-top {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
+    grid-template-rows: 1fr auto;
+    grid-template-areas:
+      'brand news mark'
+      'links links mark';
+    column-gap: clamp(3.2rem, 5vw, 8rem);
+    row-gap: 6.4rem;
     align-items: start;
   }
 
-  .dunas-footer__brand {
-    grid-column: 1 / span 4;
+  .dunas-footer:not(.dunas-footer--tall-logo) .footer__content-top {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-areas:
+      'brand news'
+      'links links';
   }
 
-  .dunas-footer .footer__blocks-wrapper {
-    grid-column: 5 / span 4;
-    grid-row: 1;
+  .dunas-footer__brand {
+    align-self: start;
+  }
+
+  .dunas-footer__statement {
+    font-size: clamp(5.6rem, 6.6vw, 9.6rem);
+  }
+
+  .dunas-footer__mark {
+    width: clamp(8.8rem, 8.4vw, 12.8rem);
   }
 
   .dunas-footer .footer-block--newsletter {
-    grid-column: 9 / span 4;
-    grid-row: 1;
+    justify-self: end;
+    width: 100%;
+    max-width: 40rem;
+    padding-top: 1.2rem;
+  }
+
+  .dunas-footer .footer__blocks-wrapper {
+    align-self: end;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .dunas-footer__bar {
