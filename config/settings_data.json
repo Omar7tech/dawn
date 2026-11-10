@@ -191,7 +191,7 @@
           }
         }
       },
-      "dunas_intro": "once_per_visit",
+      "dunas_intro": "home_page",
       "dunas_intro_tagline": "Every Skin. Every Day.",
       "dunas_intro_days": 30,
       "dunas_intro_speed": "balanced",

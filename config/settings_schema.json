@@ -171,7 +171,7 @@
         "options": [
           {
             "value": "once_per_visit",
-            "label": "Once per visit (recommended)"
+            "label": "Once per visit"
           },
           {
             "value": "first_visit",
@@ -179,7 +179,7 @@
           },
           {
             "value": "home_page",
-            "label": "Every time the home page loads"
+            "label": "Every time the home page loads (recommended)"
           },
           {
             "value": "every_page",
@@ -190,8 +190,8 @@
             "label": "Off"
           }
         ],
-        "default": "once_per_visit",
-        "info": "Once per visit plays on the first page someone opens, then not again until they come back another day or reopen the browser."
+        "default": "home_page",
+        "info": "Home page: plays each time someone opens the home page, never on other pages. Once per visit: plays on the first page someone opens, then not again until their next visit."
       },
       {
         "type": "range",
@@ -210,15 +210,15 @@
         "options": [
           {
             "value": "quick",
-            "label": "Quick (about 2 seconds)"
+            "label": "Quick (about 1.5 seconds)"
           },
           {
             "value": "balanced",
-            "label": "Balanced (about 3 seconds)"
+            "label": "Balanced (about 2 seconds)"
           },
           {
             "value": "relaxed",
-            "label": "Relaxed (about 4 seconds)"
+            "label": "Relaxed (about 3 seconds)"
           }
         ],
         "default": "balanced"

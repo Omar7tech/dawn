@@ -1,13 +1,14 @@
 {% doc %}
-  Brand intro: the DUNAS wordmark draws itself, fills in, then the panel lifts away.
-  Every option lives in Theme settings > DUNAS intro. Visitors can end it at any time
-  with a tap, click, scroll, swipe or key press. It never shows inside the theme editor.
+  Brand intro in pure CSS (no libraries): the DUNAS wordmark traces itself in a fine line,
+  fills in, the tagline fades up, then the panel lifts away.
+  All options live in Theme settings > DUNAS intro. Any tap, click, scroll, swipe or key
+  press skips straight to the exit. Never shown inside the theme editor.
 
   @example
   {% render 'dunas-intro' %}
 {% enddoc %}
 {%- liquid
-  assign intro_mode = settings.dunas_intro | default: 'once_per_visit'
+  assign intro_mode = settings.dunas_intro | default: 'home_page'
   assign show_intro = true
 
   if request.design_mode or intro_mode == 'off'
@@ -34,124 +35,89 @@
 {%- if show_intro -%}
   <style>
     .dunas-intro {
+      /* Timeline (seconds at balanced speed; every value scales with --s) */
       --s: {{ intro_speed }};
+      --t-draw: calc(0.05s * var(--s));
+      --t-fill: calc(0.65s * var(--s));
+      --t-tagline: calc(0.85s * var(--s));
+      --t-exit: calc(1.6s * var(--s));
+      --t-lift: calc(1.7s * var(--s));
+
+      --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+      --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+      --ease-in: cubic-bezier(0.55, 0.06, 0.68, 0.19);
+      --ease-lift: cubic-bezier(0.87, 0, 0.13, 1);
+
       --intro-bg: {{ intro_bg | color_extract: 'red' }}, {{ intro_bg | color_extract: 'green' }}, {{ intro_bg | color_extract: 'blue' }};
       --intro-ink: {{ intro_ink | color_extract: 'red' }}, {{ intro_ink | color_extract: 'green' }}, {{ intro_ink | color_extract: 'blue' }};
-      --intro-logo: {{ intro_logo_width }}px;
-      --intro-ease: cubic-bezier(0.76, 0, 0.24, 1);
-      --intro-out-at: calc(2100ms * var(--s));
-      --intro-out-for: calc(800ms * var(--s));
+      --intro-logo: min(64vw, {{ intro_logo_width }}px);
+
       position: fixed;
       inset: 0;
       z-index: 2147483000;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgb(var(--intro-bg));
-      color: rgb(var(--intro-ink));
+      overflow: hidden;
       cursor: pointer;
-      clip-path: inset(0 0 0 0);
-      animation: dunas-intro-out var(--intro-out-for) var(--intro-ease) var(--intro-out-at) forwards;
+      color: rgb(var(--intro-ink));
+      background: rgb(var(--intro-bg));
+      clip-path: inset(0% 0% 0% 0%);
+      -webkit-font-smoothing: antialiased;
+      animation: dunas-intro-lift calc(0.7s * var(--s)) var(--ease-lift) var(--t-lift) forwards;
     }
 
     .dunas-skip-intro .dunas-intro {
       display: none;
     }
 
-    /* A soft light drifts across the panel for depth */
-    .dunas-intro::before {
-      content: '';
-      position: absolute;
-      inset: -20%;
-      background: radial-gradient(closest-side, rgba(255, 255, 255, 0.09), transparent 70%);
-      transform: translateX(-30%);
-      animation: dunas-intro-glow var(--intro-out-at) ease-out forwards;
-      pointer-events: none;
-    }
-
     .dunas-intro__stage {
-      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2.2rem;
-      animation: dunas-intro-stage-out var(--intro-out-for) var(--intro-ease) var(--intro-out-at) forwards;
+      gap: 2.4rem;
+      animation: dunas-intro-stage-out calc(0.4s * var(--s)) var(--ease-in) var(--t-exit) forwards;
     }
 
     .dunas-intro__logo {
-      width: min(64vw, var(--intro-logo));
+      width: var(--intro-logo);
       height: auto;
       overflow: visible;
     }
 
+    /* Fine-line trace of each letter, then a smooth fill as the outline fades */
     .dunas-intro__letter {
       fill: rgb(var(--intro-ink));
       fill-opacity: 0;
       stroke: rgb(var(--intro-ink));
-      stroke-width: 5;
+      stroke-width: 3;
       stroke-linejoin: round;
       stroke-linecap: round;
       stroke-dasharray: 1;
       stroke-dashoffset: 1;
       animation:
-        dunas-intro-draw calc(900ms * var(--s)) cubic-bezier(0.65, 0, 0.35, 1) calc((100ms + var(--i) * 120ms) * var(--s)) forwards,
-        dunas-intro-fill calc(500ms * var(--s)) ease calc((850ms + var(--i) * 80ms) * var(--s)) forwards;
+        dunas-intro-draw calc(0.8s * var(--s)) var(--ease-in-out) calc(var(--t-draw) + var(--i) * 0.05s * var(--s)) forwards,
+        dunas-intro-fill calc(0.35s * var(--s)) var(--ease-out) calc(var(--t-fill) + var(--i) * 0.03s * var(--s)) forwards;
     }
 
     .dunas-intro__letter--reg {
-      stroke-width: 3;
-      transform-box: fill-box;
-      transform-origin: center;
-      animation:
-        dunas-intro-draw calc(500ms * var(--s)) ease calc(950ms * var(--s)) forwards,
-        dunas-intro-fill calc(350ms * var(--s)) ease calc(1250ms * var(--s)) forwards,
-        dunas-intro-pop calc(450ms * var(--s)) cubic-bezier(0.34, 1.56, 0.64, 1) calc(1200ms * var(--s)) both;
-    }
-
-    .dunas-intro__line {
-      width: min(64vw, var(--intro-logo));
-      height: 0.1rem;
-      background: rgba(var(--intro-ink), 0.45);
-      transform: scaleX(0);
-      transform-origin: left center;
-      animation: dunas-intro-line calc(800ms * var(--s)) cubic-bezier(0.65, 0, 0.35, 1) calc(1000ms * var(--s)) forwards;
+      stroke-width: 0;
+      fill-opacity: 1;
+      opacity: 0;
+      animation: dunas-intro-fade-in calc(0.3s * var(--s)) var(--ease-out) calc(0.9s * var(--s)) forwards;
     }
 
     .dunas-intro__tagline {
       margin: 0;
       font-family: var(--font-heading-family, sans-serif);
       font-weight: 300;
-      font-size: clamp(1.3rem, 3.6vw, 1.8rem);
-      letter-spacing: 0.32em;
+      font-size: clamp(1.2rem, 3.4vw, 1.6rem);
+      letter-spacing: 0.3em;
       text-transform: uppercase;
       white-space: nowrap;
       opacity: 0;
-      transform: translateY(0.8rem);
-      animation: dunas-intro-rise calc(600ms * var(--s)) ease calc(1300ms * var(--s)) forwards;
-    }
-
-    /* Skipping restarts a short version of the exit */
-    .dunas-intro.is-skipping {
-      animation: dunas-intro-skip 550ms var(--intro-ease) forwards;
-    }
-
-    .dunas-intro.is-skipping .dunas-intro__stage {
-      animation: dunas-intro-stage-skip 450ms var(--intro-ease) forwards;
-    }
-
-    @keyframes dunas-intro-skip {
-      to {
-        clip-path: inset(0 0 100% 0);
-        visibility: hidden;
-        pointer-events: none;
-      }
-    }
-
-    @keyframes dunas-intro-stage-skip {
-      to {
-        opacity: 0;
-        transform: translateY(-3rem) scale(0.97);
-      }
+      transform: translateY(0.6rem);
+      animation: dunas-intro-rise calc(0.5s * var(--s)) var(--ease-out) var(--t-tagline) forwards;
     }
 
     @keyframes dunas-intro-draw {
@@ -167,57 +133,63 @@
       }
     }
 
-    @keyframes dunas-intro-pop {
-      from {
-        transform: scale(0);
-      }
+    @keyframes dunas-intro-fade-in {
       to {
-        transform: scale(1);
-      }
-    }
-
-    @keyframes dunas-intro-line {
-      to {
-        transform: scaleX(1);
+        opacity: 1;
       }
     }
 
     @keyframes dunas-intro-rise {
       to {
-        opacity: 0.85;
+        opacity: 0.8;
         transform: none;
-      }
-    }
-
-    @keyframes dunas-intro-glow {
-      to {
-        transform: translateX(30%);
       }
     }
 
     @keyframes dunas-intro-stage-out {
       to {
         opacity: 0;
-        transform: translateY(-4rem) scale(0.96);
+        transform: translateY(-0.8rem);
       }
     }
 
-    /* The panel lifts upward like a curtain to reveal the page */
-    @keyframes dunas-intro-out {
+    /* The panel lifts away to reveal the page */
+    @keyframes dunas-intro-lift {
       to {
-        clip-path: inset(0 0 100% 0);
+        clip-path: inset(0% 0% 100% 0%);
         visibility: hidden;
         pointer-events: none;
       }
     }
 
-    /* Visitors who prefer less motion get a short, still fade */
+    /* Skipping: a short version of the exit, starting immediately */
+    .dunas-intro.is-skipping {
+      animation: dunas-intro-skip 0.55s var(--ease-lift) forwards;
+    }
+
+    .dunas-intro.is-skipping .dunas-intro__stage {
+      animation: dunas-intro-stage-skip 0.3s var(--ease-in) forwards;
+    }
+
+    @keyframes dunas-intro-skip {
+      to {
+        clip-path: inset(0% 0% 100% 0%);
+        visibility: hidden;
+        pointer-events: none;
+      }
+    }
+
+    @keyframes dunas-intro-stage-skip {
+      to {
+        opacity: 0;
+        transform: translateY(-0.8rem);
+      }
+    }
+
+    /* Visitors who prefer less motion: a still logo that fades out */
     @media (prefers-reduced-motion: reduce) {
-      .dunas-intro,
-      .dunas-intro::before,
       .dunas-intro__stage,
       .dunas-intro__letter,
-      .dunas-intro__line,
       .dunas-intro__tagline {
         animation: none;
       }
@@ -225,20 +197,17 @@
       .dunas-intro__letter {
         fill-opacity: 1;
         stroke-opacity: 0;
-      }
-
-      .dunas-intro__line {
-        transform: none;
+        opacity: 1;
       }
 
       .dunas-intro__tagline {
-        opacity: 0.85;
+        opacity: 0.8;
         transform: none;
       }
 
       .dunas-intro,
       .dunas-intro.is-skipping {
-        animation: dunas-intro-fade 350ms ease 600ms forwards;
+        animation: dunas-intro-fade 0.35s ease 0.6s forwards;
       }
 
       @keyframes dunas-intro-fade {
@@ -251,23 +220,16 @@
     }
   </style>
 
-  <div
-    id="DunasIntro"
-    class="dunas-intro"
-    data-mode="{{ intro_mode }}"
-    data-days="{{ settings.dunas_intro_days | default: 30 }}"
-    aria-hidden="true"
-  >
+  <div id="DunasIntro" class="dunas-intro" data-mode="{{ intro_mode }}" aria-hidden="true">
     <div class="dunas-intro__stage">
       <svg class="dunas-intro__logo" viewBox="-10 -12 1370 318" xmlns="http://www.w3.org/2000/svg" focusable="false">
-        <path class="dunas-intro__letter dunas-intro__letter--un" style="--i: 1;" pathLength="1" d="M726.46-1.75c-34.09,0-62.41,11.15-85.35,33.01-1.11,1.04-2.21,2.12-3.29,3.23-19.88,20.29-31.33,44.77-34.41,73.75-.56,5.29-.84,10.75-.84,16.35v62.73c-2.56,18.35-11.03,34.43-25.11,48.52-17.15,16.64-36.73,24.97-59.75,24.97s-43.09-8.33-60.24-24.97c-17.13-17.15-25.46-37.22-25.46-60.73V7.69h-37.71v163.02c0,36.24,11.76,66.6,34.76,90.6,23.51,24,52.9,36.24,88.64,36.24s62.36-11.12,84.86-32.95c1.11-1.07,2.21-2.17,3.29-3.29,19.91-20.32,31.38-45.2,34.41-74.35.56-5.28.84-10.69.84-16.25v-62.56c2.49-18.2,10.62-34.18,24.62-48.2,17.15-17.13,37.71-25.46,60.73-25.46s42.61,8.33,59.75,25.46c17.13,17.15,25.95,37.22,25.95,60.73v172.6h37.71V124.6c0-36.24-11.75-66.11-35.25-90.11-23.51-24-52.9-36.24-88.15-36.24Z" />
-        <path class="dunas-intro__letter dunas-intro__letter--s" style="--i: 3;" pathLength="1" d="M1309.71,204.38c-2.45-36.73-22.53-61.7-59.74-74.44l-32.32-10.77c-24.97-8.32-37.22-22.53-35.75-42.6.49-21.55,18.12-37.71,39.18-38.2,21.55,0,41.14,13.22,41.14,32.81v6.37h39.18l-.49-8.33c-1.47-19.59-10.28-35.75-26.93-48.97-16.16-13.22-33.79-19.59-52.89-18.61-22.04.98-40.65,9.3-56.32,24.49-15.18,15.18-22.53,33.79-21.55,55.34,1.47,35.75,19.59,59.25,53.87,70.03l32.81,10.28c27.43,8.82,41.14,24.98,40.65,48.97-.49,13.71-4.41,24.97-12.73,33.3-9.3,9.3-21.55,13.71-37.22,14.2-11.75.49-23.02-4.41-33.3-14.69-10.28-10.28-15.67-20.08-15.67-29.38v-9.3h-38.69c0,24,7.84,44.56,23.51,61.7,16.16,17.14,35.75,26.93,59.26,28.4,25.46,1.47,47.99-6.86,67.58-24.97,19.59-18.61,28.4-40.65,26.44-65.62Z" />
         <path class="dunas-intro__letter dunas-intro__letter--d" style="--i: 0;" pathLength="1" d="M360.53,95.51c-2.41-6.53-5.34-12.91-8.69-18.84-.09-.2-.21-.41-.31-.55-4.85-8.57-10.8-16.78-17.68-24.42-.73-.79-1.45-1.59-2.18-2.36-2.35-2.5-4.87-4.99-7.69-7.58C294.11,14.16,255.66.16,209.7.16H-.03L.03,117.23h36.49v-57.78c0-3.36.72-6.57,2.12-9.56,3.71-7.98,11.79-13.13,20.58-13.13h154.88c22.41,0,42.97,5.37,61.11,15.97,7,4.09,13.71,8.98,19.94,14.55,17.6,15.73,28.75,34.52,33.12,55.85.7,3.52,1.25,7.12,1.62,10.71.26,2.65.43,5.49.5,8.42.18,5.31.02,10.56-.5,15.56-.35,3.43-.87,6.79-1.51,10.01l-.05.23c-3.98,19.71-13.64,37.71-28.71,53.51-7.18,7.54-15.03,13.88-23.29,18.87-16.09,9.72-34.32,14.64-54.18,14.64H70.62l56.24-34.8v-50.93L11.92,240.46v50.93l.17-.11v.4h211.52c39.51,0,73.94-14.42,102.33-42.82,7.28-7.15,13.68-14.83,19.04-22.7l1.01-1.37c14.66-19.86,23.06-48.48,23.06-78.54,0-16.66-2.46-32.6-7.32-47.36-.38-1.13-.78-2.24-1.19-3.37Z" />
+        <path class="dunas-intro__letter dunas-intro__letter--un" style="--i: 1;" pathLength="1" d="M726.46-1.75c-34.09,0-62.41,11.15-85.35,33.01-1.11,1.04-2.21,2.12-3.29,3.23-19.88,20.29-31.33,44.77-34.41,73.75-.56,5.29-.84,10.75-.84,16.35v62.73c-2.56,18.35-11.03,34.43-25.11,48.52-17.15,16.64-36.73,24.97-59.75,24.97s-43.09-8.33-60.24-24.97c-17.13-17.15-25.46-37.22-25.46-60.73V7.69h-37.71v163.02c0,36.24,11.76,66.6,34.76,90.6,23.51,24,52.9,36.24,88.64,36.24s62.36-11.12,84.86-32.95c1.11-1.07,2.21-2.17,3.29-3.29,19.91-20.32,31.38-45.2,34.41-74.35.56-5.28.84-10.69.84-16.25v-62.56c2.49-18.2,10.62-34.18,24.62-48.2,17.15-17.13,37.71-25.46,60.73-25.46s42.61,8.33,59.75,25.46c17.13,17.15,25.95,37.22,25.95,60.73v172.6h37.71V124.6c0-36.24-11.75-66.11-35.25-90.11-23.51-24-52.9-36.24-88.15-36.24Z" />
         <path class="dunas-intro__letter dunas-intro__letter--a" style="--i: 2;" pathLength="1" d="M996.91-1.7c-35.3,0-64.31,12.1-87.53,35.79-23.2,23.69-34.81,53.19-34.81,88.96v169.16h37.16s0,0,0,0h.07v-.04l114.56-70.67v-51.51l-114.56,70.67v-121.47c0-23.22,8.22-43.03,25.14-59.96,16.93-16.92,37.24-25.14,59.96-25.14s42.06,8.22,58.99,25.14c16.92,16.93,25.63,36.75,25.63,59.96v173.02h37.22V123.05c0-35.77-11.59-65.27-34.81-88.96-23.2-23.69-52.22-35.79-87.03-35.79Z" />
+        <path class="dunas-intro__letter dunas-intro__letter--s" style="--i: 3;" pathLength="1" d="M1309.71,204.38c-2.45-36.73-22.53-61.7-59.74-74.44l-32.32-10.77c-24.97-8.32-37.22-22.53-35.75-42.6.49-21.55,18.12-37.71,39.18-38.2,21.55,0,41.14,13.22,41.14,32.81v6.37h39.18l-.49-8.33c-1.47-19.59-10.28-35.75-26.93-48.97-16.16-13.22-33.79-19.59-52.89-18.61-22.04.98-40.65,9.3-56.32,24.49-15.18,15.18-22.53,33.79-21.55,55.34,1.47,35.75,19.59,59.25,53.87,70.03l32.81,10.28c27.43,8.82,41.14,24.98,40.65,48.97-.49,13.71-4.41,24.97-12.73,33.3-9.3,9.3-21.55,13.71-37.22,14.2-11.75.49-23.02-4.41-33.3-14.69-10.28-10.28-15.67-20.08-15.67-29.38v-9.3h-38.69c0,24,7.84,44.56,23.51,61.7,16.16,17.14,35.75,26.93,59.26,28.4,25.46,1.47,47.99-6.86,67.58-24.97,19.59-18.61,28.4-40.65,26.44-65.62Z" />
         <path class="dunas-intro__letter dunas-intro__letter--reg" style="--i: 4;" pathLength="1" d="M1349.42,22.19v.27c0,2.81-.52,5.43-1.54,7.88-1.03,2.45-2.47,4.59-4.31,6.43-1.84,1.84-3.98,3.28-6.41,4.31-2.43,1.03-5.05,1.54-7.86,1.54h-.27c-2.83,0-5.47-.52-7.92-1.54-2.45-1.03-4.58-2.47-6.41-4.31-1.83-1.84-3.26-3.98-4.29-6.43-1.03-2.45-1.54-5.07-1.54-7.88v-.27c0-2.81.52-5.43,1.54-7.86,1.03-2.43,2.46-4.57,4.29-6.41,1.83-1.84,3.96-3.28,6.41-4.31,2.45-1.03,5.08-1.54,7.92-1.54h.27c2.81,0,5.43.52,7.86,1.54,2.43,1.03,4.57,2.47,6.41,4.31,1.84,1.84,3.28,3.98,4.31,6.41,1.03,2.43,1.54,5.05,1.54,7.86ZM1345.67,22.19c0-3.06-.73-5.83-2.18-8.3-1.45-2.47-3.42-4.43-5.89-5.89-2.47-1.45-5.24-2.18-8.3-2.18h-.27c-3.06,0-5.84.73-8.34,2.18-2.5,1.45-4.47,3.42-5.93,5.89-1.45,2.47-2.18,5.24-2.18,8.3v.27c0,3.06.73,5.84,2.18,8.32,1.45,2.48,3.43,4.46,5.93,5.93,2.5,1.47,5.28,2.2,8.34,2.2h.27c3.06,0,5.83-.73,8.3-2.2,2.47-1.47,4.44-3.44,5.89-5.93,1.45-2.48,2.18-5.26,2.18-8.32v-.27ZM1321.27,32.89V11.84h8.65c2.45,0,4.36.58,5.73,1.76,1.38,1.17,2.07,2.83,2.07,4.96v.04c0,1.39-.39,2.62-1.16,3.69s-1.81,1.82-3.13,2.26l4.9,8.34h-4.44l-4.4-7.69h-4.36v7.69h-3.86ZM1325.17,22h4.4c1.31,0,2.34-.31,3.07-.93.73-.62,1.1-1.44,1.1-2.47,0-1.08-.38-1.92-1.14-2.53-.76-.6-1.8-.91-3.11-.91h-4.32v6.84Z" />
       </svg>
       {%- if settings.dunas_intro_tagline != blank -%}
-        <span class="dunas-intro__line"></span>
         <p class="dunas-intro__tagline">{{ settings.dunas_intro_tagline | escape }}</p>
       {%- endif -%}
     </div>
@@ -278,25 +240,24 @@
       var intro = document.getElementById('DunasIntro');
       if (!intro) return;
 
-      // Already seen (decided in <head> before the page painted): remove quietly
+      // Already seen this visit (decided in <head> before the page painted): remove quietly
       if (document.documentElement.classList.contains('dunas-skip-intro')) {
         intro.parentNode.removeChild(intro);
         return;
       }
 
-      // Remember that the intro was seen, for the "once per visit" and "first visit" modes
       try {
         if (intro.dataset.mode === 'once_per_visit') sessionStorage.setItem('dunasIntroSeen', '1');
         if (intro.dataset.mode === 'first_visit') localStorage.setItem('dunasIntroSeenAt', String(Date.now()));
       } catch (e) {}
 
       var finished = false;
-      var events = ['pointerdown', 'wheel', 'touchmove', 'keydown'];
+      var skipEvents = ['pointerdown', 'wheel', 'touchmove', 'keydown'];
 
       function finish() {
         if (finished) return;
         finished = true;
-        events.forEach(function (name) {
+        skipEvents.forEach(function (name) {
           window.removeEventListener(name, skip, true);
         });
         if (intro.parentNode) intro.parentNode.removeChild(intro);
@@ -309,17 +270,17 @@
         setTimeout(finish, 600);
       }
 
-      events.forEach(function (name) {
+      skipEvents.forEach(function (name) {
         window.addEventListener(name, skip, { capture: true, passive: true });
       });
 
       intro.addEventListener('animationend', function (event) {
         if (event.target !== intro) return;
-        if (/^dunas-intro-(out|skip|fade)$/.test(event.animationName)) finish();
+        if (/^dunas-intro-(lift|skip|fade)$/.test(event.animationName)) finish();
       });
 
       // Safety net in case animations are blocked
-      setTimeout(finish, 7000);
+      setTimeout(finish, 6000);
     })();
   </script>
 {%- endif -%}
