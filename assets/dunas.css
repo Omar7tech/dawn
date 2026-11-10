@@ -684,6 +684,8 @@ body,
   --ds-pill-bg: rgb(var(--dunas-ink));
   --ds-pill-ink: rgb(var(--dunas-cream));
   --ds-chip: rgba(var(--dunas-ink), 0.06);
+  --ds-term-bg: transparent;
+  --ds-term-edge: rgba(var(--dunas-ink), 0.18);
   --ds-shadow: 0 2.4rem 6rem -2rem rgba(var(--dunas-ink), 0.3), 0 0.2rem 0.6rem rgba(var(--dunas-ink), 0.06);
   --ds-pad-y: 0.8rem;
   --ds-pad-x: 0.8rem;
@@ -698,6 +700,8 @@ body,
   --ds-hover: rgba(255, 255, 255, 0.55);
   --ds-rule: rgba(255, 255, 255, 0.55);
   --ds-chip: rgba(255, 255, 255, 0.55);
+  --ds-term-bg: rgba(255, 255, 255, 0.6);
+  --ds-term-edge: rgba(255, 255, 255, 0.95);
   --ds-shadow: inset 0 0.1rem 0.1rem rgba(255, 255, 255, 0.7), inset 0 -0.1rem 0.1rem rgba(255, 255, 255, 0.2),
     inset 0 0 2.4rem rgba(255, 255, 255, 0.18), 0 2.4rem 6rem -2rem rgba(var(--dunas-ink), 0.35),
     0 0.2rem 0.6rem rgba(var(--dunas-ink), 0.06);
@@ -722,6 +726,8 @@ body,
   --ds-pill-bg: rgb(var(--dunas-cream));
   --ds-pill-ink: rgb(var(--dunas-green));
   --ds-chip: rgba(255, 255, 255, 0.1);
+  --ds-term-bg: transparent;
+  --ds-term-edge: rgba(255, 255, 255, 0.35);
 }
 
 /* ---- Layer + backdrop ---- */
@@ -830,10 +836,48 @@ body,
   }
 }
 
+/* All sizes: open below the navbar pill, never over it. The pill's edges come from
+   --ds-top / --ds-left / --ds-right (set by the header-search snippet). The dim sits under
+   the pill's links and icons, so the navbar stays readable. */
+.dunas-header .header--dunas .search-modal__content {
+  top: calc(var(--ds-top, 7.2rem) + 0.8rem);
+  max-height: calc(100% - var(--ds-top, 7.2rem) - 0.8rem - 1.6rem);
+}
+
+.dunas-header .header--dunas details[open] .modal-overlay::after {
+  z-index: -1;
+}
+
+/* Phones and tablets: the panel shares the pill's edges, so it reads as part of the navbar */
+@media screen and (max-width: 989px) {
+  .dunas-header .header--dunas .search-modal__content {
+    left: var(--ds-left, 1.2rem);
+    right: var(--ds-right, 1.2rem);
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .dunas-header .header--dunas .search-modal__content {
+    top: calc(var(--ds-top, 8.2rem) + 1.2rem);
+    max-height: calc(100% - var(--ds-top, 8.2rem) - 1.2rem - 2.4rem);
+  }
+}
+
+.dunas-header .dunas-search--fullscreen .search-modal__content {
+  left: var(--ds-left, 1.2rem);
+  right: var(--ds-right, 1.2rem);
+  bottom: 1.6rem;
+  max-height: none;
+}
+
+@media screen and (min-width: 990px) {
+  .dunas-header .dunas-search--fullscreen .search-modal__content {
+    bottom: 2.4rem;
+  }
+}
+
 /* Immersive full screen: the panel fills the window with an even margin */
 .dunas-header .dunas-search--fullscreen .search-modal__content {
-  bottom: var(--dunas-header-pad-y);
-  max-height: none;
   --ds-pad-y: 1.2rem;
   --ds-pad-x: 1.2rem;
 }
@@ -1238,24 +1282,24 @@ body,
   width: 100%;
   min-height: 4.8rem;
   padding: 1rem 2.8rem;
-  border: 0;
+  border: 0.1rem solid var(--ds-term-edge);
   border-radius: 10rem;
-  background: var(--ds-pill-bg);
-  color: var(--ds-pill-ink);
+  background: var(--ds-term-bg);
+  color: rgb(var(--ds-ink));
   font-family: var(--font-body-family);
   font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   word-break: normal;
-  transition: opacity 150ms ease;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
 }
 
 .dunas-header .header--dunas .predictive-search__item--term:hover,
 .dunas-header .header--dunas .predictive-search__item--term[aria-selected='true'] {
+  border-color: var(--ds-pill-bg);
   background: var(--ds-pill-bg);
   color: var(--ds-pill-ink);
-  opacity: 0.88;
 }
 
 .dunas-header .header--dunas .predictive-search__item--term .icon-arrow {

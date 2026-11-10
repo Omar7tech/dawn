@@ -149,6 +149,34 @@
     </div>
   </details>
 </details-modal>
+<script>
+  // Desktop: the search opens below the navbar pill, never over it.
+  // Publishes the pill's bottom edge and side edges as CSS variables on the search layer.
+  (function () {
+    var header = document.querySelector('.header--dunas');
+    var layer = document.querySelector('.dunas-search');
+    if (!header || !layer) return;
+    function place() {
+      var r = header.getBoundingClientRect();
+      layer.style.setProperty('--ds-top', Math.round(r.bottom) + 'px');
+      layer.style.setProperty('--ds-left', Math.round(r.left) + 'px');
+      layer.style.setProperty('--ds-right', Math.round(document.documentElement.clientWidth - r.right) + 'px');
+    }
+    place();
+    window.addEventListener('resize', place, { passive: true });
+    if ('ResizeObserver' in window) new ResizeObserver(place).observe(header);
+    header.addEventListener('click', function (event) {
+      if (event.target.closest('.header__icon--search')) place();
+    }, true);
+    // opening locks page scroll, which removes the scrollbar and shifts the pill: measure again
+    var details = layer.closest('details');
+    if (details) {
+      details.addEventListener('toggle', function () {
+        if (details.open) requestAnimationFrame(place);
+      });
+    }
+  })();
+</script>
 {%- if settings.dunas_search_popular != blank and settings.predictive_search_enabled -%}
   <script>
     document.addEventListener('click', function (event) {
