@@ -4,8 +4,15 @@
   Compact top bar (logo, search, cart, close), plain rows with hairline dividers and chevrons,
   sub-items that expand inline, secondary links in two columns, two image cards, then
   country and social links. Same system as the footer and search: cream, ink, hairlines,
-  sentence case, 20px image radius. Motion is CSS only: a short fade, rows settling in.
+  sentence case, 20px image radius.
+
+  Motion is CSS only (no library): the sheet unrolls, the top bar settles, each divider draws
+  in, each label rises out of its mask, chevrons slide in, then the secondary links and the
+  image cards follow. Only transform, opacity and clip-path are animated, so it runs on the
+  compositor and stays smooth on phones. Closing is one short fade.
   State classes (is-open / is-closing / is-leaving) come from assets/dunas-menu.js.
+  The hidden "before" state applies only while the menu is neither open nor closing, so
+  content never snaps away during the closing fade.
 */
 
 /* ---------- Toggle in the header pill ---------- */
@@ -95,20 +102,32 @@ html.dunas-menu-lock {
 }
 
 .dunas-menu__sheet {
+  --t-sheet: 620ms;
+  --t-step: 45ms;
+  --menu-expo: cubic-bezier(0.16, 1, 0.3, 1);
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
   background: rgb(var(--menu-bg));
-  opacity: 0;
-  transform: translateY(0.8rem);
-  transition: opacity 200ms ease, transform 200ms ease;
 }
 
+/* Before opening: rolled up to its top edge */
+.dunas-menu:not(.is-open):not(.is-closing) .dunas-menu__sheet {
+  clip-path: inset(0 0 100% 0);
+}
+
+/* Open: unrolls downwards */
 .dunas-menu.is-open .dunas-menu__sheet {
-  opacity: 1;
-  transform: none;
-  transition: opacity 260ms ease, transform 420ms var(--menu-ease);
+  clip-path: inset(0 0 0 0);
+  transition: clip-path var(--t-sheet) var(--menu-expo);
+}
+
+/* Closing: one short fade, content stays in place */
+.dunas-menu.is-closing .dunas-menu__sheet {
+  opacity: 0;
+  transform: translateY(-0.8rem);
+  transition: opacity 220ms ease, transform 220ms ease;
 }
 
 /* ---------- Top bar ---------- */
@@ -122,6 +141,26 @@ html.dunas-menu-lock {
   min-height: 7.2rem;
   padding: 0 calc(var(--menu-gutter) - 1rem) 0 var(--menu-gutter);
   border-bottom: 0.1rem solid var(--menu-rule);
+}
+
+.dunas-menu:not(.is-open):not(.is-closing) .dunas-menu__brand,
+.dunas-menu:not(.is-open):not(.is-closing) .dunas-menu__actions > * {
+  opacity: 0;
+  transform: translateY(-0.6rem);
+}
+
+.dunas-menu.is-open .dunas-menu__brand,
+.dunas-menu.is-open .dunas-menu__actions > * {
+  transition: opacity 400ms ease, transform 600ms var(--menu-expo), background-color 150ms ease;
+  transition-delay: 120ms, 120ms, 0ms;
+}
+
+.dunas-menu.is-open .dunas-menu__actions > :nth-child(2) {
+  transition-delay: 160ms, 160ms, 0ms;
+}
+
+.dunas-menu.is-open .dunas-menu__actions > :nth-child(3) {
+  transition-delay: 200ms, 200ms, 0ms;
 }
 
 .dunas-menu__brand {
@@ -281,7 +320,29 @@ html.dunas-menu-lock {
 }
 
 .dunas-menu__item {
-  border-bottom: 0.1rem solid var(--menu-rule);
+  position: relative;
+  --d: calc(140ms + var(--i, 0) * var(--t-step));
+}
+
+/* Divider: a hairline that draws in from the left */
+.dunas-menu__item::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0.1rem;
+  background: var(--menu-rule);
+  transform-origin: 0 50%;
+  pointer-events: none;
+}
+
+.dunas-menu:not(.is-open):not(.is-closing) .dunas-menu__item::after {
+  transform: scaleX(0);
+}
+
+.dunas-menu.is-open .dunas-menu__item::after {
+  transition: transform 800ms var(--menu-expo) var(--d);
 }
 
 .dunas-menu__row {
@@ -307,13 +368,41 @@ html.dunas-menu-lock {
   transition: background-color 150ms ease;
 }
 
+/* The label is a mask; its text rises out of it. Extra bottom room keeps the
+   current-page underline and descenders from being clipped. */
 .dunas-menu__label {
+  display: block;
   min-width: 0;
+  overflow: hidden;
+  padding: 0.2rem 0 1rem;
+  margin: -0.2rem 0 -1rem;
+}
+
+.dunas-menu__label-text {
+  display: inline-block;
   overflow-wrap: anywhere;
 }
 
+.dunas-menu:not(.is-open):not(.is-closing) .dunas-menu__label-text {
+  transform: translateY(130%);
+}
+
+.dunas-menu.is-open .dunas-menu__label-text {
+  transition: transform 760ms var(--menu-expo) calc(var(--d) + 40ms);
+}
+
+.dunas-menu:not(.is-open):not(.is-closing) .dunas-menu__chevron {
+  opacity: 0;
+  translate: -0.8rem 0;
+}
+
+.dunas-menu.is-open .dunas-menu__chevron {
+  transition: transform 300ms var(--menu-ease), color 150ms ease,
+    opacity 400ms ease calc(var(--d) + 160ms), translate 600ms var(--menu-expo) calc(var(--d) + 160ms);
+}
+
 /* Current page: a fine underline under the label. No dot. */
-.dunas-menu__item.is-active > .dunas-menu__row .dunas-menu__label {
+.dunas-menu__item.is-active > .dunas-menu__row .dunas-menu__label-text {
   text-decoration: underline;
   text-decoration-thickness: 0.1rem;
   text-underline-offset: 0.6rem;
@@ -331,7 +420,6 @@ html.dunas-menu-lock {
   color: rgba(var(--menu-ink), 0.55);
   /* Dawn's caret points down; -90deg makes it point right */
   transform: rotate(-90deg);
-  transition: transform 300ms var(--menu-ease), color 150ms ease;
 }
 
 .dunas-menu__chevron svg {
@@ -364,23 +452,68 @@ html.dunas-menu-lock {
   outline-offset: -0.4rem;
 }
 
-/* Rows settle in after the sheet appears */
-.dunas-menu__item,
+/* Lower blocks follow the last row: secondary links, then cards, then the foot */
 .dunas-menu__below {
+  --below: calc(220ms + var(--n, 3) * var(--t-step));
+}
+
+.dunas-menu:not(.is-open):not(.is-closing) .dunas-menu__secondary,
+.dunas-menu:not(.is-open):not(.is-closing) .dunas-menu__foot {
   opacity: 0;
-  transform: translateY(0.8rem);
+  transform: translateY(1.2rem);
 }
 
-.dunas-menu.is-open .dunas-menu__item,
-.dunas-menu.is-open .dunas-menu__below {
-  opacity: 1;
-  transform: none;
-  transition: opacity 360ms ease, transform 520ms var(--menu-ease);
-  transition-delay: calc(60ms + var(--i, 0) * 28ms);
+.dunas-menu.is-open .dunas-menu__secondary {
+  transition: opacity 500ms ease var(--below), transform 700ms var(--menu-expo) var(--below);
 }
 
-.dunas-menu.is-open .dunas-menu__below {
-  transition-delay: 260ms;
+.dunas-menu.is-open .dunas-menu__foot {
+  transition: opacity 500ms ease calc(var(--below) + 220ms),
+    transform 700ms var(--menu-expo) calc(var(--below) + 220ms);
+}
+
+/* Cards slide in from the right, one after the other, their photos settling from a slight zoom */
+.dunas-menu:not(.is-open):not(.is-closing) .dunas-menu__cards > li {
+  opacity: 0;
+  transform: translateX(3.2rem);
+}
+
+.dunas-menu.is-open .dunas-menu__cards > li {
+  transition: opacity 500ms ease calc(var(--below) + 80ms + var(--c, 0) * 90ms),
+    transform 900ms var(--menu-expo) calc(var(--below) + 80ms + var(--c, 0) * 90ms);
+}
+
+.dunas-menu:not(.is-open):not(.is-closing) .dunas-menu__card-media img {
+  scale: 1.12;
+}
+
+.dunas-menu.is-open .dunas-menu__card-media img {
+  transition: scale 1400ms var(--menu-expo) calc(var(--below) + 80ms + var(--c, 0) * 90ms),
+    transform 800ms var(--menu-ease);
+}
+
+/* Sub-items: each one rises in as its group opens */
+@media (prefers-reduced-motion: no-preference) {
+  .dunas-menu__sub:not([hidden]) .dunas-menu__sublist > li {
+    animation: dunas-menu-sub 480ms var(--menu-ease) both;
+  }
+
+  .dunas-menu__sub:not([hidden]) .dunas-menu__sublist > li:nth-child(2) { animation-delay: 35ms; }
+  .dunas-menu__sub:not([hidden]) .dunas-menu__sublist > li:nth-child(3) { animation-delay: 70ms; }
+  .dunas-menu__sub:not([hidden]) .dunas-menu__sublist > li:nth-child(4) { animation-delay: 105ms; }
+  .dunas-menu__sub:not([hidden]) .dunas-menu__sublist > li:nth-child(5) { animation-delay: 140ms; }
+  .dunas-menu__sub:not([hidden]) .dunas-menu__sublist > li:nth-child(n + 6) { animation-delay: 175ms; }
+}
+
+@keyframes dunas-menu-sub {
+  from {
+    opacity: 0;
+    transform: translateY(0.8rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ---------- Sub-items ---------- */
@@ -512,10 +645,6 @@ html.dunas-menu-lock {
 }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .dunas-menu__card-media img {
-    transition: transform 800ms var(--menu-ease);
-  }
-
   .dunas-menu__card:hover .dunas-menu__card-media img {
     transform: scale(1.04);
   }
@@ -621,7 +750,6 @@ html.dunas-menu-lock {
     max-width: 100%;
     border-radius: 0 2.8rem 2.8rem 0;
     overflow: hidden;
-    transform: translateX(-2.4rem);
     background:
       radial-gradient(120% 50% at 20% -10%, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 60%),
       rgba(var(--menu-bg), 0.78);
@@ -659,6 +787,22 @@ html.dunas-menu-lock {
     }
   }
 
+  /* Desktop motion: the sheet slides in from the left edge */
+  .dunas-menu:not(.is-open):not(.is-closing) .dunas-menu__sheet {
+    clip-path: none;
+    transform: translateX(-102%);
+  }
+
+  .dunas-menu.is-open .dunas-menu__sheet {
+    clip-path: none;
+    transform: none;
+    transition: transform var(--t-sheet) var(--menu-expo);
+  }
+
+  .dunas-menu.is-closing .dunas-menu__sheet {
+    transform: translateX(-4rem);
+  }
+
   /* a lighter veil, so the glass has the page to pick up */
   .dunas-menu .dunas-menu__backdrop {
     background: rgba(var(--dunas-ink), 0.22);
@@ -673,26 +817,40 @@ html.dunas-menu-lock {
   }
 }
 
-/* ---------- Reduced motion ---------- */
+/* ---------- Reduced motion: everything is simply there, with a short fade ---------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .dunas-menu__sheet,
-  .dunas-menu.is-open .dunas-menu__sheet,
-  .dunas-menu__item,
-  .dunas-menu__below,
-  .dunas-menu.is-open .dunas-menu__item,
-  .dunas-menu.is-open .dunas-menu__below,
-  .dunas-menu .dunas-menu__backdrop,
-  .dunas-menu__chevron {
+  .dunas-menu .dunas-menu__sheet,
+  .dunas-menu .dunas-menu__brand,
+  .dunas-menu .dunas-menu__actions > *,
+  .dunas-menu .dunas-menu__item::after,
+  .dunas-menu .dunas-menu__label-text,
+  .dunas-menu .dunas-menu__secondary,
+  .dunas-menu .dunas-menu__foot,
+  .dunas-menu .dunas-menu__cards > li,
+  .dunas-menu .dunas-menu__card-media img {
+    clip-path: none !important;
+    transform: none !important;
+    scale: none !important;
+    opacity: 1 !important;
+    transition: none !important;
+  }
+
+  .dunas-menu .dunas-menu__chevron {
+    opacity: 1 !important;
+    translate: none !important;
+    transition: none !important;
+  }
+
+  .dunas-menu:not(.is-open) .dunas-menu__sheet {
+    opacity: 0 !important;
+  }
+
+  .dunas-menu.is-open .dunas-menu__sheet {
+    transition: opacity 150ms ease !important;
+  }
+
+  .dunas-menu .dunas-menu__backdrop {
     transition: none;
-    transform: none;
-  }
-
-  .dunas-menu__chevron {
-    transform: rotate(-90deg);
-  }
-
-  .dunas-menu__row--parent[aria-expanded='true'] .dunas-menu__chevron {
-    transform: rotate(0deg);
   }
 }

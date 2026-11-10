@@ -39,7 +39,8 @@
 >
   <div class="dunas-menu__backdrop" data-dunas-menu-close></div>
 
-  <div class="dunas-menu__sheet">
+  {%- comment -%} --n: number of main rows, so the lower blocks animate in right after the last row {%- endcomment -%}
+  <div class="dunas-menu__sheet" style="--n: {{ menu.links.size | default: 0 }};">
     <div class="dunas-menu__top">
       <a href="{{ routes.root_url }}" class="dunas-menu__brand" aria-label="{{ shop.name | escape }}">
         {%- render 'dunas-logo' -%}
@@ -92,7 +93,7 @@
                   aria-expanded="false"
                   aria-controls="DunasMenuSub-{{ forloop.index }}"
                 >
-                  <span class="dunas-menu__label">{{ link.title | escape }}</span>
+                  <span class="dunas-menu__label"><span class="dunas-menu__label-text">{{ link.title | escape }}</span></span>
                   <span class="dunas-menu__chevron" aria-hidden="true">
                     {{- 'icon-caret.svg' | inline_asset_content -}}
                   </span>
@@ -150,7 +151,7 @@
                     aria-current="page"
                   {% endif %}
                 >
-                  <span class="dunas-menu__label">{{ link.title | escape }}</span>
+                  <span class="dunas-menu__label"><span class="dunas-menu__label-text">{{ link.title | escape }}</span></span>
                   <span class="dunas-menu__chevron dunas-menu__chevron--go" aria-hidden="true">
                     {{- 'icon-caret.svg' | inline_asset_content -}}
                   </span>
@@ -195,7 +196,7 @@
             assign card_2_link = section.settings.dunas_menu_card_2_link | default: routes.root_url
           -%}
           <ul class="dunas-menu__cards" role="list">
-            <li>
+            <li style="--c: 0;">
               <a href="{{ card_1_link }}" class="dunas-menu__card">
                 <span class="dunas-menu__card-media">
                   {%- if section.settings.dunas_menu_card_1_image != blank -%}
@@ -213,7 +214,7 @@
                 {%- endif -%}
               </a>
             </li>
-            <li>
+            <li style="--c: 1;">
               <a href="{{ card_2_link }}" class="dunas-menu__card">
                 <span class="dunas-menu__card-media">
                   {%- if section.settings.dunas_menu_card_2_image != blank -%}
