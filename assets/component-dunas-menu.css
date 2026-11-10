@@ -1,11 +1,14 @@
 /*
-  DUNAS branded menu.
-  The CSS describes the fully open state; assets/dunas-menu.js animates into it with a
-  GSAP timeline (circular reveal from the toggle, masked headline links, drawn rules,
-  drifting wordmark). Without GSAP, or with reduced motion, a short fade is used instead.
+  DUNAS menu.
+  A full-screen cream sheet on phones and tablets, a side sheet on desktop.
+  Compact top bar (logo, search, cart, close), plain rows with hairline dividers and chevrons,
+  sub-items that expand inline, secondary links in two columns, two image cards, then
+  country and social links. Same system as the footer and search: cream, ink, hairlines,
+  sentence case, 20px image radius. Motion is CSS only: a short fade, rows settling in.
+  State classes (is-open / is-closing / is-leaving) come from assets/dunas-menu.js.
 */
 
-/* ---------- Toggle: two asymmetric lines in the header pill ---------- */
+/* ---------- Toggle in the header pill ---------- */
 
 .dunas-menu-toggle {
   position: relative;
@@ -22,7 +25,6 @@
   cursor: pointer;
 }
 
-/* Classic three-line hamburger icon, same as the original header */
 .dunas-menu-toggle__icon,
 .dunas-menu-toggle__icon svg {
   display: block;
@@ -45,23 +47,32 @@
   }
 }
 
-/* ---------- Menu ---------- */
+/* Lock page scroll on the root only: locking <body> too would break the sticky header */
+html.dunas-menu-lock {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* ---------- Layer ---------- */
 
 .dunas-menu {
-  --menu-x: 3rem;
-  --menu-y: 4rem;
-  --menu-r: 150vmax;
   --menu-ink: var(--dunas-ink);
-  --menu-accent: var(--dunas-green);
   --menu-bg: var(--dunas-cream);
+  --menu-rule: rgba(var(--dunas-ink), 0.14);
+  --menu-muted: rgba(var(--dunas-ink), 0.68);
+  --menu-gutter: 2.4rem;
+  --menu-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Dawn components inside (country selector, social icons) follow these */
+  --color-foreground: var(--dunas-ink);
+  --color-background: var(--dunas-cream);
   position: fixed;
   inset: 0;
-  /* The menu lives directly in <body> (moved there by dunas-menu.js): above the header,
+  /* Lives directly in <body> (moved there by dunas-menu.js): above the header,
      below Dawn's cart drawer and modals */
   z-index: 999;
   color: rgb(var(--menu-ink));
+  font-family: var(--font-body-family);
   text-shadow: none;
-  overflow: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -69,299 +80,297 @@
   display: none;
 }
 
-/* Lock page scroll on the root only: locking <body> too would break the sticky header */
-html.dunas-menu-lock {
-  overflow: hidden;
-  overscroll-behavior: none;
-}
-
-/* Dawn hides empty divs (div:empty); this panel is intentionally empty */
-.dunas-menu .dunas-menu__panel {
+/* Dawn hides empty divs (div:empty); the backdrop is intentionally empty */
+.dunas-menu .dunas-menu__backdrop {
   display: block;
-}
-
-.dunas-menu__panel {
   position: absolute;
   inset: 0;
-  background: rgb(var(--menu-bg));
+  background: rgba(var(--dunas-ink), 0.4);
+  opacity: 0;
+  transition: opacity 240ms ease;
 }
 
-/* Giant faint wordmark along the right edge */
-.dunas-menu__mark {
+.dunas-menu.is-open .dunas-menu__backdrop {
+  opacity: 1;
+}
+
+.dunas-menu__sheet {
   position: absolute;
-  top: 12%;
-  bottom: 14%;
-  right: -2.4rem;
-  color: rgb(var(--menu-ink));
-  opacity: 0.07;
-  pointer-events: none;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: rgb(var(--menu-bg));
+  opacity: 0;
+  transform: translateY(0.8rem);
+  transition: opacity 200ms ease, transform 200ms ease;
 }
 
-.dunas-menu__mark .dunas-logo {
+.dunas-menu.is-open .dunas-menu__sheet {
+  opacity: 1;
+  transform: none;
+  transition: opacity 260ms ease, transform 420ms var(--menu-ease);
+}
+
+/* ---------- Top bar ---------- */
+
+.dunas-menu__top {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+  min-height: 7.2rem;
+  padding: 0 calc(var(--menu-gutter) - 1rem) 0 var(--menu-gutter);
+  border-bottom: 0.1rem solid var(--menu-rule);
+}
+
+.dunas-menu__brand {
   display: block;
-  height: 100%;
-  width: auto;
+  width: 11.2rem;
+  color: rgb(var(--menu-ink));
+  line-height: 0;
+}
+
+.dunas-menu__brand .dunas-logo {
+  display: block;
+  width: 100%;
+  height: auto;
   overflow: visible;
 }
 
-.dunas-menu__inner {
-  position: relative;
+.dunas-menu__actions {
   display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: var(--dunas-header-pad-y, 1.2rem) 1.6rem calc(2.4rem + env(safe-area-inset-bottom));
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-/* Top bar mirrors the header pill so the close button sits where the toggle was */
-.dunas-menu__top {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  height: var(--dunas-header-pill, 5.6rem);
-  padding: 0 1.2rem 0 1.6rem;
-  flex-shrink: 0;
+  gap: 0.4rem;
 }
 
+.dunas-menu__action,
 .dunas-menu__close {
-  justify-self: start;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 4.4rem;
+  gap: 0.6rem;
+  min-width: 4.4rem;
   height: 4.4rem;
-  margin-left: -1rem;
-  padding: 0;
+  padding: 0 1rem;
   border: 0;
-  border-radius: 50%;
-  background: none;
-  color: inherit;
+  border-radius: 10rem;
+  background: transparent;
+  color: rgb(var(--menu-ink));
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  letter-spacing: 0;
+  text-decoration: none;
   cursor: pointer;
+  transition: background-color 150ms ease;
 }
 
-.dunas-menu__close-lines {
-  position: relative;
+.dunas-menu__action .svg-wrapper,
+.dunas-menu__close .svg-wrapper {
   display: block;
   width: 2rem;
   height: 2rem;
 }
 
-.dunas-menu__close-lines span {
-  position: absolute;
-  top: 50%;
-  left: 0;
+.dunas-menu__close .svg-wrapper {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.dunas-menu__action svg,
+.dunas-menu__close svg {
+  display: block;
   width: 100%;
-  height: 0.15rem;
-  margin-top: -0.075rem;
-  border-radius: 1rem;
-  background: currentColor;
-}
-
-.dunas-menu__close-lines span:first-child {
-  transform: rotate(45deg);
-}
-
-.dunas-menu__close-lines span:last-child {
-  transform: rotate(-45deg);
-}
-
-.dunas-menu__brand {
-  display: inline-flex;
-  color: inherit;
-}
-
-.dunas-menu__brand .dunas-logo {
-  width: 10.4rem;
-  height: auto;
-  overflow: visible;
-}
-
-.dunas-menu__cart {
-  justify-self: end;
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 4.4rem;
-  height: 4.4rem;
-  margin-right: -0.8rem;
-  color: inherit;
-}
-
-.dunas-menu__cart .svg-wrapper,
-.dunas-menu__cart svg {
-  width: 3.8rem;
-  height: 3.8rem;
+  height: 100%;
 }
 
 .dunas-menu__count {
-  position: absolute;
-  top: 0.4rem;
-  right: 0.2rem;
-  min-width: 1.8rem;
-  height: 1.8rem;
-  padding: 0 0.4rem;
-  border-radius: 1rem;
-  background: rgb(var(--menu-accent));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.6rem;
+  border-radius: 10rem;
+  background: rgb(var(--menu-ink));
   color: rgb(var(--menu-bg));
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1.8rem;
-  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
-/* Headline links */
-.dunas-menu__nav {
-  flex: 1 0 auto;
-  display: flex;
-  align-items: center;
-  padding: 3.2rem 0.8rem 2.4rem;
+@media (hover: hover) {
+  .dunas-menu__action:hover,
+  .dunas-menu__close:hover {
+    background: rgba(var(--menu-ink), 0.06);
+  }
 }
+
+.dunas-menu__action:active,
+.dunas-menu__close:active {
+  background: rgba(var(--menu-ink), 0.1);
+}
+
+.dunas-menu :focus-visible {
+  outline: 0.2rem solid rgb(var(--menu-ink));
+  outline-offset: 0.2rem;
+}
+
+/* ---------- Scroll area ---------- */
+
+.dunas-menu__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--menu-ink), 0.2) transparent;
+}
+
+/* ---------- Main rows ---------- */
 
 .dunas-menu__list {
-  width: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .dunas-menu__item {
-  position: relative;
+  border-bottom: 0.1rem solid var(--menu-rule);
 }
 
 .dunas-menu__row {
   display: flex;
   align-items: center;
-  gap: 1.4rem;
-  padding: 1.4rem 0;
-}
-
-.dunas-menu__num {
-  flex: 0 0 2.6rem;
-  align-self: flex-start;
-  margin-top: 0.9rem;
-  font-family: var(--font-body-family);
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  opacity: 0.55;
-}
-
-.dunas-menu__link {
-  flex: 1;
-  min-width: 0;
-  color: inherit;
+  justify-content: space-between;
+  gap: 1.6rem;
+  width: 100%;
+  min-height: 6.4rem;
+  padding: 1.2rem var(--menu-gutter);
+  border: 0;
+  background: transparent;
+  color: rgb(var(--menu-ink));
+  font-family: var(--font-heading-family);
+  font-size: 2.2rem;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  text-align: left;
   text-decoration: none;
-  font-family: var(--dunas-display-font, var(--font-heading-family));
-  font-weight: 300;
-  font-size: clamp(3.4rem, 11vw, 6rem);
-  line-height: 1.04;
-  letter-spacing: -0.01em;
-}
-
-.dunas-menu__mask {
-  display: block;
-  overflow: hidden;
-  padding-bottom: 0.08em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 150ms ease;
 }
 
 .dunas-menu__label {
-  display: inline-block;
-  transform-origin: left bottom;
-  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
-.dunas-menu__item.is-active .dunas-menu__label::after {
-  content: '';
-  display: inline-block;
-  width: 0.7rem;
-  height: 0.7rem;
-  margin-left: 1.2rem;
-  border-radius: 50%;
-  background: currentColor;
-  vertical-align: 0.5em;
+.dunas-menu__chevron {
+  flex: 0 0 auto;
+  display: block;
+  width: 1.2rem;
+  height: 1.2rem;
+  color: rgba(var(--menu-ink), 0.55);
+  /* Dawn's caret points down; -90deg makes it point right */
+  transform: rotate(-90deg);
+  transition: transform 300ms var(--menu-ease), color 150ms ease;
+}
+
+.dunas-menu__chevron svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.dunas-menu__row--parent[aria-expanded='true'] .dunas-menu__chevron {
+  transform: rotate(0deg);
+  color: rgb(var(--menu-ink));
 }
 
 @media (hover: hover) {
-  .dunas-menu__link:hover .dunas-menu__label {
-    transform: translateX(0.8rem);
+  .dunas-menu__row:hover {
+    background: rgba(var(--menu-ink), 0.035);
+  }
+
+  .dunas-menu__row:hover .dunas-menu__chevron--go {
+    transform: rotate(-90deg) translateY(0.3rem);
+    color: rgb(var(--menu-ink));
   }
 }
 
-.dunas-menu__rule {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 0.1rem;
-  background: rgba(var(--menu-ink), 0.16);
-  transform-origin: left center;
+.dunas-menu__row:active {
+  background: rgba(var(--menu-ink), 0.06);
 }
 
-/* Expand button for links with sub-items */
-.dunas-menu__expand {
-  position: relative;
-  flex: 0 0 4.4rem;
-  width: 4.4rem;
-  height: 4.4rem;
-  padding: 0;
-  border: 0.1rem solid rgba(var(--menu-ink), 0.3);
-  border-radius: 50%;
-  background: none;
-  color: inherit;
-  cursor: pointer;
-  transition: background-color 250ms ease, transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+.dunas-menu__row:focus-visible {
+  outline-offset: -0.4rem;
 }
 
-.dunas-menu__expand span::before,
-.dunas-menu__expand span::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 1.4rem;
-  height: 0.15rem;
-  margin: -0.075rem 0 0 -0.7rem;
-  border-radius: 1rem;
-  background: currentColor;
+/* Rows settle in after the sheet appears */
+.dunas-menu__item,
+.dunas-menu__below {
+  opacity: 0;
+  transform: translateY(0.8rem);
 }
 
-.dunas-menu__expand span::after {
-  transform: rotate(90deg);
+.dunas-menu.is-open .dunas-menu__item,
+.dunas-menu.is-open .dunas-menu__below {
+  opacity: 1;
+  transform: none;
+  transition: opacity 360ms ease, transform 520ms var(--menu-ease);
+  transition-delay: calc(60ms + var(--i, 0) * 28ms);
 }
 
-.dunas-menu__expand[aria-expanded='true'] {
-  transform: rotate(45deg);
-  background: rgba(var(--menu-ink), 0.12);
+.dunas-menu.is-open .dunas-menu__below {
+  transition-delay: 260ms;
 }
+
+/* ---------- Sub-items ---------- */
 
 .dunas-menu__sub {
-  margin: 0;
-  padding: 0 0 1.8rem 4rem;
-  list-style: none;
   overflow: hidden;
+}
+
+.dunas-menu__sub[hidden] {
+  display: none;
+}
+
+.dunas-menu__sublist {
+  margin: 0;
+  padding: 0 var(--menu-gutter) 2rem;
+  list-style: none;
 }
 
 .dunas-menu__subsub {
   margin: 0;
-  padding: 0 0 0.6rem 1.6rem;
+  padding: 0 0 0.4rem 1.6rem;
   list-style: none;
 }
 
 .dunas-menu__sublink {
-  display: block;
-  padding: 0.7rem 0;
-  color: rgba(var(--menu-ink), 0.82);
+  display: flex;
+  align-items: center;
+  min-height: 4.4rem;
+  padding: 0.6rem 0;
+  color: var(--menu-muted);
+  font-size: 1.6rem;
+  line-height: 1.4;
+  letter-spacing: 0;
   text-decoration: none;
-  font-family: var(--font-heading-family);
-  font-size: 2rem;
-  font-weight: 300;
+  transition: color 150ms ease;
+}
+
+.dunas-menu__sublink--all {
+  color: rgb(var(--menu-ink));
+  font-weight: 600;
 }
 
 .dunas-menu__sublink--small {
-  font-size: 1.6rem;
-  padding: 0.5rem 0;
+  min-height: 4rem;
+  font-size: 1.4rem;
 }
 
 .dunas-menu__sublink[aria-current='page'],
@@ -369,421 +378,218 @@ html.dunas-menu-lock {
   color: rgb(var(--menu-ink));
 }
 
-/* Footer */
-.dunas-menu__foot {
-  display: flex;
-  flex-direction: column;
-  gap: 1.8rem;
-  padding: 0 0.8rem;
-  flex-shrink: 0;
+/* ---------- Below the rows ---------- */
+
+.dunas-menu__below {
+  padding: 3.2rem 0 calc(3.2rem + env(safe-area-inset-bottom, 0px));
 }
 
-.dunas-menu__tagline {
+.dunas-menu__secondary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem 2.4rem;
   margin: 0;
-  font-family: var(--dunas-display-font, var(--font-heading-family));
-  font-weight: 300;
-  font-size: 2.2rem;
-  line-height: 1.1;
-  opacity: 0.85;
+  padding: 0 var(--menu-gutter);
+  list-style: none;
+}
+
+.dunas-menu__secondary a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 4.4rem;
+  color: rgb(var(--menu-ink));
+  font-size: 1.5rem;
+  letter-spacing: 0;
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) left calc(100% - 1rem) / 0 0.1rem no-repeat;
+  transition: background-size 300ms var(--menu-ease);
+}
+
+.dunas-menu__secondary a:hover,
+.dunas-menu__secondary a[aria-current='page'] {
+  background-size: 100% 0.1rem;
+}
+
+/* Image cards: the second card peeks in, inviting a swipe */
+.dunas-menu__cards {
+  display: flex;
+  gap: 1.6rem;
+  margin: 3.2rem 0 0;
+  padding: 0 var(--menu-gutter);
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: var(--menu-gutter);
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dunas-menu__cards::-webkit-scrollbar {
+  display: none;
+}
+
+.dunas-menu__cards > li {
+  flex: 0 0 72%;
+  scroll-snap-align: start;
+}
+
+.dunas-menu__card {
+  display: block;
+  color: rgb(var(--menu-ink));
+  text-decoration: none;
+}
+
+.dunas-menu__card-media {
+  display: block;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 2rem;
+  background: rgba(var(--menu-ink), 0.06);
+}
+
+.dunas-menu__card-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .dunas-menu__card-media img {
+    transition: transform 800ms var(--menu-ease);
+  }
+
+  .dunas-menu__card:hover .dunas-menu__card-media img {
+    transform: scale(1.04);
+  }
+}
+
+.dunas-menu__card-label {
+  display: block;
+  margin-top: 1.2rem;
+  font-size: 1.5rem;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+/* Country, language, social */
+.dunas-menu__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem 2.4rem;
+  margin: 3.2rem var(--menu-gutter) 0;
+  padding-top: 2rem;
+  border-top: 0.1rem solid var(--menu-rule);
 }
 
 .dunas-menu__utility {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 1.2rem 2rem;
+  gap: 0.4rem 1.6rem;
 }
 
-.dunas-menu__account {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.8rem;
-  color: inherit;
-  text-decoration: none;
-  font-family: var(--font-body-family);
-  font-size: 1.4rem;
-  letter-spacing: 0.04em;
-}
-
-.dunas-menu__account .svg-wrapper,
-.dunas-menu__account svg {
-  width: 2rem;
-  height: 2rem;
+.dunas-menu .localization-form {
+  margin: 0;
+  padding: 0;
 }
 
 .dunas-menu .localization-form__select {
+  min-height: 4.4rem;
+  margin: 0;
+  padding: 0 2.2rem 0 0;
+  border-radius: 0;
+  background: transparent;
   color: rgb(var(--menu-ink));
-  background: rgba(var(--menu-ink), 0.1);
-  border-radius: 10rem;
-  min-height: 4rem;
-  padding: 0.8rem 4rem 0.8rem 1.6rem;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
+  letter-spacing: 0;
+  box-shadow: none;
 }
 
 .dunas-menu .localization-form__select::before,
 .dunas-menu .localization-form__select::after {
-  border-radius: 10rem;
-  box-shadow: none;
+  display: none;
 }
 
-.dunas-menu .localization-form {
-  padding: 0;
-  margin: 0;
+.dunas-menu .localization-form__select .icon-caret {
+  right: 0;
 }
 
 .dunas-menu .disclosure__list-wrapper {
-  bottom: 100%;
-  top: auto;
-  color: rgb(var(--dunas-ink));
+  background: rgb(var(--menu-bg));
+  color: rgb(var(--menu-ink));
 }
 
 .dunas-menu__social {
-  display: flex;
-  gap: 0.4rem;
-  margin: 0 0 0 -1.2rem;
+  margin: 0 -1.2rem 0 0;
+  justify-content: flex-end;
 }
 
 .dunas-menu__social .list-social__link {
+  color: var(--menu-muted);
+  transition: color 150ms ease;
+}
+
+.dunas-menu__social .list-social__link:hover {
   color: rgb(var(--menu-ink));
 }
 
-/* Waiting a moment for GSAP (fast tap right after page load) */
-.dunas-menu.is-waiting {
-  visibility: hidden;
+/* ---------- Leaving: the chosen link stays, the rest steps back ---------- */
+
+.dunas-menu.is-leaving .dunas-menu__row,
+.dunas-menu.is-leaving .dunas-menu__sublink,
+.dunas-menu.is-leaving .dunas-menu__secondary a,
+.dunas-menu.is-leaving .dunas-menu__card {
+  opacity: 0.35;
+  transition: opacity 200ms ease;
 }
 
-/* Fallback (no GSAP, or reduced motion): a short fade in */
-.dunas-menu.is-static {
-  animation: dunas-menu-fade 220ms ease both;
-}
-
-@keyframes dunas-menu-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@media screen and (min-width: 750px) {
-  .dunas-menu__inner {
-    padding-left: 3.2rem;
-    padding-right: 3.2rem;
-  }
-
-  .dunas-menu__nav {
-    padding-left: 4rem;
-    padding-right: 4rem;
-  }
-
-  .dunas-menu__foot {
-    padding: 0 4rem;
-  }
-}
-
-/* =====================================================================
-   Cream edition refinements
-   Cream panel, ink type, brand-green accents.
-   ===================================================================== */
-
-/* Watermark in brand green, a touch more present on cream */
-.dunas-menu__mark {
-  color: rgb(var(--menu-accent));
-}
-
-/* Close: a soft round button */
-.dunas-menu__close {
-  background: rgba(var(--menu-ink), 0.06);
-  transition: background-color 200ms ease;
-}
-
-.dunas-menu__close:hover {
-  background: rgba(var(--menu-ink), 0.1);
-}
-
-.dunas-menu__close:active {
-  background: rgba(var(--menu-ink), 0.14);
-}
-
-.dunas-menu__close-lines {
-  width: 1.6rem;
-  height: 1.6rem;
-}
-
-/* Numbers and active dot in the brand green */
-.dunas-menu__num {
-  color: rgb(var(--menu-accent));
+.dunas-menu.is-leaving .is-chosen {
   opacity: 1;
 }
 
-.dunas-menu__item.is-active .dunas-menu__link {
-  color: rgb(var(--menu-accent));
-}
+/* ---------- Desktop: a side sheet ---------- */
 
-/* Links respond to touch and hover: a small shift and the accent colour */
-.dunas-menu__link {
-  transition: color 250ms ease;
-}
+@media screen and (min-width: 990px) {
+  .dunas-menu {
+    --menu-gutter: 3.2rem;
+  }
 
-.dunas-menu__link:active,
-.dunas-menu__link:focus-visible {
-  color: rgb(var(--menu-accent));
-}
+  .dunas-menu__sheet {
+    right: auto;
+    width: 46rem;
+    max-width: 100%;
+    border-radius: 0 2.8rem 2.8rem 0;
+    overflow: hidden;
+    transform: translateX(-2.4rem);
+  }
 
-.dunas-menu__link:active .dunas-menu__label {
-  transform: translateX(0.6rem);
-}
-
-@media (hover: hover) {
-  .dunas-menu__link:hover {
-    color: rgb(var(--menu-accent));
+  .dunas-menu__cards > li {
+    flex-basis: 62%;
   }
 }
 
-/* Dividers slightly finer on cream */
-.dunas-menu__rule {
-  background: rgba(var(--menu-ink), 0.1);
-}
+/* ---------- Reduced motion ---------- */
 
-/* Expand buttons in ink, green when open */
-.dunas-menu__expand {
-  border-color: rgba(var(--menu-ink), 0.16);
-}
-
-.dunas-menu__expand[aria-expanded='true'] {
-  background: rgba(var(--menu-accent), 0.1);
-  color: rgb(var(--menu-accent));
-}
-
-.dunas-menu__sublink {
-  color: rgba(var(--menu-ink), 0.7);
-}
-
-.dunas-menu__sublink[aria-current='page'],
-.dunas-menu__sublink:hover {
-  color: rgb(var(--menu-accent));
-}
-
-/* Footer: a fine line above, tagline as a quiet brand signature */
-.dunas-menu__foot {
-  padding-top: 2rem;
-  border-top: 0.1rem solid rgba(var(--menu-ink), 0.1);
-  margin: 0 0.8rem;
-  padding-left: 0;
-  padding-right: 0;
-}
-
-.dunas-menu__tagline {
-  color: rgb(var(--menu-accent));
-  opacity: 1;
-}
-
-/* Bottom pills: account and country on white */
-.dunas-menu__account {
-  min-height: 4rem;
-  padding: 0.8rem 1.6rem;
-  border-radius: 10rem;
-  background: #fff;
-  border: 0.1rem solid rgba(var(--menu-ink), 0.08);
-  font-weight: 600;
-}
-
-.dunas-menu .localization-form__select {
-  background: #fff;
-  border: 0.1rem solid rgba(var(--menu-ink), 0.08);
-}
-
-.dunas-menu__social .list-social__link {
-  color: rgb(var(--menu-ink));
-}
-
-@media screen and (min-width: 750px) {
-  .dunas-menu__foot {
-    margin: 0 4rem;
+@media (prefers-reduced-motion: reduce) {
+  .dunas-menu__sheet,
+  .dunas-menu.is-open .dunas-menu__sheet,
+  .dunas-menu__item,
+  .dunas-menu__below,
+  .dunas-menu.is-open .dunas-menu__item,
+  .dunas-menu.is-open .dunas-menu__below,
+  .dunas-menu .dunas-menu__backdrop,
+  .dunas-menu__chevron {
+    transition: none;
+    transform: none;
   }
-}
 
-/* =====================================================================
-   UX pass: whole-row tap targets, arrows, search, no active dot
-   ===================================================================== */
-
-/* No dot beside the current page; it is shown by the accent colour only */
-.dunas-menu__item.is-active .dunas-menu__label::after {
-  content: none;
-}
-
-/* The row is a single, generous tap target */
-.dunas-menu__row {
-  padding: 0;
-  gap: 0.6rem;
-}
-
-.dunas-menu__link {
-  display: flex;
-  align-items: center;
-  gap: 1.4rem;
-  min-height: 6.4rem;
-  margin: 0 -1rem;
-  padding: 1rem;
-  border-radius: 1.6rem;
-  font-size: clamp(3rem, 9.4vw, 5.2rem);
-  -webkit-user-select: none;
-  user-select: none;
-  transition: color 250ms ease, background-color 200ms ease;
-}
-
-.dunas-menu__link:active {
-  background-color: rgba(var(--menu-accent), 0.08);
-}
-
-.dunas-menu__num {
-  flex: 0 0 2.4rem;
-  align-self: flex-start;
-  margin-top: 0.6rem;
-}
-
-.dunas-menu__mask {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.dunas-menu__label {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-/* Arrow on the right: shows the row is tappable, nudges on press/hover */
-.dunas-menu__arrow {
-  flex: 0 0 auto;
-  display: inline-flex;
-  width: 1.8rem;
-  height: 1.8rem;
-  color: rgba(var(--menu-ink), 0.3);
-  transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1), color 200ms ease;
-}
-
-.dunas-menu__arrow svg {
-  width: 100%;
-  height: 100%;
-}
-
-.dunas-menu__link:active .dunas-menu__arrow,
-.dunas-menu__link:focus-visible .dunas-menu__arrow {
-  transform: translateX(0.4rem);
-  color: rgb(var(--menu-accent));
-}
-
-.dunas-menu__item.is-active .dunas-menu__arrow {
-  color: rgb(var(--menu-accent));
-}
-
-@media (hover: hover) {
-  .dunas-menu__link:hover .dunas-menu__arrow {
-    transform: translateX(0.4rem);
-    color: rgb(var(--menu-accent));
+  .dunas-menu__chevron {
+    transform: rotate(-90deg);
   }
-}
 
-/* Links with sub-items: the + sits where the arrow would be */
-.dunas-menu__expand {
-  flex: 0 0 4.4rem;
-  width: 4.4rem;
-  height: 4.4rem;
-  margin-right: -0.2rem;
-}
-
-/* Search */
-.dunas-menu__search {
-  position: relative;
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  margin: 1.2rem 0.8rem 0;
-}
-
-.dunas-menu__search .svg-wrapper {
-  position: absolute;
-  left: 1.8rem;
-  width: 1.8rem;
-  height: 1.8rem;
-  color: rgb(var(--menu-accent));
-  pointer-events: none;
-}
-
-.dunas-menu__search .svg-wrapper svg {
-  width: 100%;
-  height: 100%;
-}
-
-.dunas-menu__search input {
-  width: 100%;
-  height: 5.2rem;
-  padding: 0 1.8rem 0 4.8rem;
-  border: 0.1rem solid rgba(var(--menu-ink), 0.08);
-  border-radius: 10rem;
-  background: #fff;
-  color: rgb(var(--menu-ink));
-  font-family: var(--font-heading-family);
-  font-size: 1.7rem;
-  -webkit-appearance: none;
-  appearance: none;
-  outline: none;
-  transition: border-color 200ms ease, box-shadow 200ms ease;
-}
-
-.dunas-menu__search input::placeholder {
-  color: rgba(var(--menu-ink), 0.4);
-}
-
-.dunas-menu__search input:focus {
-  border-color: rgba(var(--menu-accent), 0.45);
-  box-shadow: 0 0 0 0.3rem rgba(var(--menu-accent), 0.12);
-}
-
-/* With search above, the links sit a little higher */
-.dunas-menu__nav {
-  padding-top: 2rem;
-}
-
-@media screen and (min-width: 750px) {
-  .dunas-menu__search {
-    margin: 1.6rem 4rem 0;
-    max-width: 52rem;
+  .dunas-menu__row--parent[aria-expanded='true'] .dunas-menu__chevron {
+    transform: rotate(0deg);
   }
-}
-
-/* =====================================================================
-   Reveal + navigation polish
-   ===================================================================== */
-
-/* The whole menu (panel AND content) is clipped to the growing circle, so nothing can
-   ever appear outside the cream while it opens or closes */
-.dunas-menu {
-  clip-path: circle(var(--menu-r) at var(--menu-x) var(--menu-y));
-}
-
-/* After tapping a link: the chosen row stays, everything else steps back */
-.dunas-menu.is-leaving .dunas-menu__item:not(.is-chosen),
-.dunas-menu.is-leaving .dunas-menu__search,
-.dunas-menu.is-leaving .dunas-menu__foot,
-.dunas-menu.is-leaving .dunas-menu__top > *:not(.dunas-menu__close) {
-  opacity: 0.3;
-  transition: opacity 250ms ease;
-}
-
-.dunas-menu.is-leaving .dunas-menu__item.is-chosen .dunas-menu__link {
-  color: rgb(var(--menu-accent));
-  background-color: rgba(var(--menu-accent), 0.08);
-}
-
-.dunas-menu.is-leaving .dunas-menu__item.is-chosen .dunas-menu__arrow {
-  color: rgb(var(--menu-accent));
-  transform: translateX(0.6rem);
-}
-
-.dunas-menu.is-leaving .dunas-menu__sublink.is-chosen {
-  color: rgb(var(--menu-accent));
 }

@@ -1517,6 +1517,18 @@
     ]
   },
   {
+    "name": "DUNAS menu",
+    "settings": [
+      {
+        "type": "link_list",
+        "id": "dunas_menu_secondary",
+        "label": "Secondary links",
+        "default": "footer",
+        "info": "Smaller links under the main menu, shown in two columns. More menu options are in the Header section."
+      }
+    ]
+  },
+  {
     "name": "DUNAS search",
     "settings": [
       {

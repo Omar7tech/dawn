@@ -1,127 +1,35 @@
 /*
-  DUNAS branded menu.
+  DUNAS menu behaviour. No libraries: the open/close motion is CSS (see component-dunas-menu.css),
+  this file only manages state.
 
-  Open:  a cream panel grows in a circle from the menu button, the top bar fades in,
-         headline links rise out of their masks with their numbers, divider rules draw in,
-         the giant wordmark drifts up, and the footer settles last.
-  Close: the same timeline plays in reverse, faster.
-
-  GSAP is loaded in the background once the page has finished loading (and again on the
-  first touch of the button), so opening is instant and never delays the page. If GSAP is
-  not available yet, or the visitor prefers reduced motion, the menu simply fades in.
+  - open / close with a class, scroll lock on <html> only (locking <body> breaks the sticky header)
+  - focus is trapped in the menu, Escape closes, focus returns to the menu button
+  - parent rows expand their sub-items inline
+  - the search action closes the menu and opens the header search
+  - a page restored from the back/forward cache never shows the menu stuck open
 */
 (function () {
+  'use strict';
+
   var menu = document.getElementById('DunasMenu');
   var toggle = document.querySelector('.dunas-menu-toggle');
   if (!menu || !toggle) return;
 
   // Live directly in <body>, so nothing in the header (sticky positioning, glass effects,
-  // stacking) can ever hide or misplace the menu, at any scroll position
+  // stacking) can hide or misplace the menu at any scroll position.
   if (menu.parentElement !== document.body) document.body.appendChild(menu);
 
-  var GSAP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
+  var CLOSE_MS = 240;
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   var closeButton = menu.querySelector('.dunas-menu__close');
-  var timeline = null;
   var isOpen = false;
-  var gsapPromise = null;
-
-  function loadGsap() {
-    if (window.gsap) return Promise.resolve(window.gsap);
-    if (gsapPromise) return gsapPromise;
-    gsapPromise = new Promise(function (resolve, reject) {
-      var script = document.createElement('script');
-      script.src = GSAP_SRC;
-      script.async = true;
-      script.onload = function () {
-        resolve(window.gsap);
-      };
-      script.onerror = function () {
-        gsapPromise = null;
-        reject();
-      };
-      document.head.appendChild(script);
-    });
-    return gsapPromise;
-  }
-
-  // Warm GSAP up without competing with the page
-  function warm() {
-    loadGsap().catch(function () {});
-  }
-  // Start fetching soon after the page appears (idle time, at most ~1.5s later)
-  if (window.requestIdleCallback) {
-    window.requestIdleCallback(warm, { timeout: 1500 });
-  } else {
-    setTimeout(warm, 800);
-  }
-  toggle.addEventListener('pointerenter', warm, { once: true });
-  toggle.addEventListener('touchstart', warm, { once: true, passive: true });
-
-  // Circle origin = centre of the toggle; radius = distance to the farthest corner
-  function setOrigin() {
-    var box = toggle.getBoundingClientRect();
-    var x = box.left + box.width / 2;
-    var y = box.top + box.height / 2;
-    var w = window.innerWidth;
-    var h = window.innerHeight;
-    var radius = Math.ceil(Math.max(Math.hypot(x, y), Math.hypot(w - x, y), Math.hypot(x, h - y), Math.hypot(w - x, h - y)));
-    menu.style.setProperty('--menu-x', x + 'px');
-    menu.style.setProperty('--menu-y', y + 'px');
-    menu.dataset.radius = radius;
-  }
-
-  function buildTimeline(gsap) {
-    var top = menu.querySelectorAll('.dunas-menu__top > *');
-    var labels = menu.querySelectorAll('.dunas-menu__label');
-    var numbers = menu.querySelectorAll('.dunas-menu__num');
-    var expands = menu.querySelectorAll('.dunas-menu__expand');
-    var rules = menu.querySelectorAll('.dunas-menu__rule');
-    var mark = menu.querySelector('.dunas-menu__mark');
-    var foot = menu.querySelectorAll('.dunas-menu__foot > *');
-    var search = menu.querySelector('.dunas-menu__search');
-    var arrows = menu.querySelectorAll('.dunas-menu__arrow');
-
-    var tl = gsap.timeline({
-      paused: true,
-      defaults: { ease: 'expo.out', duration: 0.9 },
-      onReverseComplete: afterClose,
-    });
-
-    tl.addLabel('reveal', 0)
-      .fromTo(
-        menu,
-        { '--menu-r': '0px' },
-        {
-          '--menu-r': function () {
-            return menu.dataset.radius + 'px';
-          },
-          duration: 0.6,
-          ease: 'expo.inOut',
-        },
-        'reveal'
-      )
-      .fromTo(mark, { yPercent: 14, opacity: 0 }, { yPercent: 0, opacity: 0.09, duration: 1.2 }, 'reveal+=0.2')
-      .addLabel('content', 'reveal+=0.22')
-      .fromTo(top, { opacity: 0, y: -6 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.04 }, 'content')
-      .fromTo(closeButton, { rotate: -90 }, { rotate: 0, duration: 0.7, ease: 'back.out(1.6)' }, 'content')
-      .fromTo(labels, { yPercent: 115, rotate: 4 }, { yPercent: 0, rotate: 0, duration: 0.8, stagger: 0.05 }, 'content+=0.06')
-      .fromTo(numbers, { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.05 }, 'content+=0.12')
-      .fromTo(arrows, { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.05 }, 'content+=0.16')
-      .fromTo(rules, { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: 'expo.inOut', stagger: 0.05 }, 'content+=0.04')
-      .fromTo(expands, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, stagger: 0.05 }, 'content+=0.16')
-      .fromTo(foot, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.05 }, 'content+=0.22');
-
-    if (search) tl.fromTo(search, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5 }, 'content');
-
-    return tl;
-  }
+  var closeTimer = null;
 
   function focusables() {
     return Array.prototype.filter.call(
       menu.querySelectorAll('a[href], button:not([disabled]), summary, select, input'),
       function (element) {
-        return element.offsetParent !== null || element === closeButton;
+        return element.offsetParent !== null;
       }
     );
   }
@@ -161,169 +69,152 @@
   function open() {
     if (isOpen) return;
     isOpen = true;
-    setOrigin();
+    clearTimeout(closeTimer);
+    menu.classList.remove('is-closing');
     menu.hidden = false;
+    // Next frame, so the transition runs from the hidden state
+    void menu.offsetWidth;
+    menu.classList.add('is-open');
     toggle.setAttribute('aria-expanded', 'true');
     lockScroll(true);
     document.addEventListener('keydown', onKeydown);
-
-    if (window.gsap || reduceMotion.matches) {
-      animateIn();
-    } else {
-      // Tapped before GSAP arrived: wait briefly (invisible) so the real animation plays
-      menu.classList.add('is-waiting');
-      var timer = new Promise(function (resolve) {
-        setTimeout(resolve, 350);
-      });
-      Promise.race([loadGsap().catch(function () {}), timer]).then(function () {
-        menu.classList.remove('is-waiting');
-        if (isOpen) animateIn();
-      });
-    }
+    if (closeButton) closeButton.focus({ preventScroll: true });
   }
 
-  function animateIn() {
-    if (window.gsap && !reduceMotion.matches) {
-      menu.classList.remove('is-static');
-      if (!timeline) timeline = buildTimeline(window.gsap);
-      if (timeline.reversed() && timeline.isActive()) {
-        timeline.timeScale(1).play();
-      } else {
-        timeline.invalidate().timeScale(1).play(0);
-      }
-    } else {
-      menu.style.removeProperty('--menu-r');
-      menu.classList.add('is-static');
-    }
-    closeButton.focus({ preventScroll: true });
+  function finishClose(returnFocus) {
+    if (isOpen) return;
+    menu.hidden = true;
+    menu.classList.remove('is-closing', 'is-leaving');
+    menu.querySelectorAll('.is-chosen').forEach(function (element) {
+      element.classList.remove('is-chosen');
+    });
+    collapseAll();
+    var scroller = menu.querySelector('.dunas-menu__scroll');
+    if (scroller) scroller.scrollTop = 0;
+    lockScroll(false);
+    if (returnFocus !== false) toggle.focus({ preventScroll: true });
   }
 
-  function close() {
+  function close(options) {
     if (!isOpen) return;
     isOpen = false;
+    var returnFocus = !(options && options.returnFocus === false);
     toggle.setAttribute('aria-expanded', 'false');
     document.removeEventListener('keydown', onKeydown);
-    collapseAll();
-
-    if (timeline && !menu.classList.contains('is-static')) {
-      timeline.timeScale(2.4).reverse();
-    } else {
-      afterClose();
-    }
-  }
-
-  function afterClose() {
-    if (isOpen) return;
-    clearLeaving();
-    menu.hidden = true;
-    menu.classList.remove('is-static');
-    lockScroll(false);
-    toggle.focus({ preventScroll: true });
+    menu.classList.remove('is-open');
+    menu.classList.add('is-closing');
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(
+      function () {
+        finishClose(returnFocus);
+        if (options && typeof options.then === 'function') options.then();
+      },
+      reduceMotion.matches ? 0 : CLOSE_MS
+    );
   }
 
   toggle.addEventListener('click', function () {
     if (isOpen) close();
     else open();
   });
-  closeButton.addEventListener('click', close);
+  if (closeButton) closeButton.addEventListener('click', function () { close(); });
+  menu.querySelectorAll('[data-dunas-menu-close]').forEach(function (element) {
+    element.addEventListener('click', function () { close(); });
+  });
 
-  // Accordion for links with sub-items
+  /* ---------- Sub-items expand inline ---------- */
+
   function setExpanded(button, expanded) {
     var sub = document.getElementById(button.getAttribute('aria-controls'));
     if (!sub) return;
     button.setAttribute('aria-expanded', String(expanded));
-    var gsap = window.gsap;
 
-    if (!gsap || reduceMotion.matches) {
+    if (reduceMotion.matches || typeof sub.animate !== 'function') {
       sub.hidden = !expanded;
       return;
     }
 
-    gsap.killTweensOf(sub);
+    sub.getAnimations().forEach(function (animation) { animation.cancel(); });
     if (expanded) {
       sub.hidden = false;
-      gsap.fromTo(sub, { height: 0 }, { height: 'auto', duration: 0.55, ease: 'expo.out' });
-      gsap.fromTo(
-        sub.children,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out', stagger: 0.04, delay: 0.05 }
-      );
-    } else {
-      gsap.to(sub, {
-        height: 0,
-        duration: 0.35,
-        ease: 'power2.inOut',
-        onComplete: function () {
-          sub.hidden = true;
-          sub.style.height = '';
-        },
+      var height = sub.scrollHeight;
+      sub.animate([{ height: '0px', opacity: 0 }, { height: height + 'px', opacity: 1 }], {
+        duration: 280,
+        easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
       });
+    } else {
+      var from = sub.offsetHeight;
+      var animation = sub.animate([{ height: from + 'px', opacity: 1 }, { height: '0px', opacity: 0 }], {
+        duration: 200,
+        easing: 'ease',
+      });
+      animation.onfinish = function () {
+        if (button.getAttribute('aria-expanded') !== 'true') sub.hidden = true;
+      };
     }
   }
 
   function collapseAll() {
-    menu.querySelectorAll('.dunas-menu__expand[aria-expanded="true"]').forEach(function (button) {
+    menu.querySelectorAll('.dunas-menu__row--parent[aria-expanded="true"]').forEach(function (button) {
       button.setAttribute('aria-expanded', 'false');
       var sub = document.getElementById(button.getAttribute('aria-controls'));
-      if (sub) {
-        sub.hidden = true;
-        sub.style.height = '';
-      }
+      if (sub) sub.hidden = true;
     });
   }
 
-  menu.querySelectorAll('.dunas-menu__expand').forEach(function (button) {
-    button.addEventListener('click', function () {
-      setExpanded(button, button.getAttribute('aria-expanded') !== 'true');
-    });
+  menu.addEventListener('click', function (event) {
+    var button = event.target.closest('.dunas-menu__row--parent');
+    if (!button || !menu.contains(button)) return;
+    setExpanded(button, button.getAttribute('aria-expanded') !== 'true');
   });
 
-  // Tapping a link: instant feedback while the next page loads; same-page links just close
+  /* ---------- Links ---------- */
+
   menu.addEventListener('click', function (event) {
     var link = event.target.closest('a[href]');
     if (!link || !menu.contains(link)) return;
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     if (link.target && link.target !== '_self') return;
 
+    // Search: close the menu, then open the header search (falls back to the search page)
+    if (link.hasAttribute('data-dunas-menu-search')) {
+      var searchSummary = document.querySelector('.dunas-header .header__search summary');
+      if (searchSummary) {
+        event.preventDefault();
+        close({
+          returnFocus: false,
+          then: function () {
+            searchSummary.click();
+          },
+        });
+      }
+      return;
+    }
+
     var url = new URL(link.href, window.location.href);
     if (url.origin !== window.location.origin) return;
 
+    // Same page: just close
     if (url.pathname === window.location.pathname && url.search === window.location.search) {
       event.preventDefault();
       close();
       return;
     }
 
-    var chosen = link.closest('.dunas-menu__item') || link;
-    chosen.classList.add('is-chosen');
-    if (link.classList.contains('dunas-menu__sublink')) link.classList.add('is-chosen');
+    // Another page: instant feedback while it loads
+    link.classList.add('is-chosen');
     menu.classList.add('is-leaving');
   });
 
-  function clearLeaving() {
-    menu.classList.remove('is-leaving');
-    menu.querySelectorAll('.is-chosen').forEach(function (element) {
-      element.classList.remove('is-chosen');
-    });
-  }
+  /* ---------- Back/forward cache ---------- */
 
-  // A page restored from the back/forward cache must never show the menu stuck open
   window.addEventListener('pageshow', function (event) {
     if (!event.persisted) return;
-    clearLeaving();
-    if (menu.hidden) return;
-    if (timeline) timeline.pause(0);
+    clearTimeout(closeTimer);
     isOpen = false;
-    menu.hidden = true;
-    menu.classList.remove('is-static');
+    menu.classList.remove('is-open');
     toggle.setAttribute('aria-expanded', 'false');
     document.removeEventListener('keydown', onKeydown);
-    collapseAll();
-    lockScroll(false);
-  });
-
-  // Keep the circle origin right if the screen rotates while open
-  window.addEventListener('resize', function () {
-    if (isOpen) setOrigin();
+    finishClose(false);
   });
 })();
