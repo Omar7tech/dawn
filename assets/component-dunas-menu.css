@@ -445,6 +445,11 @@ html.dunas-menu-lock body {
   color: rgb(var(--menu-ink));
 }
 
+/* Waiting a moment for GSAP (fast tap right after page load) */
+.dunas-menu.is-waiting {
+  visibility: hidden;
+}
+
 /* Fallback (no GSAP, or reduced motion): a short fade in */
 .dunas-menu.is-static {
   animation: dunas-menu-fade 220ms ease both;

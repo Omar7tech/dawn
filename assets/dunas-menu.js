@@ -45,9 +45,12 @@
   function warm() {
     loadGsap().catch(function () {});
   }
-  window.addEventListener('load', function () {
-    (window.requestIdleCallback || function (cb) { return setTimeout(cb, 1200); })(warm);
-  });
+  // Start fetching soon after the page appears (idle time, at most ~1.5s later)
+  if (window.requestIdleCallback) {
+    window.requestIdleCallback(warm, { timeout: 1500 });
+  } else {
+    setTimeout(warm, 800);
+  }
   toggle.addEventListener('pointerenter', warm, { once: true });
   toggle.addEventListener('touchstart', warm, { once: true, passive: true });
 
@@ -156,6 +159,22 @@
     lockScroll(true);
     document.addEventListener('keydown', onKeydown);
 
+    if (window.gsap || reduceMotion.matches) {
+      animateIn();
+    } else {
+      // Tapped before GSAP arrived: wait briefly (invisible) so the real animation plays
+      menu.classList.add('is-waiting');
+      var timer = new Promise(function (resolve) {
+        setTimeout(resolve, 350);
+      });
+      Promise.race([loadGsap().catch(function () {}), timer]).then(function () {
+        menu.classList.remove('is-waiting');
+        if (isOpen) animateIn();
+      });
+    }
+  }
+
+  function animateIn() {
     if (window.gsap && !reduceMotion.matches) {
       menu.classList.remove('is-static');
       if (!timeline) timeline = buildTimeline(window.gsap);
@@ -166,9 +185,7 @@
       }
     } else {
       menu.classList.add('is-static');
-      warm();
     }
-
     closeButton.focus({ preventScroll: true });
   }
 
