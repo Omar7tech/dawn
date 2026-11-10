@@ -333,7 +333,11 @@ body,
              bottom-right, like light catching the edge of a lens.
 */
 .header-wrapper.dunas-header .header.header--dunas {
+  /* Clear Liquid Glass. Legibility comes from the halo on the content, not from frosting */
   --glass-tint: rgba(var(--color-background), 0.42);
+  --glass-blur: 0rem;
+  --glass-edge: rgba(var(--dunas-ink), 0.07);
+  --glass-halo: rgba(var(--color-background), 0.95);
   --glass-x: 30%;
 }
 
@@ -347,15 +351,17 @@ body,
   background:
     radial-gradient(120% 140% at var(--glass-x) -30%, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 55%),
     var(--glass-tint);
-  -webkit-backdrop-filter: blur(0.6rem) saturate(180%) brightness(1.05);
-  backdrop-filter: blur(0.6rem) saturate(180%) brightness(1.05);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 0.6rem)) saturate(180%) brightness(1.05);
+  backdrop-filter: blur(calc(var(--glass-blur) + 0.6rem)) saturate(180%) brightness(1.05);
   box-shadow:
+    0 0 0 0.1rem var(--glass-edge),
     inset 0 0.1rem 0.1rem rgba(255, 255, 255, 0.55),
     inset 0 -0.1rem 0.1rem rgba(255, 255, 255, 0.18),
     inset 0 0 1.6rem rgba(255, 255, 255, 0.12),
     0 1rem 3rem -1.2rem rgba(var(--dunas-ink), 0.35),
     0 0.2rem 0.6rem rgba(var(--dunas-ink), 0.06);
-  transition: background 400ms var(--dunas-ease);
+  transition: background 400ms var(--dunas-ease), backdrop-filter 400ms var(--dunas-ease),
+    box-shadow 400ms var(--dunas-ease);
 }
 
 .header-wrapper.dunas-header .header.header--dunas::after {
@@ -381,8 +387,34 @@ body,
 
 /* Chromium: real refraction of the page behind the glass, with slight dispersion */
 .dunas-liquid-glass .header-wrapper.dunas-header .header.header--dunas[data-glass-ready]::before {
-  -webkit-backdrop-filter: var(--glass-filter) saturate(170%) brightness(1.04);
-  backdrop-filter: var(--glass-filter) saturate(170%) brightness(1.04);
+  -webkit-backdrop-filter: var(--glass-filter) blur(var(--glass-blur)) saturate(170%) brightness(1.04);
+  backdrop-filter: var(--glass-filter) blur(var(--glass-blur)) saturate(170%) brightness(1.04);
+}
+
+/* Scrolled over content: a little more tint, still clear glass */
+.scrolled-past-header .header-wrapper.dunas-header .header.header--dunas,
+.menu-open .header-wrapper.dunas-header .header.header--dunas {
+  --glass-tint: rgba(var(--color-background), 0.55);
+  --glass-blur: 0.15rem;
+}
+
+/*
+  Halo: a soft glow in the glass colour behind every link, icon and the logo, so they
+  read clearly over whatever passes under the clear glass (Apple's "vibrancy" idea).
+*/
+.header--dunas .header__menu-item,
+.header--dunas .header__locale {
+  text-shadow:
+    0 0 0.1rem var(--glass-halo),
+    0 0 0.6rem var(--glass-halo),
+    0 0 1.2rem var(--glass-halo);
+}
+
+.header--dunas .header__icon .svg-wrapper,
+.header--dunas header-drawer .header__icon span,
+.header--dunas .header__brand .dunas-logo,
+.header--dunas .header__brand img {
+  filter: drop-shadow(0 0 0.1rem var(--glass-halo)) drop-shadow(0 0 0.5rem var(--glass-halo));
 }
 
 .dunas-glass-defs {
@@ -561,6 +593,9 @@ body,
 /* Over the hero photo: almost clear glass with a whisper of shade for legibility */
 .header-wrapper.dunas-header--overlay .header.header--dunas {
   --glass-tint: rgba(var(--dunas-ink), 0.1);
+  --glass-blur: 0rem;
+  --glass-edge: rgba(255, 255, 255, 0);
+  --glass-halo: rgba(0, 0, 0, 0.28);
 }
 
 .header-wrapper.dunas-header--overlay .header.header--dunas > .header__left,
@@ -612,9 +647,12 @@ body,
 
 /* Once the visitor scrolls past the hero, the pill turns to frosted brand green */
 /* Scrolled past the hero, or menu open: brand-green tinted glass */
-.scrolled-past-header .dunas-header--overlay .header.header--dunas,
-.menu-open .dunas-header--overlay .header.header--dunas {
-  --glass-tint: rgba(var(--dunas-green), 0.62);
+.scrolled-past-header .header-wrapper.dunas-header--overlay .header.header--dunas,
+.menu-open .header-wrapper.dunas-header--overlay .header.header--dunas {
+  --glass-tint: rgba(var(--dunas-green), 0.66);
+  --glass-blur: 0.15rem;
+  --glass-edge: rgba(255, 255, 255, 0.08);
+  --glass-halo: rgba(var(--dunas-ink), 0.45);
 }
 
 /* ---------- Search: the pill opens into a floating search card ---------- */
