@@ -1246,3 +1246,23 @@ body,
 .footer .newsletter-form__field-wrapper .field::before {
   border-radius: 10rem;
 }
+
+/* ---------- Smooth page changes (cross-document view transitions) ----------
+   Pages cross-fade instead of cutting, e.g. after choosing a link in the menu.
+   Supported in Chrome, Edge, Android and recent Safari; other browsers switch normally. */
+
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}

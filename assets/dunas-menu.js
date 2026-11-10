@@ -15,6 +15,10 @@
   var toggle = document.querySelector('.dunas-menu-toggle');
   if (!menu || !toggle) return;
 
+  // Live directly in <body>, so nothing in the header (sticky positioning, glass effects,
+  // stacking) can ever hide or misplace the menu, at any scroll position
+  if (menu.parentElement !== document.body) document.body.appendChild(menu);
+
   var GSAP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   var closeButton = menu.querySelector('.dunas-menu__close');
@@ -68,7 +72,6 @@
   }
 
   function buildTimeline(gsap) {
-    var panel = menu.querySelector('.dunas-menu__panel');
     var top = menu.querySelectorAll('.dunas-menu__top > *');
     var labels = menu.querySelectorAll('.dunas-menu__label');
     var numbers = menu.querySelectorAll('.dunas-menu__num');
@@ -87,7 +90,7 @@
 
     tl.addLabel('reveal', 0)
       .fromTo(
-        panel,
+        menu,
         { '--menu-r': '0px' },
         {
           '--menu-r': function () {
@@ -189,6 +192,7 @@
         timeline.invalidate().timeScale(1).play(0);
       }
     } else {
+      menu.style.removeProperty('--menu-r');
       menu.classList.add('is-static');
     }
     closeButton.focus({ preventScroll: true });
@@ -210,6 +214,7 @@
 
   function afterClose() {
     if (isOpen) return;
+    clearLeaving();
     menu.hidden = true;
     menu.classList.remove('is-static');
     lockScroll(false);
@@ -273,9 +278,40 @@
     });
   });
 
+  // Tapping a link: instant feedback while the next page loads; same-page links just close
+  menu.addEventListener('click', function (event) {
+    var link = event.target.closest('a[href]');
+    if (!link || !menu.contains(link)) return;
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (link.target && link.target !== '_self') return;
+
+    var url = new URL(link.href, window.location.href);
+    if (url.origin !== window.location.origin) return;
+
+    if (url.pathname === window.location.pathname && url.search === window.location.search) {
+      event.preventDefault();
+      close();
+      return;
+    }
+
+    var chosen = link.closest('.dunas-menu__item') || link;
+    chosen.classList.add('is-chosen');
+    if (link.classList.contains('dunas-menu__sublink')) link.classList.add('is-chosen');
+    menu.classList.add('is-leaving');
+  });
+
+  function clearLeaving() {
+    menu.classList.remove('is-leaving');
+    menu.querySelectorAll('.is-chosen').forEach(function (element) {
+      element.classList.remove('is-chosen');
+    });
+  }
+
   // A page restored from the back/forward cache must never show the menu stuck open
   window.addEventListener('pageshow', function (event) {
-    if (!event.persisted || menu.hidden) return;
+    if (!event.persisted) return;
+    clearLeaving();
+    if (menu.hidden) return;
     if (timeline) timeline.pause(0);
     isOpen = false;
     menu.hidden = true;

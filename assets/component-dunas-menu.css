@@ -56,7 +56,9 @@
   --menu-bg: var(--dunas-cream);
   position: fixed;
   inset: 0;
-  z-index: 10;
+  /* The menu lives directly in <body> (moved there by dunas-menu.js): above the header,
+     below Dawn's cart drawer and modals */
+  z-index: 999;
   color: rgb(var(--menu-ink));
   text-shadow: none;
   overflow: hidden;
@@ -67,9 +69,10 @@
   display: none;
 }
 
-html.dunas-menu-lock,
-html.dunas-menu-lock body {
+/* Lock page scroll on the root only: locking <body> too would break the sticky header */
+html.dunas-menu-lock {
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
 /* Dawn hides empty divs (div:empty); this panel is intentionally empty */
@@ -81,7 +84,6 @@ html.dunas-menu-lock body {
   position: absolute;
   inset: 0;
   background: rgb(var(--menu-bg));
-  clip-path: circle(var(--menu-r) at var(--menu-x) var(--menu-y));
 }
 
 /* Giant faint wordmark along the right edge */
@@ -751,4 +753,37 @@ html.dunas-menu-lock body {
     margin: 1.6rem 4rem 0;
     max-width: 52rem;
   }
+}
+
+/* =====================================================================
+   Reveal + navigation polish
+   ===================================================================== */
+
+/* The whole menu (panel AND content) is clipped to the growing circle, so nothing can
+   ever appear outside the cream while it opens or closes */
+.dunas-menu {
+  clip-path: circle(var(--menu-r) at var(--menu-x) var(--menu-y));
+}
+
+/* After tapping a link: the chosen row stays, everything else steps back */
+.dunas-menu.is-leaving .dunas-menu__item:not(.is-chosen),
+.dunas-menu.is-leaving .dunas-menu__search,
+.dunas-menu.is-leaving .dunas-menu__foot,
+.dunas-menu.is-leaving .dunas-menu__top > *:not(.dunas-menu__close) {
+  opacity: 0.3;
+  transition: opacity 250ms ease;
+}
+
+.dunas-menu.is-leaving .dunas-menu__item.is-chosen .dunas-menu__link {
+  color: rgb(var(--menu-accent));
+  background-color: rgba(var(--menu-accent), 0.08);
+}
+
+.dunas-menu.is-leaving .dunas-menu__item.is-chosen .dunas-menu__arrow {
+  color: rgb(var(--menu-accent));
+  transform: translateX(0.6rem);
+}
+
+.dunas-menu.is-leaving .dunas-menu__sublink.is-chosen {
+  color: rgb(var(--menu-accent));
 }
