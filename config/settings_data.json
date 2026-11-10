@@ -31,10 +31,10 @@
           "settings": {
             "background": "#556361",
             "background_gradient": "",
-            "text": "#FFFFFF",
+            "text": "#F1EFE7",
             "button": "#F1EFE7",
             "button_label": "#556361",
-            "secondary_button_label": "#FFFFFF",
+            "secondary_button_label": "#F1EFE7",
             "shadow": "#31322D"
           }
         },

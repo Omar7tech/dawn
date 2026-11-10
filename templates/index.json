@@ -40,19 +40,11 @@
         "padding_bottom": 120,
         "button_style": "muted"
       }
-    },
-    "brand": {
-      "type": "dunas-brand-block",
-      "settings": {
-        "tagline": "Every Skin.\nEvery Day.",
-        "color_scheme": "scheme-3"
-      }
     }
   },
   "order": [
     "hero",
     "banner",
-    "showcase",
-    "brand"
+    "showcase"
   ]
 }
