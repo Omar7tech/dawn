@@ -9,6 +9,12 @@
 
     {%- if settings.favicon != blank -%}
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+      <link rel="apple-touch-icon" href="{{ settings.favicon | image_url: width: 180, height: 180 }}">
+    {%- else -%}
+      {%- comment -%} DUNAS "D" mark, used until a favicon is uploaded in Theme settings › Logo {%- endcomment -%}
+      <link rel="icon" type="image/svg+xml" href="{{ 'dunas-favicon.svg' | asset_url }}">
+      <link rel="icon" type="image/png" sizes="32x32" href="{{ 'dunas-favicon-32.png' | asset_url }}">
+      <link rel="apple-touch-icon" href="{{ 'dunas-apple-touch-icon.png' | asset_url }}">
     {%- endif -%}
 
     {%- unless settings.type_header_font.system? and settings.type_body_font.system? -%}
