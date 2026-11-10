@@ -30,6 +30,45 @@
   }
 }
 
+/* ---------- Touch: no blue/grey tap highlight box on phones ---------- */
+
+html,
+body,
+*,
+*::before,
+*::after {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Keyboard users still get focus rings; mouse and touch taps don't leave one behind */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* A quiet press effect so taps still feel responsive without the highlight */
+@media (hover: none) {
+  .dunas-btn:active,
+  .button:active,
+  .header__icon:active,
+  .shopify-payment-button__button:active {
+    transform: scale(0.97);
+    transition: transform 120ms ease;
+  }
+
+  .menu-drawer__menu-item:active,
+  .predictive-search__item:active,
+  .list-menu__item:active {
+    opacity: 0.6;
+    transition: opacity 120ms ease;
+  }
+
+  .card-wrapper:active .card__inner,
+  .dunas-showcase__card:active {
+    transform: scale(0.985);
+    transition: transform 160ms ease;
+  }
+}
+
 /* ---------- Typography helpers ---------- */
 
 .dunas-display {
