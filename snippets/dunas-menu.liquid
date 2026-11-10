@@ -55,15 +55,31 @@
       </a>
     </div>
 
+    {%- if section.settings.dunas_menu_search -%}
+      <form action="{{ routes.search_url }}" method="get" role="search" class="dunas-menu__search">
+        <span class="svg-wrapper" aria-hidden="true">{{ 'icon-search.svg' | inline_asset_content }}</span>
+        <label class="visually-hidden" for="DunasMenuSearch">{{ 'general.search.search' | t }}</label>
+        <input
+          id="DunasMenuSearch"
+          type="search"
+          name="q"
+          placeholder="{{ 'general.search.search' | t }}"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          enterkeyhint="search"
+        >
+        <input type="hidden" name="options[prefix]" value="last">
+      </form>
+    {%- endif -%}
+
     <nav class="dunas-menu__nav" aria-label="{{ 'sections.header.menu' | t }}">
       <ol class="dunas-menu__list" role="list">
         {%- for link in menu.links -%}
           <li class="dunas-menu__item{% if link.active or link.child_active %} is-active{% endif %}">
             <div class="dunas-menu__row">
-              <span class="dunas-menu__num" aria-hidden="true">
-                {%- if forloop.index < 10 -%}0{%- endif -%}
-                {{- forloop.index -}}
-              </span>
+              {%- comment -%} The whole row (number, title, arrow) is one large tap target {%- endcomment -%}
               <a
                 href="{{ link.url }}"
                 class="dunas-menu__link"
@@ -71,7 +87,14 @@
                   aria-current="page"
                 {% endif %}
               >
+                <span class="dunas-menu__num" aria-hidden="true">
+                  {%- if forloop.index < 10 -%}0{%- endif -%}
+                  {{- forloop.index -}}
+                </span>
                 <span class="dunas-menu__mask"><span class="dunas-menu__label">{{ link.title | escape }}</span></span>
+                {%- if link.links == blank -%}
+                  <span class="dunas-menu__arrow" aria-hidden="true">{{ 'icon-arrow.svg' | inline_asset_content }}</span>
+                {%- endif -%}
               </a>
               {%- if link.links != blank -%}
                 <button

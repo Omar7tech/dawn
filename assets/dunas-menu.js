@@ -76,6 +76,8 @@
     var rules = menu.querySelectorAll('.dunas-menu__rule');
     var mark = menu.querySelector('.dunas-menu__mark');
     var foot = menu.querySelectorAll('.dunas-menu__foot > *');
+    var search = menu.querySelector('.dunas-menu__search');
+    var arrows = menu.querySelectorAll('.dunas-menu__arrow');
 
     var tl = gsap.timeline({
       paused: true,
@@ -91,20 +93,23 @@
           '--menu-r': function () {
             return menu.dataset.radius + 'px';
           },
-          duration: 0.75,
+          duration: 0.6,
           ease: 'expo.inOut',
         },
         'reveal'
       )
-      .fromTo(mark, { yPercent: 14, opacity: 0 }, { yPercent: 0, opacity: 0.09, duration: 1.4 }, 'reveal+=0.25')
-      .addLabel('content', 'reveal+=0.34')
+      .fromTo(mark, { yPercent: 14, opacity: 0 }, { yPercent: 0, opacity: 0.09, duration: 1.2 }, 'reveal+=0.2')
+      .addLabel('content', 'reveal+=0.22')
       .fromTo(top, { opacity: 0, y: -6 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.04 }, 'content')
       .fromTo(closeButton, { rotate: -90 }, { rotate: 0, duration: 0.7, ease: 'back.out(1.6)' }, 'content')
-      .fromTo(labels, { yPercent: 115, rotate: 4 }, { yPercent: 0, rotate: 0, stagger: 0.065 }, 'content+=0.04')
-      .fromTo(numbers, { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: 0.6, stagger: 0.065 }, 'content+=0.12')
-      .fromTo(rules, { scaleX: 0 }, { scaleX: 1, duration: 1, ease: 'expo.inOut', stagger: 0.065 }, 'content+=0.02')
-      .fromTo(expands, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.6, stagger: 0.065 }, 'content+=0.2')
-      .fromTo(foot, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.7, stagger: 0.06 }, 'content+=0.28');
+      .fromTo(labels, { yPercent: 115, rotate: 4 }, { yPercent: 0, rotate: 0, duration: 0.8, stagger: 0.05 }, 'content+=0.06')
+      .fromTo(numbers, { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.05 }, 'content+=0.12')
+      .fromTo(arrows, { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: 0.5, stagger: 0.05 }, 'content+=0.16')
+      .fromTo(rules, { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: 'expo.inOut', stagger: 0.05 }, 'content+=0.04')
+      .fromTo(expands, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, stagger: 0.05 }, 'content+=0.16')
+      .fromTo(foot, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.05 }, 'content+=0.22');
+
+    if (search) tl.fromTo(search, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.5 }, 'content');
 
     return tl;
   }
@@ -197,7 +202,7 @@
     collapseAll();
 
     if (timeline && !menu.classList.contains('is-static')) {
-      timeline.timeScale(1.8).reverse();
+      timeline.timeScale(2.4).reverse();
     } else {
       afterClose();
     }
