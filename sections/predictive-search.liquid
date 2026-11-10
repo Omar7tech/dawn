@@ -221,6 +221,15 @@
       </div>
     {%- endif -%}
 
+    {%- if first_column_results_size == 0 and predictive_search.resources.products.size == 0 -%}
+      <div class="dunas-search__empty">
+        <p class="dunas-search__empty-text">
+          {{- 'templates.search.no_results' | t: terms: predictive_search.terms -}}
+        </p>
+        {%- render 'dunas-search-chips' -%}
+      </div>
+    {%- endif -%}
+
     {%- render 'loading-spinner', class: 'predictive-search__loading-state' -%}
 
     <div id="predictive-search-option-search-keywords" class="predictive-search__search-for-button">

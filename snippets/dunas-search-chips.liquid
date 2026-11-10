@@ -1,0 +1,34 @@
+{% doc %}
+  Renders the "Popular searches" chips from Theme settings > DUNAS search.
+  Each chip is a real search link; dunas-search.js turns it into a live search when available.
+
+  @param {string} [label] - Heading above the chips. Defaults to the "Popular searches heading" setting.
+
+  @example
+  {% render 'dunas-search-chips' %}
+{% enddoc %}
+{%- if settings.dunas_search_popular != blank -%}
+  {%- assign chips_label = label | default: settings.dunas_search_popular_label -%}
+  <div class="dunas-search__popular">
+    {%- if chips_label != blank -%}
+      <p class="dunas-search__popular-label">{{ chips_label | escape }}</p>
+    {%- endif -%}
+    <ul class="dunas-search__chips list-unstyled" role="list">
+      {%- assign chip_terms = settings.dunas_search_popular | split: ',' -%}
+      {%- for term in chip_terms -%}
+        {%- assign term_clean = term | strip -%}
+        {%- if term_clean != blank -%}
+          <li>
+            <a
+              class="dunas-search__chip"
+              href="{{ routes.search_url }}?q={{ term_clean | url_encode }}"
+              data-dunas-search-term="{{ term_clean | escape }}"
+            >
+              {{- term_clean | escape -}}
+            </a>
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}

@@ -107,30 +107,7 @@
             <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
           {%- endif -%}
         </form>
-        {%- if settings.dunas_search_popular != blank -%}
-          <div class="dunas-search__popular">
-            {%- if settings.dunas_search_popular_label != blank -%}
-              <p class="dunas-search__popular-label">{{ settings.dunas_search_popular_label | escape }}</p>
-            {%- endif -%}
-            <ul class="dunas-search__chips list-unstyled" role="list">
-              {%- assign ds_terms = settings.dunas_search_popular | split: ',' -%}
-              {%- for term in ds_terms -%}
-                {%- assign term_clean = term | strip -%}
-                {%- if term_clean != blank -%}
-                  <li>
-                    <a
-                      class="dunas-search__chip"
-                      href="{{ routes.search_url }}?q={{ term_clean | url_encode }}"
-                      data-dunas-search-term="{{ term_clean | escape }}"
-                    >
-                      {{- term_clean | escape -}}
-                    </a>
-                  </li>
-                {%- endif -%}
-              {%- endfor -%}
-            </ul>
-          </div>
-        {%- endif -%}
+        {%- render 'dunas-search-chips' -%}
         {%- if settings.predictive_search_enabled -%}
           </predictive-search>
         {%- else -%}
@@ -149,46 +126,3 @@
     </div>
   </details>
 </details-modal>
-<script>
-  // Desktop: the search opens below the navbar pill, never over it.
-  // Publishes the pill's bottom edge and side edges as CSS variables on the search layer.
-  (function () {
-    var header = document.querySelector('.header--dunas');
-    var layer = document.querySelector('.dunas-search');
-    if (!header || !layer) return;
-    function place() {
-      var r = header.getBoundingClientRect();
-      layer.style.setProperty('--ds-top', Math.round(r.bottom) + 'px');
-      layer.style.setProperty('--ds-left', Math.round(r.left) + 'px');
-      layer.style.setProperty('--ds-right', Math.round(document.documentElement.clientWidth - r.right) + 'px');
-    }
-    place();
-    window.addEventListener('resize', place, { passive: true });
-    if ('ResizeObserver' in window) new ResizeObserver(place).observe(header);
-    header.addEventListener('click', function (event) {
-      if (event.target.closest('.header__icon--search')) place();
-    }, true);
-    // opening locks page scroll, which removes the scrollbar and shifts the pill: measure again
-    var details = layer.closest('details');
-    if (details) {
-      details.addEventListener('toggle', function () {
-        if (details.open) requestAnimationFrame(place);
-      });
-    }
-  })();
-</script>
-{%- if settings.dunas_search_popular != blank and settings.predictive_search_enabled -%}
-  <script>
-    document.addEventListener('click', function (event) {
-      var chip = event.target.closest('[data-dunas-search-term]');
-      if (!chip) return;
-      var form = chip.closest('.search-modal__content');
-      var input = form && form.querySelector('input[type="search"]');
-      if (!input) return;
-      event.preventDefault();
-      input.value = chip.getAttribute('data-dunas-search-term');
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      input.focus();
-    });
-  </script>
-{%- endif -%}

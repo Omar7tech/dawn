@@ -679,7 +679,8 @@ body,
   --ds-field-edge-focus: rgba(var(--dunas-ink), 0.45);
   --ds-hover: rgba(var(--dunas-ink), 0.05);
   --ds-rule: rgba(var(--dunas-ink), 0.08);
-  --ds-muted: rgba(var(--dunas-ink), 0.55);
+  /* 0.72 keeps small text at >= 4.5:1 on cream (WCAG AA) */
+  --ds-muted: rgba(var(--dunas-ink), 0.72);
   --ds-control: rgba(var(--dunas-ink), 0.07);
   --ds-pill-bg: rgb(var(--dunas-ink));
   --ds-pill-ink: rgb(var(--dunas-cream));
@@ -721,7 +722,7 @@ body,
   --ds-field-edge-focus: rgba(255, 255, 255, 0.6);
   --ds-hover: rgba(255, 255, 255, 0.08);
   --ds-rule: rgba(255, 255, 255, 0.16);
-  --ds-muted: rgba(var(--dunas-cream), 0.65);
+  --ds-muted: rgba(var(--dunas-cream), 0.85);
   --ds-control: rgba(255, 255, 255, 0.12);
   --ds-pill-bg: rgb(var(--dunas-cream));
   --ds-pill-ink: rgb(var(--dunas-green));
@@ -1039,15 +1040,18 @@ body,
 .dunas-header .header--dunas .search-modal__close-button {
   position: absolute;
   /* centred on the input row: panel padding + half the input height - half the button */
-  top: calc(var(--ds-pad-y) + var(--ds-input, 16px) + 1rem - 1.7rem);
-  right: calc(var(--ds-pad-x) + 0.9rem);
+  /* 44px tap target; the visible circle is 34px (background clipped to the content box) */
+  top: calc(var(--ds-pad-y) + var(--ds-input, 16px) + 1rem - 2.2rem);
+  right: calc(var(--ds-pad-x) + 0.4rem);
   z-index: 2;
-  width: 3.4rem;
-  height: 3.4rem;
+  width: 4.4rem;
+  height: 4.4rem;
   margin: 0;
+  padding: 0.5rem;
   border: 0;
   border-radius: 50%;
   background: var(--ds-control);
+  background-clip: content-box;
   color: rgb(var(--ds-ink));
   display: flex;
   align-items: center;
@@ -1057,24 +1061,39 @@ body,
 
 .dunas-header .header--dunas .search-modal__close-button:active {
   background: rgba(var(--ds-ink), 0.14);
+  background-clip: content-box;
 }
 
 @media (hover: hover) {
   .dunas-header .header--dunas .search-modal__close-button:hover {
     background: var(--ds-pill-bg);
+    background-clip: content-box;
     color: var(--ds-pill-ink);
   }
 }
 
 .dunas-header .header--dunas .search-modal__close-button:focus-visible {
   outline: 0.2rem solid rgb(var(--ds-ink));
-  outline-offset: 0.2rem;
+  outline-offset: -0.3rem;
 }
 
 .dunas-header .header--dunas .search-modal__close-button .icon {
   width: 1.1rem;
   height: 1.1rem;
   color: currentColor;
+}
+
+/* Phones: text never below 16px (iOS zooms the page into smaller fields), and a lighter
+   glass blur, which is much cheaper to render on older devices */
+@media screen and (max-width: 749px) {
+  .dunas-header .header--dunas .search-modal .search__input.field__input {
+    font-size: max(16px, var(--ds-input, 16px));
+  }
+
+  .dunas-header .dunas-search--glass .search-modal__content {
+    -webkit-backdrop-filter: blur(min(var(--ds-glass-blur, 28px), 16px)) saturate(170%) brightness(1.05);
+    backdrop-filter: blur(min(var(--ds-glass-blur, 28px), 16px)) saturate(170%) brightness(1.05);
+  }
 }
 
 /* ---- Popular searches (before typing) ---- */
@@ -1084,9 +1103,26 @@ body,
   padding: 1.6rem 0.8rem 0.6rem;
 }
 
-.dunas-header predictive-search[open] .dunas-search__popular,
-.dunas-header predictive-search[loading] .dunas-search__popular {
+.dunas-header predictive-search[open] > .dunas-search__popular,
+.dunas-header predictive-search[loading] > .dunas-search__popular {
   display: none;
+}
+
+/* No results: Dawn's translated message, then the popular chips as a way back */
+.dunas-search__empty {
+  padding: 2rem 1.2rem 0.8rem;
+}
+
+.dunas-search__empty-text {
+  margin: 0;
+  max-width: 48rem;
+  font-size: 1.4rem;
+  line-height: 1.5;
+  color: rgb(var(--ds-ink));
+}
+
+.dunas-search__empty .dunas-search__popular {
+  padding: 1.6rem 0 0;
 }
 
 .dunas-search__popular-label {
@@ -1154,12 +1190,24 @@ body,
   transition: background-color 150ms ease;
 }
 
+/* Dawn paints the highlight on the list item's first child (a square wrapper for products).
+   Keep that transparent and paint the rounded row instead, for mouse and keyboard alike. */
 .dunas-header .header--dunas .predictive-search__list-item[aria-selected='true'] > *,
-.dunas-header .header--dunas .predictive-search__list-item:hover > *,
+.dunas-header .header--dunas .predictive-search__list-item:hover > * {
+  background-color: transparent;
+}
+
+.dunas-header .header--dunas .predictive-search__list-item[aria-selected='true'] .predictive-search__item,
+.dunas-header .header--dunas .predictive-search__list-item:hover .predictive-search__item,
 .dunas-header .header--dunas .predictive-search__item[aria-selected='true'],
 .dunas-header .header--dunas .predictive-search__item:hover {
   background-color: var(--ds-hover);
   color: rgb(var(--ds-ink));
+}
+
+/* keyboard selection also gets a clear ring, so it never relies on a faint tint alone */
+.dunas-header .header--dunas .predictive-search__list-item[aria-selected='true'] .predictive-search__item {
+  box-shadow: inset 0 0 0 0.15rem rgba(var(--ds-ink), 0.35);
 }
 
 .dunas-header .header--dunas .predictive-search__list-item[aria-selected='true'] .predictive-search__item-heading,

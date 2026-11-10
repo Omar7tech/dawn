@@ -458,6 +458,8 @@
     {%- if settings.predictive_search_enabled -%}
       <script src="{{ 'predictive-search.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
+    {%- comment -%} DUNAS search: placement, popular chips, result settings. Must load after predictive-search.js. {%- endcomment -%}
+    <script src="{{ 'dunas-search.js' | asset_url }}" defer="defer"></script>
 
     {%- if settings.cart_type == 'drawer' -%}
       <script src="{{ 'cart-drawer.js' | asset_url }}" defer="defer"></script>
