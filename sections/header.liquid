@@ -167,7 +167,7 @@
     Dawn's header--has-account / --has-app / --has-localizations classes drive its own grid and
     hide the search icon on mobile; the DUNAS pill lays itself out, so only has-menu is kept.
   {% endcomment %}
-  <header class="header header--dunas drawer-menu{% if section.settings.menu != blank %} header--has-menu{% endif %}">
+  <header class="header header--dunas{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}">
     <div class="header__left">
       {%- if section.settings.menu != blank -%}
         {%- render 'header-drawer',
@@ -175,6 +175,11 @@
           show_language_selector: language_selector,
           show_social_links: social_links
         -%}
+        {%- if section.settings.menu_type_desktop == 'dropdown' -%}
+          {%- render 'header-dropdown-menu' -%}
+        {%- elsif section.settings.menu_type_desktop == 'mega' -%}
+          {%- render 'header-mega-menu' -%}
+        {%- endif -%}
       {%- endif -%}
       {%- if section.settings.dunas_show_locale -%}
         <span class="header__locale" lang="{{ request.locale.iso_code }}">

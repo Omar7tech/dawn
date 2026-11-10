@@ -285,6 +285,69 @@
   margin: 0 -0.8rem;
 }
 
+/* ---------- Desktop inline menu inside the pill ---------- */
+
+.header-wrapper.dunas-header .header--dunas .header__inline-menu {
+  margin: 0 0 0 -0.8rem;
+}
+
+.header--dunas .header__inline-menu > .list-menu--inline {
+  flex-wrap: nowrap;
+  gap: 0.4rem;
+}
+
+.header--dunas .header__inline-menu > .list-menu > li > .header__menu-item,
+.header--dunas .header__inline-menu > .list-menu > li > header-menu > details > .header__menu-item {
+  font-family: var(--font-heading-family);
+  font-size: 1.7rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  padding: 0.8rem 1.2rem;
+  color: rgba(var(--color-foreground), 0.85);
+}
+
+.header--dunas .header__inline-menu > .list-menu > li > header-menu > details > .header__menu-item {
+  padding-right: 2.8rem;
+}
+
+.header--dunas .header__inline-menu .header__menu-item:hover {
+  color: rgb(var(--color-foreground));
+}
+
+/* Dropdown panels: rounded cream cards that float under the pill */
+.header--dunas .header__submenu.list-menu--disclosure {
+  top: calc(100% + 1.4rem);
+  min-width: 22rem;
+  padding: 1rem 0;
+  border-radius: 1.8rem;
+  border: 0.1rem solid rgba(var(--dunas-ink), 0.06);
+  box-shadow: 0 1.6rem 4rem rgba(var(--dunas-ink), 0.14);
+  text-shadow: none;
+}
+
+.header--dunas .header__submenu .header__menu-item {
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  padding: 0.9rem 2.2rem;
+  color: rgba(var(--color-foreground), 0.85);
+}
+
+.header--dunas .header__submenu .header__menu-item:hover {
+  color: rgb(var(--dunas-green));
+}
+
+/* Locale sits after the links on desktop, as a quiet label */
+@media screen and (min-width: 990px) {
+  .header--dunas:not(.drawer-menu) .header__locale {
+    margin-left: 0.8rem;
+    padding-left: 1.2rem;
+    border-left: 0.1rem solid rgba(var(--color-foreground), 0.2);
+    align-self: center;
+    margin-top: 0;
+  }
+}
+
 /* Overlay variant: sits on top of the home hero photo */
 .section-header:has(.dunas-header--overlay) {
   margin-bottom: calc(-1 * var(--dunas-header-total));
@@ -329,6 +392,16 @@
 .dunas-header--overlay .header--dunas > .header__icons > .header__icon,
 .dunas-header--overlay .header--dunas > .header__icons > details-modal > details > .header__icon {
   color: #fff;
+}
+
+.dunas-header--overlay .header--dunas .header__inline-menu > .list-menu > li > .header__menu-item,
+.dunas-header--overlay .header--dunas .header__inline-menu > .list-menu > li > header-menu > details > .header__menu-item,
+.dunas-header--overlay .header--dunas .header__inline-menu .header__active-menu-item {
+  color: #fff;
+}
+
+.dunas-header--overlay .header--dunas .header__locale {
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .dunas-header--overlay .header--dunas .cart-count-bubble {
