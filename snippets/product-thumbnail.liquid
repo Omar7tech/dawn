@@ -25,6 +25,12 @@
     assign lazy = 'lazy'
   endunless
 
+  # The product's main photo is the page's largest image: ask the browser to fetch it first
+  assign priority = 'auto'
+  if lazy_load == false and position == 1
+    assign priority = 'high'
+  endif
+
   assign desktop_columns = 1
   if desktop_layout == 'columns' and media_count > 1
     assign desktop_columns = 2
@@ -79,6 +85,7 @@
         | image_tag:
           class: image_class,
           loading: lazy,
+          fetchpriority: priority,
           sizes: sizes,
           widths: '246, 493, 600, 713, 823, 990, 1100, 1206, 1346, 1426, 1646, 1946'
       }}

@@ -246,8 +246,8 @@
 
     const fitCover = () => {
       if (!photo || !width || !height) return;
-      const iw = photo.naturalWidth;
-      const ih = photo.naturalHeight;
+      const iw = photo.naturalWidth || photo.width;
+      const ih = photo.naturalHeight || photo.height;
       const s = Math.max(width / iw, height / ih);
       const sx = width / (iw * s);
       const sy = height / (ih * s);
@@ -352,40 +352,56 @@
       last = { x, y };
     };
 
+    const reveal = () => hero.classList.add('has-mirage');
+    const giveUp = () => {
+      // the photo could not be used: keep the plain photo
+      hero.classList.remove('has-mirage');
+      canvas.remove();
+    };
+
+    const upload = (source) => {
+      try {
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, imageTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, source);
+      } catch (error) {
+        return false;
+      }
+      photo = source;
+      fitCover();
+      draw(performance.now());
+      // show the canvas once the photo's own settle animation has finished
+      const running = img.getAnimations ? img.getAnimations().filter((a) => a.playState === 'running') : [];
+      if (running.length) Promise.all(running.map((a) => a.finished)).then(reveal, reveal);
+      else reveal();
+      return true;
+    };
+
     const load = () => {
       const src = img.currentSrc || img.src;
       if (!src || src === photoSrc) return;
+      if (!img.complete || !img.naturalWidth) {
+        img.addEventListener('load', load, { once: true });
+        return;
+      }
       photoSrc = src;
+      // Shopify serves theme and store images from the shop's own domain, so the photo already
+      // on the page can be handed to WebGL as it is: no second download.
+      if (upload(img)) return;
+      // A photo from another domain: fetch one CORS copy instead.
       const source = new Image();
       source.crossOrigin = 'anonymous';
       source.decoding = 'async';
       source.onload = () => {
-        try {
-          gl.activeTexture(gl.TEXTURE0);
-          gl.bindTexture(gl.TEXTURE_2D, imageTexture);
-          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, source);
-        } catch (error) {
-          // the image could not be used (cross-origin): keep the plain photo
-          hero.classList.remove('has-mirage');
-          canvas.remove();
-          return;
-        }
-        photo = source;
-        fitCover();
-        draw(performance.now());
-        // show the canvas once the photo's own settle animation has finished
-        const reveal = () => hero.classList.add('has-mirage');
-        const running = img.getAnimations ? img.getAnimations().filter((a) => a.playState === 'running') : [];
-        if (running.length) Promise.all(running.map((a) => a.finished)).then(reveal, reveal);
-        else reveal();
+        if (!upload(source)) giveUp();
       };
+      source.onerror = giveUp;
       source.src = src;
     };
 
     media.appendChild(canvas);
     resize();
-    if (img.complete) load();
-    else img.addEventListener('load', load, { once: true });
+    load();
 
     new ResizeObserver(() => {
       resize();

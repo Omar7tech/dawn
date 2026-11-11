@@ -41,6 +41,10 @@
         }));
     if (!isChromium) return;
 
+    // Phones and touch tablets keep the frosted glass without the bending: the SVG refraction
+    // is redrawn on every scroll frame and can make scrolling stutter on modest phones.
+    if (window.matchMedia('(max-width: 749px), (pointer: coarse)').matches) return;
+
     var SVG_NS = 'http://www.w3.org/2000/svg';
     var defs = document.createElementNS(SVG_NS, 'svg');
     defs.setAttribute('class', 'dunas-glass-defs');
