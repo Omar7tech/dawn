@@ -261,6 +261,8 @@
           window.removeEventListener(name, skip, true);
         });
         if (intro.parentNode) intro.parentNode.removeChild(intro);
+        document.documentElement.classList.add('dunas-intro-done');
+        window.dispatchEvent(new Event('dunas:intro-done'));
       }
 
       // Any tap, click, scroll, swipe or key press ends the intro right away

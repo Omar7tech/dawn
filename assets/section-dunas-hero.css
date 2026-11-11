@@ -157,3 +157,8 @@
     }
   }
 }
+
+/* Tagline lines (one span per line of the setting) */
+.dunas-hero__line {
+  display: block;
+}

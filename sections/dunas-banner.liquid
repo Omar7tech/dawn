@@ -1,10 +1,15 @@
 {{ 'section-dunas-banner.css' | asset_url | stylesheet_tag }}
 {%- assign button_style = section.settings.button_style | default: 'light' -%}
 
-{%- assign heading = section.settings.heading | escape | newline_to_br -%}
+{%- liquid
+  assign heading_lines = section.settings.heading | escape | newline_to_br | split: '<br />'
+  assign scroll_open = section.settings.scroll_open
+  assign scroll_words = section.settings.scroll_words
+  assign word_index = 0
+-%}
 
 <section
-  class="dunas-banner color-{{ section.settings.color_scheme }}{% if section.settings.overlap_previous %} dunas-banner--overlap{% endif %}"
+  class="dunas-banner color-{{ section.settings.color_scheme }}{% if section.settings.overlap_previous %} dunas-banner--overlap{% endif %}{% if scroll_open %} dunas-banner--open{% endif %}{% if scroll_words %} dunas-banner--words{% endif %}"
   style="--dunas-banner-overlay: {{ section.settings.overlay_opacity | divided_by: 100.0 }};"
 >
   <div class="dunas-banner__card">
@@ -33,7 +38,17 @@
 
     <div class="dunas-banner__content">
       {%- if section.settings.heading != blank -%}
-        <h2 class="dunas-banner__heading dunas-eyebrow">{{ heading }}</h2>
+        <h2 class="dunas-banner__heading dunas-eyebrow">
+          {%- for line in heading_lines -%}
+            {%- unless forloop.first -%}<br>{%- endunless -%}
+            {%- assign words = line | strip | split: ' ' -%}
+            {%- for word in words -%}
+              <span class="dunas-banner__word" style="--i: {{ word_index }};">{{ word }}</span>
+              {%- assign word_index = word_index | plus: 1 -%}
+              {%- unless forloop.last -%}{{ ' ' }}{%- endunless -%}
+            {%- endfor -%}
+          {%- endfor -%}
+        </h2>
       {%- endif -%}
       {%- if section.settings.button_label != blank -%}
         <a
@@ -125,6 +140,19 @@
       "id": "button_link",
       "label": "Button link",
       "default": "/collections/all"
+    },
+    {
+      "type": "checkbox",
+      "id": "scroll_open",
+      "label": "Open the photo as it scrolls in",
+      "info": "The photo widens from a narrow window to the full card and settles its zoom. Chrome, Edge and Safari; other browsers show it still.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "scroll_words",
+      "label": "Light up the heading word by word",
+      "default": true
     },
     {
       "type": "checkbox",

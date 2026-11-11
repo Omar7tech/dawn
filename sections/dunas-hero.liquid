@@ -2,7 +2,7 @@
 {%- assign button_style = section.settings.button_style | default: 'liquid' -%}
 
 {%- liquid
-  assign tagline = section.settings.tagline | escape | newline_to_br
+  assign tagline_lines = section.settings.tagline | escape | newline_to_br | split: '<br />'
   assign body = section.settings.text | escape | newline_to_br
 -%}
 
@@ -47,7 +47,14 @@
 
   <div class="dunas-hero__inner">
     {%- if section.settings.tagline != blank -%}
-      <h2 class="dunas-hero__tagline dunas-display">{{ tagline }}</h2>
+      <h2 class="dunas-hero__tagline dunas-display">
+        {%- for line in tagline_lines -%}
+          {%- assign line_text = line | strip -%}
+          {%- if line_text != blank -%}
+            <span class="dunas-hero__line"><span style="--i: {{ forloop.index0 }};">{{ line_text }}</span></span>
+          {%- endif -%}
+        {%- endfor -%}
+      </h2>
     {%- endif -%}
 
     <div class="dunas-hero__bottom">
@@ -75,6 +82,7 @@
       </div>
     {%- endif -%}
   </div>
+
 </section>
 
 

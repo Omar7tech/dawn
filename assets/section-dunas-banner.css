@@ -99,3 +99,75 @@
     padding-right: 5.6rem;
   }
 }
+
+/* ---------- Scroll moment ----------
+   Driven by the page's own scroll (CSS scroll-driven animations, no script): as the banner
+   comes up, the photo opens from a narrow window to the full card while its zoom settles, and
+   the heading lights up word by word. Browsers without scroll timelines, and visitors who ask
+   for reduced motion, see the finished banner. */
+
+.dunas-banner__word {
+  display: inline-block;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .dunas-banner__card {
+      view-timeline: --dunas-banner block;
+    }
+
+    .dunas-banner--open .dunas-banner__card {
+      --open-inset: 7%;
+      animation: dunas-banner-open linear both;
+      animation-timeline: --dunas-banner;
+      animation-range: entry 0% cover 36%;
+    }
+
+    .dunas-banner--open .dunas-banner__media {
+      animation: dunas-banner-settle linear both;
+      animation-timeline: --dunas-banner;
+      animation-range: entry 0% cover 60%;
+    }
+
+    .dunas-banner--words .dunas-banner__word {
+      animation: dunas-banner-word linear both;
+      animation-timeline: --dunas-banner;
+      animation-range: cover calc(36% + var(--i, 0) * 3%) cover calc(42% + var(--i, 0) * 3%);
+    }
+
+    @media screen and (min-width: 750px) {
+      .dunas-banner--open .dunas-banner__card {
+        --open-inset: 14%;
+      }
+    }
+  }
+}
+
+@keyframes dunas-banner-open {
+  from {
+    clip-path: inset(0 var(--open-inset) round var(--dunas-radius-lg, 2.8rem));
+  }
+  to {
+    clip-path: inset(0 0 round var(--dunas-radius-lg, 2.8rem));
+  }
+}
+
+@keyframes dunas-banner-settle {
+  from {
+    transform: scale(1.22);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes dunas-banner-word {
+  from {
+    opacity: 0.22;
+    filter: blur(0.15rem);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
