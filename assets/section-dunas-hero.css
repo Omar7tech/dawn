@@ -209,3 +209,91 @@
 .dunas-hero.is-in .dunas-hero__logo {
   clip-path: inset(0 0 0 0);
 }
+
+/* ---------- Pointer effect (assets/dunas-hero.js) ----------
+   Light: a pool of light in the photo's own tone follows the pointer. Two layers: a wide
+   soft-light wash that warms what it passes over, and a small screen glow at its heart.
+   Depth: the photo drifts against the pointer (scaled a touch so its edges never show) and
+   the logo with it. Individual translate/scale properties, so the photo's settle animation
+   and the logo's entrance keep working underneath. */
+
+.dunas-hero.has-pointer-fx[data-pointer='light_depth'] .dunas-hero__media > picture,
+.dunas-hero.has-pointer-fx[data-pointer='light_depth'] .dunas-hero__media > img,
+.dunas-hero.has-pointer-fx[data-pointer='depth'] .dunas-hero__media > picture,
+.dunas-hero.has-pointer-fx[data-pointer='depth'] .dunas-hero__media > img {
+  scale: var(--hero-depth-scale, 1.045);
+  will-change: translate;
+}
+
+.dunas-hero.has-pointer-fx .dunas-hero__logo {
+  will-change: translate;
+}
+
+.dunas-hero__light {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    circle at var(--px, 50%) var(--py, 40%),
+    rgba(var(--hero-glow, 232, 205, 178), 0.85) 0,
+    rgba(var(--hero-glow, 232, 205, 178), 0.35) 14vw,
+    rgba(var(--hero-glow, 232, 205, 178), 0) 36vw
+  );
+  mix-blend-mode: soft-light;
+  transition: opacity 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dunas-hero__light::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--px, 50%) var(--py, 40%),
+    rgba(var(--hero-glow, 232, 205, 178), 0.32) 0,
+    rgba(var(--hero-glow, 232, 205, 178), 0) 12vw
+  );
+  mix-blend-mode: screen;
+}
+
+.dunas-hero.is-lit .dunas-hero__light {
+  opacity: calc(0.45 + var(--hero-fx, 0.5));
+}
+
+/* Bright photos: a gentler light so highlights do not blow out */
+.dunas-hero.is-bright-photo .dunas-hero__light::after {
+  opacity: 0.45;
+}
+
+.dunas-hero.is-bright-photo.is-lit .dunas-hero__light {
+  opacity: calc(0.3 + var(--hero-fx, 0.5) * 0.7);
+}
+
+@media (prefers-reduced-motion: reduce), (hover: none) {
+  .dunas-hero__light {
+    display: none;
+  }
+}
+
+/* Mirage canvas: laid exactly over the photo, shown once WebGL has the photo */
+.dunas-hero__mirage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 600ms ease;
+}
+
+.dunas-hero.has-mirage .dunas-hero__mirage {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dunas-hero__mirage {
+    display: none;
+  }
+}

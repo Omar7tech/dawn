@@ -1,4 +1,19 @@
 {{ 'section-dunas-hero.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign pointer = section.settings.pointer_effect | default: 'mirage'
+  if pointer != 'off'
+    if section.settings.image != blank
+      assign hero_sample = section.settings.image | image_url: width: 32
+    else
+      assign hero_sample = 'dunas-hero.jpg' | asset_url
+    endif
+  endif
+  assign pointer_strength = section.settings.pointer_strength | default: 5
+  assign depth_scale = pointer_strength | times: 0.009 | plus: 1
+-%}
+{%- if pointer != 'off' -%}
+  <script src="{{ 'dunas-hero.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
 {%- assign button_style = section.settings.button_style | default: 'liquid' -%}
 
 {%- liquid
@@ -8,7 +23,17 @@
 
 <section
   class="dunas-hero color-{{ section.settings.color_scheme }}"
-  style="--dunas-hero-overlay: {{ section.settings.overlay_opacity | divided_by: 100.0 }}; --dunas-hero-focus: {{ section.settings.image_focus }};"
+  style="--dunas-hero-overlay: {{ section.settings.overlay_opacity | divided_by: 100.0 }}; --dunas-hero-focus: {{ section.settings.image_focus }}; --hero-fx: {{ pointer_strength | divided_by: 10.0 }}; --hero-depth-scale: {{ depth_scale }};"
+  {% if pointer != 'off' %}
+    data-pointer="{{ pointer }}"
+    data-pointer-strength="{{ pointer_strength }}"
+    data-pointer-colour="{{ section.settings.pointer_colour | default: 'auto' }}"
+    data-sample="{{ hero_sample }}"
+    data-mirage-size="{{ section.settings.mirage_size | default: 14 }}"
+    data-mirage-shimmer="{{ section.settings.mirage_shimmer }}"
+    data-mirage-touch="{{ section.settings.mirage_touch }}"
+    data-mirage-split="{{ section.settings.mirage_split | default: 0 }}"
+  {% endif %}
 >
   <div class="dunas-hero__media">
     {%- if section.settings.image != blank -%}
@@ -42,6 +67,9 @@
         class="dunas-hero__img"
         fetchpriority="high"
       >
+    {%- endif -%}
+    {%- if pointer != 'off' -%}
+      <span class="dunas-hero__light" aria-hidden="true"></span>
     {%- endif -%}
   </div>
 
@@ -223,6 +251,76 @@
       "id": "button_link",
       "label": "Button link",
       "default": "/collections/all"
+    },
+    {
+      "type": "select",
+      "id": "pointer_effect",
+      "label": "Pointer effect",
+      "info": "Mirage: the photo bends like desert heat haze along the pointer's path, with a faint colour split, then settles. Light: a soft light follows the pointer. Depth: the photo and logo drift apart in layers.",
+      "options": [
+        { "value": "mirage", "label": "Mirage" },
+        { "value": "light_depth", "label": "Light and depth" },
+        { "value": "light", "label": "Light" },
+        { "value": "depth", "label": "Depth" },
+        { "value": "off", "label": "Off" }
+      ],
+      "default": "mirage"
+    },
+    {
+      "type": "range",
+      "id": "pointer_strength",
+      "label": "Pointer effect strength",
+      "info": "For Mirage: how far the photo bends.",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "mirage_size",
+      "label": "Mirage brush size",
+      "min": 6,
+      "max": 30,
+      "step": 2,
+      "unit": "%",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "mirage_split",
+      "label": "Mirage colour split",
+      "info": "The faint red and blue edge where the photo bends. 0 for none.",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "checkbox",
+      "id": "mirage_shimmer",
+      "label": "Mirage: heat shimmer at rest",
+      "info": "A faint, constant shimmer low in the photo, like air over hot sand.",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "mirage_touch",
+      "label": "Mirage on touch screens",
+      "info": "A finger moving over the photo bends it too.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "pointer_colour",
+      "label": "Light colour",
+      "info": "Auto reads the hero photo and gives the light the photo's own tone, so it suits any image.",
+      "options": [
+        { "value": "auto", "label": "Auto, from the photo" },
+        { "value": "sand", "label": "Sand" },
+        { "value": "white", "label": "Warm white" }
+      ],
+      "default": "auto"
     },
     {
       "type": "checkbox",
