@@ -83,6 +83,35 @@
     {%- endif -%}
   </div>
 
+  {%- if section.settings.text_entrance -%}
+    <script>
+      (function () {
+        // Text entrance: armed before the first paint, played once the intro has lifted.
+        // Without the script, or with reduced motion, everything simply shows.
+        var hero = document.currentScript.closest('.dunas-hero');
+        if (!hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        hero.classList.add('is-armed');
+        var played = false;
+        function play() {
+          if (played) return;
+          played = true;
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              hero.classList.add('is-in');
+            });
+          });
+        }
+        var root = document.documentElement;
+        if (document.getElementById('DunasIntro') && !root.classList.contains('dunas-skip-intro') && !root.classList.contains('dunas-intro-done')) {
+          window.addEventListener('dunas:intro-done', play, { once: true });
+          setTimeout(play, 7000);
+        } else {
+          play();
+        }
+      })();
+    </script>
+  {%- endif -%}
+
 </section>
 
 
@@ -194,6 +223,13 @@
       "id": "button_link",
       "label": "Button link",
       "default": "/collections/all"
+    },
+    {
+      "type": "checkbox",
+      "id": "text_entrance",
+      "label": "Text entrance",
+      "info": "After the intro, the tagline rises line by line, the logo draws upward and the text and button follow. The photo stays still.",
+      "default": true
     },
     {
       "type": "checkbox",

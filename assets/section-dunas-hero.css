@@ -162,3 +162,50 @@
 .dunas-hero__line {
   display: block;
 }
+
+/* ---------- Text entrance ----------
+   Armed by the section's script before the first paint and played once the intro lifts:
+   the tagline rises out of its line, the tall logo draws upward, then the text and button
+   arrive. The photo stays still. About 1.4s in all. */
+
+.dunas-hero__line {
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.dunas-hero__line > span {
+  display: block;
+}
+
+.dunas-hero.is-armed .dunas-hero__line > span {
+  transform: translateY(110%);
+  transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(0.1s + var(--i, 0) * 0.12s);
+}
+
+.dunas-hero.is-armed .dunas-hero__logo {
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 1.3s cubic-bezier(0.76, 0, 0.24, 1) 0.15s;
+}
+
+.dunas-hero.is-armed .dunas-hero__bottom > * {
+  opacity: 0;
+  transform: translateY(1.6rem);
+  transition: opacity 0.8s ease, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: 0.5s;
+}
+
+.dunas-hero.is-armed .dunas-hero__bottom > * + * {
+  transition-delay: 0.62s;
+}
+
+.dunas-hero.is-in .dunas-hero__line > span,
+.dunas-hero.is-in .dunas-hero__bottom > * {
+  opacity: 1;
+  transform: none;
+}
+
+.dunas-hero.is-in .dunas-hero__logo {
+  clip-path: inset(0 0 0 0);
+}
