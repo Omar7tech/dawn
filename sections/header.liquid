@@ -3,6 +3,7 @@
 <link rel="stylesheet" href="{{ 'component-menu-drawer.css' | asset_url }}" media="print" onload="this.media='all'">
 {{ 'component-dunas-menu.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'dunas-menu.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'dunas-locale.js' | asset_url }}" defer="defer"></script>
 <link
   rel="stylesheet"
   href="{{ 'component-cart-notification.css' | asset_url }}"
@@ -188,9 +189,7 @@
         {%- endif -%}
       {%- endif -%}
       {%- if section.settings.dunas_show_locale -%}
-        <span class="header__locale" lang="{{ request.locale.iso_code }}">
-          {{- request.locale.iso_code | upcase -}}
-        </span>
+        {%- render 'dunas-language-switcher' -%}
       {%- endif -%}
     </div>
 
@@ -222,6 +221,12 @@
     </div>
 
     <div class="header__icons">
+      {%- comment -%}
+        Order: search, account, bag. The bag sits last, in the far-right corner, on every screen
+        (the convention customers expect, and the easiest spot for the right thumb on phones).
+      {%- endcomment -%}
+      {% render 'header-search', input_id: 'Search-In-Modal' %}
+
       {%- if shop.customer_accounts_enabled -%}
         <a
           href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
@@ -258,7 +263,6 @@
         {%- endif -%}
       </a>
 
-      {% render 'header-search', input_id: 'Search-In-Modal' %}
     </div>
   </header>
 </{{ header_tag }}>
@@ -574,7 +578,8 @@
       "type": "checkbox",
       "id": "dunas_show_locale",
       "default": true,
-      "label": "Show language code next to menu"
+      "label": "Show language switcher next to menu",
+      "info": "Shows the current language code. With more than one published language it opens a list to switch."
     },
     {
       "type": "select",

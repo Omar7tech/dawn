@@ -854,3 +854,82 @@ html.dunas-menu-lock {
     transition: none;
   }
 }
+
+/* ---------- Right-to-left (Arabic) ----------
+   Rows, top bar and cards mirror on their own (flex). These rules point the chevrons toward
+   the end of the line and open the desktop sheet from the right edge. */
+
+[dir='rtl'] .dunas-menu__top {
+  padding: 0 var(--menu-gutter) 0 calc(var(--menu-gutter) - 1rem);
+}
+
+/* Dawn's caret points down; +90deg makes it point left */
+[dir='rtl'] .dunas-menu__chevron {
+  transform: rotate(90deg);
+}
+
+[dir='rtl'] .dunas-menu__row--parent[aria-expanded='true'] .dunas-menu__chevron {
+  transform: rotate(0deg);
+}
+
+@media (hover: hover) {
+  [dir='rtl'] .dunas-menu__row:hover .dunas-menu__chevron--go {
+    transform: rotate(90deg) translateY(0.3rem);
+  }
+}
+
+[dir='rtl'] .dunas-menu__secondary a {
+  background-position: right calc(100% - 1rem);
+}
+
+[dir='rtl'] .dunas-menu__count {
+  right: auto;
+  left: 0.4rem;
+}
+
+[dir='rtl'] .dunas-menu .localization-form__select {
+  padding: 0 0 0 2.2rem;
+}
+
+[dir='rtl'] .dunas-menu .localization-form__select .icon-caret {
+  right: auto;
+  left: 0;
+}
+
+[dir='rtl'] .dunas-menu__social {
+  margin: 0 0 0 -1.2rem;
+}
+
+@media screen and (min-width: 990px) {
+  [dir='rtl'] .dunas-menu__sheet {
+    left: auto;
+    right: 0;
+    border-radius: 2.8rem 0 0 2.8rem;
+    box-shadow:
+      inset 0 0.1rem 0.1rem rgba(255, 255, 255, 0.7),
+      inset 0 0 2.4rem rgba(255, 255, 255, 0.18),
+      -2.4rem 0 6rem -2rem rgba(var(--dunas-ink), 0.35);
+  }
+
+  [dir='rtl'] .dunas-menu__sheet::after {
+    padding: 0.1rem 0 0.1rem 0.1rem;
+  }
+
+  [dir='rtl'] .dunas-menu:not(.is-open):not(.is-closing) .dunas-menu__sheet {
+    transform: translateX(102%);
+  }
+
+  [dir='rtl'] .dunas-menu.is-closing .dunas-menu__sheet {
+    transform: translateX(4rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [dir='rtl'] .dunas-menu .dunas-menu__chevron {
+    transform: rotate(90deg);
+  }
+
+  [dir='rtl'] .dunas-menu .dunas-menu__row--parent[aria-expanded='true'] .dunas-menu__chevron {
+    transform: rotate(0deg);
+  }
+}

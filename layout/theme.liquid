@@ -1,11 +1,27 @@
 <!doctype html>
-<html class="js" lang="{{ request.locale.iso_code }}">
+{%- liquid
+  # DUNAS: right-to-left languages flip the layout and get an Arabic-script font
+  assign dunas_lang_root = request.locale.iso_code | split: '-' | first
+  assign dunas_rtl = false
+  if dunas_lang_root == 'ar' or dunas_lang_root == 'he' or dunas_lang_root == 'fa' or dunas_lang_root == 'ur'
+    assign dunas_rtl = true
+  endif
+-%}
+<html class="js" lang="{{ request.locale.iso_code }}" dir="{% if dunas_rtl %}rtl{% else %}ltr{% endif %}">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="">
     <link rel="canonical" href="{{ canonical_url }}">
+    {%- if dunas_lang_root == 'ar' %}
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap"
+      >
+    {%- endif %}
 
     {%- assign dunas_intro_mode = settings.dunas_intro | default: 'home_page' -%}
     {%- if request.design_mode == false -%}
@@ -174,12 +190,19 @@
       }
 
       :root {
-        --font-body-family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+        {%- comment -%}
+          Arabic: the brand fonts have no Arabic letters, so IBM Plex Sans Arabic is placed before
+          the generic fallback. Latin text (DUNAS, prices, product names) keeps the brand fonts.
+        {%- endcomment -%}
+        {%- if dunas_lang_root == 'ar' -%}
+          {%- assign dunas_arabic_font = "'IBM Plex Sans Arabic', " -%}
+        {%- endif %}
+        --font-body-family: {{ settings.type_body_font.family }}, {{ dunas_arabic_font }}{{ settings.type_body_font.fallback_families }};
         --font-body-style: {{ settings.type_body_font.style }};
         --font-body-weight: {{ settings.type_body_font.weight }};
         --font-body-weight-bold: {{ settings.type_body_font.weight | plus: 300 | at_most: 1000 }};
 
-        --font-heading-family: {{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }};
+        --font-heading-family: {{ settings.type_header_font.family }}, {{ dunas_arabic_font }}{{ settings.type_header_font.fallback_families }};
         --font-heading-style: {{ settings.type_header_font.style }};
         --font-heading-weight: {{ settings.type_header_font.weight }};
 

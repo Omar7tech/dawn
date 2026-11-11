@@ -524,3 +524,32 @@
     padding-bottom: 8rem;
   }
 }
+
+/* ---------- Right-to-left (Arabic) ---------- */
+
+[dir='rtl'] .dunas-footer .footer-block__newsletter {
+  text-align: right;
+}
+
+[dir='rtl'] .dunas-footer .newsletter-form__field-wrapper .field__input {
+  padding: 0 2rem 0 12rem;
+}
+
+[dir='rtl'] .dunas-footer .newsletter-form__field-wrapper .newsletter-form__button,
+[dir='rtl'] .dunas-footer .newsletter-form__field-wrapper .newsletter-form__button:not(:focus-visible):not(.focused) {
+  right: auto;
+  left: 0.8rem;
+}
+
+[dir='rtl'] .dunas-footer .footer__list-social {
+  margin: 2rem -1.2rem 0 0;
+}
+
+[dir='rtl'] .dunas-footer .localization-form__select {
+  padding: 0.2rem 0 0.2rem 2rem;
+}
+
+[dir='rtl'] .dunas-footer .localization-form__select .icon-caret {
+  right: auto;
+  left: 0;
+}

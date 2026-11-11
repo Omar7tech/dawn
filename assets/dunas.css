@@ -487,6 +487,168 @@ body,
   }
 }
 
+/* ---------- Language switcher (snippets/dunas-language-switcher.liquid) ----------
+   The code stays where it always was; with several languages it opens a small glass list,
+   the same glass as the search panel. */
+.dunas-locale {
+  position: relative;
+}
+
+.dunas-locale__form {
+  margin: 0;
+}
+
+.dunas-locale__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 2.4rem;
+  margin: -0.6rem -0.6rem;
+  padding: 0.6rem;
+  border: 0;
+  border-radius: 10rem;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-shadow: inherit;
+  cursor: pointer;
+}
+
+/* larger tap target than the text itself */
+.dunas-locale__toggle::after {
+  content: '';
+  position: absolute;
+  inset: -1rem -0.6rem;
+}
+
+.dunas-locale__caret {
+  display: block;
+  width: 0.8rem;
+  height: 0.8rem;
+  opacity: 0.7;
+  transition: transform 250ms var(--dunas-ease);
+}
+
+.dunas-locale__caret svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.dunas-locale.is-open .dunas-locale__caret {
+  transform: rotate(180deg);
+}
+
+.dunas-locale__toggle:focus-visible {
+  outline: 0.2rem solid currentColor;
+  outline-offset: 0.2rem;
+}
+
+.dunas-locale__panel {
+  position: absolute;
+  top: calc(100% + 3.2rem);
+  inset-inline-start: -1.6rem;
+  z-index: 10;
+  min-width: 20rem;
+  padding: 0.8rem;
+  border-radius: 2rem;
+  background:
+    radial-gradient(120% 60% at 20% -10%, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 60%),
+    rgba(var(--dunas-cream), 0.86);
+  -webkit-backdrop-filter: blur(2.4rem) saturate(180%) brightness(1.05);
+  backdrop-filter: blur(2.4rem) saturate(180%) brightness(1.05);
+  box-shadow:
+    inset 0 0.1rem 0.1rem rgba(255, 255, 255, 0.7),
+    0 0 0 0.1rem rgba(255, 255, 255, 0.7),
+    0 1.6rem 4rem -1.2rem rgba(var(--dunas-ink), 0.35);
+  color: rgb(var(--dunas-ink));
+  text-shadow: none;
+  letter-spacing: 0;
+  animation: dunas-search-drop 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dunas-locale__panel[hidden] {
+  display: none;
+}
+
+.dunas-locale__label {
+  margin: 0;
+  padding: 0.6rem 1.2rem 0.4rem;
+  font-family: var(--font-body-family);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: rgba(var(--dunas-ink), 0.72);
+}
+
+.dunas-locale__list {
+  margin: 0;
+  padding: 0;
+}
+
+.dunas-locale__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+  width: 100%;
+  min-height: 4.4rem;
+  padding: 0 1.2rem;
+  border: 0;
+  border-radius: 1.2rem;
+  background: none;
+  color: rgb(var(--dunas-ink));
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  text-align: start;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+/* Arabic is named in Arabic, so it needs a font that has Arabic letters */
+.dunas-locale__option:lang(ar) {
+  font-family: var(--font-body-family), 'IBM Plex Sans Arabic', 'Noto Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+}
+
+.dunas-locale__option:hover,
+.dunas-locale__option:focus-visible {
+  background: rgba(255, 255, 255, 0.6);
+  outline: none;
+}
+
+.dunas-locale__option:focus-visible {
+  box-shadow: inset 0 0 0 0.15rem rgba(var(--dunas-ink), 0.35);
+}
+
+.dunas-locale__option[aria-current='true'] {
+  font-weight: 600;
+}
+
+.dunas-locale__check {
+  display: block;
+  flex: none;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.dunas-locale__check svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.dunas-locale.is-switching .dunas-locale__panel {
+  opacity: 0.6;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dunas-locale__panel {
+    animation: none;
+  }
+}
+
 .header--dunas .header__brand {
   display: inline-flex;
   color: rgb(var(--color-foreground));
@@ -2217,4 +2379,63 @@ body,
   @view-transition {
     navigation: none;
   }
+}
+
+/* =====================================================================
+   Right-to-left (Arabic). <html dir="rtl"> is set in layout/theme.liquid.
+   Flex and grid layouts mirror on their own; these rules mirror the few
+   DUNAS elements that are positioned by left/right, and point arrows the
+   way the text reads.
+   ===================================================================== */
+
+/* Arrows point toward the end of the line */
+[dir='rtl'] .icon-arrow {
+  transform: scaleX(-1);
+}
+
+/* ---- Header search panel ---- */
+[dir='rtl'] .dunas-header .header--dunas .search-modal .search__input.field__input {
+  padding-left: calc(var(--ds-input, 16px) * 2 + 3rem);
+  padding-right: calc(var(--ds-input, 16px) + 3.2rem);
+}
+
+[dir='rtl'] .dunas-header .header--dunas .search-modal .search__button {
+  left: auto;
+  right: 0.8rem;
+}
+
+[dir='rtl'] .dunas-header .header--dunas .search-modal__close-button {
+  right: auto;
+  left: calc(var(--ds-pad-x) + 0.4rem);
+}
+
+@media screen and (min-width: 990px) and (hover: hover) {
+  [dir='rtl'] .dunas-header .header--dunas .search-modal .search__input.field__input {
+    padding-left: 8rem;
+  }
+}
+
+/* ---- Search results page ---- */
+[dir='rtl'] .dunas-search-page .search__input.field__input {
+  padding: 0 5.2rem 0 5.6rem;
+}
+
+[dir='rtl'] .dunas-search-page .search__button {
+  left: auto;
+  right: 0.6rem;
+}
+
+[dir='rtl'] .dunas-search-page .reset__button {
+  right: auto;
+  left: 0.6rem;
+}
+
+/* ---- Text that was set flush-left ---- */
+[dir='rtl'] .dunas-search__trending {
+  text-align: right;
+}
+
+/* ---- Language switcher: the list opens from the start edge ---- */
+[dir='rtl'] .dunas-locale__toggle::after {
+  inset: -1rem -0.6rem;
 }

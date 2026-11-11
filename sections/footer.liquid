@@ -267,7 +267,7 @@
   <div class="footer__content-bottom dunas-footer__bottom">
     <div class="dunas-footer__bar page-width">
       <div class="dunas-footer__legal">
-        <small class="dunas-footer__copy">&copy; {{ 'now' | date: '%Y' }} {{ shop.name | upcase | escape }}. All rights reserved.</small>
+        <small class="dunas-footer__copy">&copy; {{ 'now' | date: '%Y' }} {{ shop.name | upcase | escape }}. {{ 'dunas.all_rights_reserved' | t }}</small>
         {%- if section.settings.show_policy -%}
           <ul class="dunas-footer__policies list-unstyled" role="list">
             {%- for policy in shop.policies -%}

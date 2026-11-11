@@ -1,0 +1,68 @@
+{% doc %}
+  DUNAS language switcher for the header pill.
+  With more than one published language: the current code ("EN") opens a small glass list of
+  the languages, each written in its own language and script (English, العربية, Português,
+  Français). Every option is a submit button of Shopify's localization form, so switching
+  works even before JavaScript loads; assets/dunas-locale.js adds open/close and keys.
+  With a single language: the code is shown as plain text, as before.
+
+  @example
+  {% render 'dunas-language-switcher' %}
+{% enddoc %}
+{%- assign current_code = localization.language.iso_code | split: '-' | first | upcase -%}
+
+{%- if localization.available_languages.size > 1 -%}
+  <dunas-locale class="header__locale dunas-locale">
+    {%- form 'localization', class: 'dunas-locale__form' -%}
+      <button
+        type="button"
+        class="dunas-locale__toggle"
+        aria-expanded="false"
+        aria-controls="DunasLocaleList"
+        aria-label="{{ 'localization.language_label' | t }}: {{ localization.language.endonym_name | capitalize | escape }}"
+      >
+        <span lang="{{ localization.language.iso_code }}">{{ current_code }}</span>
+        <span class="dunas-locale__caret" aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+      </button>
+
+      <div id="DunasLocaleList" class="dunas-locale__panel" hidden>
+        <p class="dunas-locale__label">{{ 'localization.language_label' | t }}</p>
+        <ul class="dunas-locale__list list-unstyled" role="list">
+          {%- for language in localization.available_languages -%}
+            {%- liquid
+              assign is_current = false
+              if language.iso_code == localization.language.iso_code
+                assign is_current = true
+              endif
+              assign language_dir = 'ltr'
+              assign language_root = language.iso_code | split: '-' | first
+              if language_root == 'ar' or language_root == 'he' or language_root == 'fa' or language_root == 'ur'
+                assign language_dir = 'rtl'
+              endif
+            -%}
+            <li>
+              <button
+                type="submit"
+                name="locale_code"
+                value="{{ language.iso_code }}"
+                class="dunas-locale__option"
+                lang="{{ language.iso_code }}"
+                {% if is_current %}
+                  aria-current="true"
+                {% endif %}
+              >
+                {%- comment -%} dir sits on the name only, so every name lines up in one column {%- endcomment -%}
+                <span class="dunas-locale__name" dir="{{ language_dir }}">{{ language.endonym_name | capitalize }}</span>
+                <span class="dunas-locale__check" aria-hidden="true">
+                  {%- if is_current -%}{{- 'icon-checkmark.svg' | inline_asset_content -}}{%- endif -%}
+                </span>
+              </button>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- endform -%}
+  </dunas-locale>
+{%- else -%}
+  <span class="header__locale" lang="{{ localization.language.iso_code }}">{{ current_code }}</span>
+{%- endif -%}
