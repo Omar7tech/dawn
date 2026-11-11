@@ -5,6 +5,7 @@
   @param {boolean} enable_filtering - Whether to show filtering controls.
   @param {boolean} enable_sorting - Whether to show sorting controls.
   @param {string} filter_type - The filter layout. Allowed values are `horizontal`, `vertical`, and `drawer`.
+  @param {boolean} [show_categories] - DUNAS: list collections at the top of the phone filter sheet (collection pages only).
   @param {object} [section] - The current section context, supplied implicitly when rendered from a section and used to namespace filter controls.
 
   @example
@@ -493,6 +494,14 @@
                     {{ 'products.facets.filter_button' | t }}
                   {%- endif -%}
                 </h2>
+                <button
+                  type="button"
+                  class="dunas-sheet__close"
+                  aria-label="{{ 'accessibility.close' | t }}"
+                  onclick="this.closest('.mobile-facets__wrapper').querySelector('summary').click()"
+                >
+                  <span class="svg-wrapper" aria-hidden="true">{{- 'icon-close.svg' | inline_asset_content -}}</span>
+                </button>
                 <p class="mobile-facets__count">
                   {%- if results.results_count -%}
                     {{ 'templates.search.results_with_count' | t: terms: results.terms, count: results.results_count }}
@@ -511,6 +520,48 @@
               id="FacetsWrapperMobile"
               class="mobile-facets__main has-submenu gradient"
             >
+              {%- comment -%} DUNAS: category chooser at the top of the phone sheet {%- endcomment -%}
+              {%- if show_categories and template.name == 'collection' -%}
+                {%- capture sheet_chips -%}
+                  {%- for chip_collection in collections limit: 16 -%}
+                    {%- if chip_collection.handle != 'all'
+                      and chip_collection.handle != 'frontpage'
+                      and chip_collection.products_count > 0
+                    -%}
+                      <li>
+                        <a
+                          href="{{ chip_collection.url }}"
+                          class="dunas-sheet__chip"
+                          {% if chip_collection.handle == collection.handle %}
+                            aria-current="page"
+                          {% endif %}
+                        >
+                          {{- chip_collection.title | escape -}}
+                        </a>
+                      </li>
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endcapture -%}
+                {%- if sheet_chips != blank -%}
+                  <div class="dunas-sheet__categories">
+                    <p class="dunas-sheet__label">{{ 'sections.collection_template.title' | t }}</p>
+                    <ul class="dunas-sheet__chips list-unstyled" role="list">
+                      <li>
+                        <a
+                          href="{{ routes.all_products_collection_url }}"
+                          class="dunas-sheet__chip"
+                          {% if collection.handle == 'all' %}
+                            aria-current="page"
+                          {% endif %}
+                        >
+                          {{- 'sections.featured_collection.view_all' | t -}}
+                        </a>
+                      </li>
+                      {{ sheet_chips }}
+                    </ul>
+                  </div>
+                {%- endif -%}
+              {%- endif -%}
               {%- if enable_filtering -%}
                 {%- for filter in results.filters -%}
                   {% liquid

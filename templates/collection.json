@@ -1,10 +1,14 @@
 {
   "sections": {
     "banner": {
-      "type": "main-collection-banner",
+      "type": "dunas-collection-hero",
       "settings": {
-        "show_collection_description": true,
-        "show_collection_image": false,
+        "eyebrow": "Shop DUNAS",
+        "title": "Products",
+        "description": "Considered skincare for every skin, every day.",
+        "show_image": true,
+        "show_chips": true,
+        "all_label": "",
         "color_scheme": "scheme-1"
       }
     },
@@ -24,8 +28,25 @@
         "filter_type": "horizontal",
         "enable_sorting": true,
         "columns_mobile": "2",
-        "padding_top": 36,
-        "padding_bottom": 36
+        "padding_top": 8,
+        "padding_bottom": 36,
+        "dunas_story_enable": true,
+        "dunas_story_position": 4,
+        "dunas_story_heading": "Every Skin.\nEvery Day.",
+        "dunas_story_text": "Gentle rituals, made for the climate you live in.",
+        "dunas_story_button": "Our story",
+        "dunas_story_button_style": "liquid",
+        "dunas_toolbar_sticky": true,
+        "dunas_toolbar_label": false,
+        "dunas_toolbar_count": true,
+        "dunas_float_style": "compact",
+        "dunas_float_align": "center",
+        "dunas_float_gap": 8,
+        "dunas_float_count": false,
+        "dunas_float_blur": 20,
+        "dunas_float_tint": 80,
+        "dunas_float_mobile": true,
+        "dunas_sheet_categories": true
       }
     }
   },

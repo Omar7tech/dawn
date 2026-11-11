@@ -1,0 +1,1481 @@
+/*
+  DUNAS products page (collection template).
+  1. Editorial header: eyebrow, the title set large in the display type, a line of copy,
+     the product count, and a tall rounded photo on desktop.
+  2. Collection chips: pills to move between collections; the current one is filled.
+  3. Toolbar: Dawn's filters and sort restyled as pills, dropdowns as cream glass cards.
+  4. Brand tile: one photo tile in the grid spanning two columns with the brand statement.
+  Loaded from sections/dunas-collection-hero.liquid and main-collection-product-grid.liquid.
+*/
+
+/* =====================================================================
+   1. Header
+   ===================================================================== */
+
+.dunas-collection-hero {
+  --hero-ink: var(--dunas-ink);
+  --hero-muted: rgba(var(--dunas-ink), 0.72);
+  padding-top: clamp(3.2rem, 5vw, 6.4rem);
+}
+
+.dunas-collection-hero__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 3.2rem;
+  align-items: end;
+}
+
+.dunas-collection-hero__eyebrow {
+  margin: 0 0 1.6rem;
+  font-family: var(--font-body-family);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--hero-muted);
+}
+
+.dunas-collection-hero__title {
+  margin: 0;
+  font-size: clamp(5.6rem, 14vw, 13.6rem);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  color: rgb(var(--hero-ink));
+  overflow-wrap: anywhere;
+}
+
+.dunas-collection-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.2rem 3.2rem;
+  margin-top: 2.4rem;
+  padding-top: 2rem;
+  border-top: 0.1rem solid rgba(var(--dunas-ink), 0.14);
+}
+
+.dunas-collection-hero__description,
+.dunas-collection-hero__description p {
+  margin: 0;
+  max-width: 44rem;
+  font-family: var(--font-body-family);
+  font-size: 1.6rem;
+  line-height: 1.55;
+  letter-spacing: 0;
+  color: rgb(var(--hero-ink));
+}
+
+.dunas-collection-hero__count {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--hero-muted);
+}
+
+.dunas-collection-hero__media {
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  border-radius: 2.4rem;
+  background: rgba(var(--dunas-ink), 0.06);
+}
+
+.dunas-collection-hero__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Phones: a short landscape photo, so products start on the first screen */
+@media screen and (max-width: 749px) {
+  .dunas-collection-hero__media {
+    aspect-ratio: 2 / 1;
+    border-radius: 2rem;
+  }
+}
+
+/* Tablets and up: text and photo side by side, title scaled to its column */
+@media screen and (min-width: 750px) {
+  .dunas-collection-hero__inner--with-image {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: clamp(3.2rem, 5vw, 9.6rem);
+  }
+
+  .dunas-collection-hero__inner--with-image .dunas-collection-hero__title {
+    font-size: clamp(5.6rem, 9.4vw, 13.6rem);
+  }
+
+  .dunas-collection-hero__media {
+    aspect-ratio: 1 / 1;
+    max-height: 36rem;
+  }
+
+  .dunas-collection-hero__text {
+    padding-bottom: 0.4rem;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  /* Wide rather than tall, so the first row of products shows on the first screen */
+  .dunas-collection-hero__media {
+    aspect-ratio: 5 / 4;
+    max-height: 40rem;
+    border-radius: 2.8rem;
+  }
+}
+
+/* =====================================================================
+   2. Collection chips
+   ===================================================================== */
+
+.dunas-collection-chips {
+  margin-top: clamp(3.2rem, 4vw, 4.8rem);
+}
+
+.dunas-collection-chips__list {
+  display: flex;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0.2rem 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dunas-collection-chips__list::-webkit-scrollbar {
+  display: none;
+}
+
+.dunas-collection-chips__list > li {
+  flex: none;
+}
+
+.dunas-collection-chips__chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 4rem;
+  padding: 0 1.8rem;
+  border: 0.1rem solid rgba(var(--dunas-ink), 0.16);
+  border-radius: 10rem;
+  background: transparent;
+  color: rgb(var(--dunas-ink));
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  letter-spacing: 0;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+@media (hover: hover) {
+  .dunas-collection-chips__chip:hover {
+    border-color: rgb(var(--dunas-green));
+  }
+}
+
+.dunas-collection-chips__chip[aria-current='page'] {
+  border-color: rgb(var(--dunas-green));
+  background: rgb(var(--dunas-green));
+  color: rgb(var(--dunas-cream));
+}
+
+.dunas-collection-chips__chip:focus-visible {
+  outline: 0.2rem solid rgb(var(--dunas-green));
+  outline-offset: 0.2rem;
+}
+
+/* Phones: chips run edge to edge so the scroll reads as intentional */
+@media screen and (max-width: 749px) {
+  .dunas-collection-chips {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .dunas-collection-chips__list {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    scroll-padding-left: 1.5rem;
+  }
+}
+
+/* =====================================================================
+   3. Toolbar: Dawn's filters and sort, rebuilt as one row of equal pills
+   Every control is the same 40px pill: same border, same padding, same 8px gap. Dawn's
+   absolutely-positioned carets are put back into the flow so they never touch the text.
+   Options (Product grid section > DUNAS toolbar) add classes on .dunas-collection-grid:
+   --toolbar-sticky, --toolbar-label, --toolbar-no-count.
+   ===================================================================== */
+
+.dunas-collection-grid {
+  --pill-h: 4rem;
+  --pill-edge: rgba(var(--dunas-ink), 0.16);
+  --pill-edge-hover: rgba(var(--dunas-green), 0.6);
+  --pill-muted: rgba(var(--dunas-ink), 0.72);
+}
+
+#main-collection-filters {
+  padding-bottom: 2.4rem;
+}
+
+#main-collection-filters .facets-container {
+  display: block;
+  padding-top: 0;
+}
+
+/* One row: filters on the start side, sort and count on the end side */
+#main-collection-filters .facets__form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem 1.6rem;
+  margin: 0;
+}
+
+#main-collection-filters .facets__wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* sort and count sit together at the end of the row */
+#main-collection-filters .facet-filters {
+  margin-inline-start: auto;
+}
+
+/* "Filter:" is hidden by default: the pills explain themselves */
+#main-collection-filters .facets__heading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  margin: 0;
+}
+
+.dunas-collection-grid--toolbar-label #main-collection-filters .facets__heading {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  margin: 0 0.4rem 0 0;
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  letter-spacing: 0;
+  color: var(--pill-muted);
+}
+
+#main-collection-filters .facets__disclosure {
+  margin: 0;
+}
+
+/* ---- Filter pill ---- */
+#main-collection-filters .facets__summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--pill-h);
+  margin: 0;
+  padding: 0 1.6rem 0 1.8rem;
+  border: 0.1rem solid var(--pill-edge);
+  border-radius: 10rem;
+  background: transparent;
+  color: rgb(var(--dunas-ink));
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  line-height: 1;
+  letter-spacing: 0;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+#main-collection-filters .facets__summary > div {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+#main-collection-filters .facets__summary-label,
+#main-collection-filters .facets__summary > div > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* the caret back in the flow, after the text, with its own space */
+#main-collection-filters .facets__summary .icon-caret {
+  position: static;
+  flex: none;
+  width: 1rem;
+  height: 0.6rem;
+  margin: 0;
+  color: var(--pill-muted);
+  transition: transform 250ms var(--dunas-ease);
+}
+
+#main-collection-filters .facets__summary:hover .facets__summary-label {
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  #main-collection-filters .facets__summary:hover {
+    border-color: var(--pill-edge-hover);
+  }
+}
+
+#main-collection-filters .facets__disclosure[open] .facets__summary {
+  border-color: rgb(var(--dunas-green));
+  background: rgba(255, 255, 255, 0.7);
+}
+
+#main-collection-filters .facets__disclosure[open] .facets__summary .icon-caret {
+  transform: rotate(180deg);
+}
+
+/* a filter with values chosen: a filled pill */
+#main-collection-filters .facets__disclosure:has(input[type='checkbox']:checked) .facets__summary,
+#main-collection-filters .facets__disclosure:has(.facets__price input:not(:placeholder-shown)) .facets__summary {
+  border-color: rgb(var(--dunas-green));
+  background: rgb(var(--dunas-green));
+  color: rgb(var(--dunas-cream));
+}
+
+#main-collection-filters .facets__disclosure:has(input[type='checkbox']:checked) .facets__summary .icon-caret,
+#main-collection-filters .facets__disclosure:has(.facets__price input:not(:placeholder-shown)) .facets__summary .icon-caret {
+  color: rgba(var(--dunas-cream), 0.8);
+}
+
+#main-collection-filters .facets__summary:focus-visible {
+  outline: 0.2rem solid rgb(var(--dunas-green));
+  outline-offset: 0.2rem;
+}
+
+/* ---- Dropdown: the cream glass card used by search and the language list ---- */
+#main-collection-filters .facets__display {
+  top: calc(100% + 0.8rem);
+  left: 0;
+  width: 32rem;
+  border: 0;
+  border-radius: 2rem;
+  background:
+    radial-gradient(120% 60% at 20% -10%, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 60%),
+    rgba(var(--dunas-cream), 0.94);
+  -webkit-backdrop-filter: blur(2.4rem) saturate(180%);
+  backdrop-filter: blur(2.4rem) saturate(180%);
+  box-shadow:
+    inset 0 0.1rem 0.1rem rgba(255, 255, 255, 0.7),
+    0 0 0 0.1rem rgba(255, 255, 255, 0.7),
+    0 1.6rem 4rem -1.2rem rgba(var(--dunas-ink), 0.35);
+  color: rgb(var(--dunas-ink));
+}
+
+#main-collection-filters .facets__header {
+  padding: 1.4rem 1.8rem;
+  border-bottom: 0.1rem solid rgba(var(--dunas-ink), 0.1);
+  background: transparent;
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  color: var(--pill-muted);
+}
+
+#main-collection-filters .facets__reset {
+  color: rgb(var(--dunas-ink));
+  font-size: 1.3rem;
+}
+
+#main-collection-filters .facets__list {
+  padding: 0.8rem 1rem 1rem;
+}
+
+#main-collection-filters .facets__item label,
+#main-collection-filters .facet-checkbox {
+  min-height: 4rem;
+  padding: 0 0.8rem;
+  border-radius: 1.2rem;
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  letter-spacing: 0;
+  color: rgb(var(--dunas-ink));
+  transition: background-color 150ms ease;
+}
+
+#main-collection-filters .facet-checkbox:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* Checkboxes: soft rounded boxes, filled ink with a cream tick when checked.
+   Dawn draws an outline svg and keeps the real input hidden behind it; here the real input
+   is the box, and Dawn's tick sits centred on top of it. */
+#main-collection-filters .facet-checkbox {
+  align-items: center;
+  gap: 1.2rem;
+}
+
+#main-collection-filters .facet-checkbox > svg {
+  display: none;
+}
+
+#main-collection-filters .facet-checkbox > input[type='checkbox'] {
+  position: static;
+  z-index: auto;
+  flex: none;
+  width: 1.8rem;
+  height: 1.8rem;
+  margin: 0;
+  border: 0.1rem solid rgba(var(--dunas-ink), 0.35);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.7);
+  opacity: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+#main-collection-filters .facet-checkbox > input[type='checkbox']:checked {
+  border-color: rgb(var(--dunas-green));
+  background: rgb(var(--dunas-green));
+}
+
+#main-collection-filters .facet-checkbox > input[type='checkbox']:focus-visible {
+  outline: 0.2rem solid rgb(var(--dunas-green));
+  outline-offset: 0.2rem;
+}
+
+#main-collection-filters .facet-checkbox .svg-wrapper {
+  left: calc(0.8rem + 0.35rem);
+  top: 50%;
+  width: 1.1rem;
+  height: 0.8rem;
+  margin: 0;
+  background: none;
+  color: rgb(var(--dunas-cream));
+  transform: translateY(-50%);
+}
+
+#main-collection-filters .facet-checkbox .svg-wrapper svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* No underline: the row highlight is the hover state */
+#main-collection-filters .facets__label:hover .facet-checkbox__text-label,
+#main-collection-filters .facets-layout-list input:focus ~ .facet-checkbox__text-label,
+#main-collection-filters .facet-checkbox__text-label {
+  text-decoration: none;
+}
+
+#main-collection-filters .facet-checkbox__text {
+  color: rgb(var(--dunas-ink));
+}
+
+#main-collection-filters .facet-checkbox--disabled {
+  color: rgba(var(--dunas-ink), 0.4);
+}
+
+#main-collection-filters .facets__price {
+  padding: 1.6rem 1.8rem 2rem;
+}
+
+/* ---- Sort: one pill with its label inside ---- */
+#main-collection-filters .facet-filters {
+  display: flex;
+  flex: none;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+#main-collection-filters .facet-filters__field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: var(--pill-h);
+  padding: 0 0 0 1.8rem;
+  border: 0.1rem solid var(--pill-edge);
+  border-radius: 10rem;
+  transition: border-color 150ms ease;
+}
+
+@media (hover: hover) {
+  #main-collection-filters .facet-filters__field:hover {
+    border-color: var(--pill-edge-hover);
+  }
+}
+
+#main-collection-filters .facet-filters__field:focus-within {
+  border-color: rgb(var(--dunas-green));
+}
+
+#main-collection-filters .facet-filters__label {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--pill-muted);
+}
+
+#main-collection-filters .facet-filters__label label {
+  cursor: pointer;
+}
+
+#main-collection-filters .facet-filters .select {
+  display: flex;
+  align-items: center;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* Dawn draws the input border on .select's pseudo-elements; the pill replaces it */
+#main-collection-filters .facet-filters .select::before,
+#main-collection-filters .facet-filters .select::after,
+#main-collection-filters .facet-filters__sort::before,
+#main-collection-filters .facet-filters__sort::after {
+  display: none;
+}
+
+#main-collection-filters .facet-filters__sort {
+  height: calc(var(--pill-h) - 0.2rem);
+  margin: 0;
+  padding: 0 4rem 0 0;
+  border: 0;
+  border-radius: 0 10rem 10rem 0;
+  background: transparent;
+  color: rgb(var(--dunas-ink));
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  line-height: 1;
+  letter-spacing: 0;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+}
+
+#main-collection-filters .facet-filters__sort:focus-visible {
+  box-shadow: none;
+}
+
+#main-collection-filters .facet-filters .select .svg-wrapper {
+  position: absolute;
+  top: 50%;
+  right: 1.6rem;
+  width: 1rem;
+  height: 0.6rem;
+  color: var(--pill-muted);
+  transform: translateY(-50%);
+}
+
+/* ---- Count ---- */
+#main-collection-filters .product-count {
+  display: flex;
+  flex: none;
+  align-items: center;
+  min-height: var(--pill-h);
+  margin: 0;
+}
+
+#main-collection-filters .product-count__text {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--pill-muted);
+}
+
+.dunas-collection-grid--toolbar-no-count #main-collection-filters .product-count,
+.dunas-collection-grid--toolbar-no-count #main-collection-filters .product-count-vertical {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* ---- Active filters: removable pills under the row ---- */
+/* Dawn places this between the filters and sort; order moves it to its own line below */
+#main-collection-filters .active-facets {
+  order: 10;
+  flex-basis: 100%;
+  gap: 0.6rem;
+  margin: 0.4rem 0 0;
+}
+
+#main-collection-filters .active-facets__button {
+  margin: 0;
+  padding: 0;
+}
+
+#main-collection-filters .active-facets__button-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 3.2rem;
+  padding: 0 1.2rem 0 1.4rem;
+  border-radius: 10rem;
+  background: rgba(var(--dunas-ink), 0.06);
+  color: rgb(var(--dunas-ink));
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  letter-spacing: 0;
+  box-shadow: none;
+}
+
+#main-collection-filters .active-facets__button-inner::before,
+#main-collection-filters .active-facets__button-inner::after {
+  display: none;
+}
+
+#main-collection-filters .active-facets__button-inner .svg-wrapper,
+#main-collection-filters .active-facets__button-inner svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+#main-collection-filters .active-facets__button-remove {
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  color: rgb(var(--dunas-ink));
+}
+
+/* ---- Phones: one full-width "Filter and sort" pill ---- */
+#main-collection-filters .mobile-facets__wrapper {
+  margin: 0;
+}
+
+#main-collection-filters .mobile-facets__open-wrapper,
+#main-collection-filters .mobile-facets__disclosure {
+  width: 100%;
+}
+
+#main-collection-filters .mobile-facets__open {
+  justify-content: center;
+  gap: 0.8rem;
+  min-height: 4.4rem;
+  padding: 0 1.8rem;
+  border: 0.1rem solid var(--pill-edge);
+  border-radius: 10rem;
+  background: transparent;
+  color: rgb(var(--dunas-ink));
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  letter-spacing: 0;
+}
+
+#main-collection-filters .mobile-facets__open .icon-filter {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+#main-collection-filters .mobile-facets__open-label {
+  letter-spacing: 0;
+}
+
+/* Phone filter drawer: cream sheet, pill buttons */
+.dunas-collection-grid .mobile-facets__inner {
+  background: rgb(var(--dunas-cream));
+  color: rgb(var(--dunas-ink));
+}
+
+.dunas-collection-grid .mobile-facets__heading {
+  font-family: var(--font-heading-family);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.dunas-collection-grid .mobile-facets__footer .button,
+.dunas-collection-grid .mobile-facets__footer .button::before,
+.dunas-collection-grid .mobile-facets__footer .button::after {
+  border-radius: 10rem;
+}
+
+.dunas-collection-grid .mobile-facets__footer .button {
+  min-height: 4.8rem;
+  font-family: var(--font-body-family);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 1.3rem;
+}
+
+/* ---- Floating filters (Product grid > DUNAS floating filters) ----
+   Settings write these on .dunas-collection-grid:
+   --float-gap   distance under the navbar's visible pill (not the header's padding)
+   --float-blur  glass blur, --float-tint  cream opacity of the glass
+   Classes: --toolbar-sticky (on), --float-full (full-width bar instead of a compact pill),
+   --float-start / --float-end (compact pill alignment), --float-count (keep the count),
+   --float-no-mobile (phones keep the bar in place). */
+.dunas-collection-grid {
+  --float-gap: 8px;
+  --float-blur: 20px;
+  --float-tint: 0.78;
+  /* the header's padding around its pill, so the gap is measured from the pill itself */
+  --float-top: calc(var(--header-height, 8rem) - var(--dunas-header-pad-y, 1.2rem) + var(--float-gap));
+}
+
+.dunas-collection-grid--toolbar-sticky #main-collection-filters {
+  position: sticky;
+  top: var(--float-top);
+  z-index: 3;
+  padding-bottom: 0;
+  margin-bottom: 2.4rem;
+}
+
+/* Padding is always there and cancelled by a negative margin: the pills stay flush with the
+   grid, and nothing shifts when the glass appears */
+.dunas-collection-grid--toolbar-sticky #main-collection-filters .facets-container {
+  padding: 0.6rem;
+  margin: -0.6rem;
+  border-radius: 10rem;
+  transition: background-color 250ms ease, box-shadow 250ms ease;
+}
+
+@media screen and (min-width: 750px) {
+  /* glass, shared by both styles */
+  .dunas-collection-grid--toolbar-sticky #main-collection-filters.is-stuck .facets-container {
+    background: rgba(var(--dunas-cream), var(--float-tint));
+    -webkit-backdrop-filter: blur(var(--float-blur)) saturate(170%);
+    backdrop-filter: blur(var(--float-blur)) saturate(170%);
+    box-shadow:
+      inset 0 0.1rem 0.1rem rgba(255, 255, 255, 0.7),
+      0 0 0 0.1rem rgba(255, 255, 255, 0.6),
+      0 1rem 3rem -1.2rem rgba(var(--dunas-ink), 0.3);
+  }
+
+  /* Compact (default): a pill sized to its controls */
+  .dunas-collection-grid--toolbar-sticky:not(.dunas-collection-grid--float-full)
+    #main-collection-filters.is-stuck
+    .facets-container {
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+  }
+
+  /* same specificity as the centring rule above, so position wins (it comes later) */
+  .dunas-collection-grid--toolbar-sticky.dunas-collection-grid--float-start:not(.dunas-collection-grid--float-full)
+    #main-collection-filters.is-stuck
+    .facets-container {
+    margin-inline: -0.6rem auto;
+  }
+
+  .dunas-collection-grid--toolbar-sticky.dunas-collection-grid--float-end:not(.dunas-collection-grid--float-full)
+    #main-collection-filters.is-stuck
+    .facets-container {
+    margin-inline: auto -0.6rem;
+  }
+
+  .dunas-collection-grid--toolbar-sticky:not(.dunas-collection-grid--float-full)
+    #main-collection-filters.is-stuck
+    .facets__form {
+    flex-wrap: nowrap;
+  }
+
+  .dunas-collection-grid--toolbar-sticky:not(.dunas-collection-grid--float-full)
+    #main-collection-filters.is-stuck
+    .facets__wrapper {
+    flex: none;
+  }
+
+  .dunas-collection-grid--toolbar-sticky:not(.dunas-collection-grid--float-full)
+    #main-collection-filters.is-stuck
+    .facet-filters {
+    margin-inline-start: 0.8rem;
+  }
+
+  /* the count steps away while floating, unless the setting keeps it */
+  .dunas-collection-grid--toolbar-sticky:not(.dunas-collection-grid--float-count)
+    #main-collection-filters.is-stuck
+    .product-count,
+  .dunas-collection-grid--toolbar-sticky #main-collection-filters.is-stuck .active-facets {
+    display: none;
+  }
+
+  .dunas-collection-grid--float-count:not(.dunas-collection-grid--float-full)
+    #main-collection-filters.is-stuck
+    .product-count {
+    padding-inline: 0.6rem 1rem;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .dunas-collection-grid--toolbar-sticky #main-collection-filters .facets-container {
+    padding: 0;
+    margin: 0;
+  }
+
+  .dunas-collection-grid--toolbar-sticky #main-collection-filters {
+    top: var(--float-top);
+  }
+
+  /* phones can keep the bar in its place */
+  .dunas-collection-grid--float-no-mobile #main-collection-filters {
+    position: static;
+    margin-bottom: 0;
+    padding-bottom: 2.4rem;
+  }
+}
+
+/* Pagination as pills */
+.collection .pagination__list {
+  gap: 0.6rem;
+}
+
+.collection .pagination__item {
+  min-width: 4rem;
+  height: 4rem;
+  border-radius: 10rem;
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  letter-spacing: 0;
+}
+
+.collection .pagination__item--current {
+  background: rgb(var(--dunas-green));
+  color: rgb(var(--dunas-cream));
+}
+
+.collection .pagination__item--current::after {
+  display: none;
+}
+
+/* =====================================================================
+   4. Brand tile in the grid
+   ===================================================================== */
+
+.product-grid .dunas-collection-story {
+  display: flex;
+}
+
+/* phones (2 columns): the full row */
+.product-grid .grid__item.dunas-collection-story {
+  width: 100%;
+  max-width: 100%;
+}
+
+@media screen and (min-width: 750px) {
+  /* 3 or 4 column grids: two columns wide */
+  .product-grid.grid--4-col-desktop .grid__item.dunas-collection-story {
+    width: calc(50% - var(--grid-desktop-horizontal-spacing) / 2);
+    max-width: calc(50% - var(--grid-desktop-horizontal-spacing) / 2);
+  }
+
+  .product-grid.grid--3-col-desktop .grid__item.dunas-collection-story {
+    width: calc(66.66% - var(--grid-desktop-horizontal-spacing) / 3);
+    max-width: calc(66.66% - var(--grid-desktop-horizontal-spacing) / 3);
+  }
+}
+
+.dunas-collection-story__link {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  min-height: 42rem;
+  overflow: hidden;
+  border-radius: 2rem;
+  color: rgb(var(--dunas-cream));
+  text-decoration: none;
+}
+
+.dunas-collection-story__media {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+
+.dunas-collection-story__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 40%;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .dunas-collection-story__media img {
+    transition: transform 1200ms var(--dunas-ease);
+  }
+
+  .dunas-collection-story__link:hover .dunas-collection-story__media img {
+    transform: scale(1.04);
+  }
+}
+
+/* a soft floor of shade so the cream type reads on any photo */
+.dunas-collection-story__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to top, rgba(31, 32, 29, 0.6) 0%, rgba(31, 32, 29, 0.15) 50%, rgba(31, 32, 29, 0) 75%);
+  pointer-events: none;
+}
+
+.dunas-collection-story__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.4rem;
+  width: 100%;
+  padding: clamp(2.4rem, 3vw, 4rem);
+}
+
+.dunas-collection-story__heading {
+  display: block;
+  font-size: clamp(3.6rem, 4.2vw, 6rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.dunas-collection-story__line {
+  display: block;
+}
+
+.dunas-collection-story__line:nth-child(2n) {
+  color: rgb(var(--dunas-sand));
+}
+
+.dunas-collection-story__text {
+  max-width: 34rem;
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: rgba(var(--dunas-cream), 0.9);
+}
+
+.dunas-collection-story__button {
+  margin-top: 0.6rem;
+  pointer-events: none;
+}
+
+.dunas-collection-story__link:focus-visible {
+  outline: 0.2rem solid rgb(var(--dunas-green));
+  outline-offset: 0.3rem;
+}
+
+/* =====================================================================
+   Right-to-left (Arabic)
+   ===================================================================== */
+
+[dir='rtl'] .dunas-collection-story__content {
+  align-items: flex-start;
+}
+
+[dir='rtl'] #main-collection-filters .facets__display {
+  left: auto;
+  right: 0;
+}
+
+[dir='rtl'] #main-collection-filters .facet-checkbox .svg-wrapper {
+  left: auto;
+  right: calc(0.8rem + 0.35rem);
+}
+
+[dir='rtl'] .dunas-collection-grid--toolbar-label #main-collection-filters .facets__heading {
+  margin: 0 0 0 0.4rem;
+}
+
+[dir='rtl'] #main-collection-filters .facets__summary {
+  padding: 0 1.8rem 0 1.6rem;
+}
+
+[dir='rtl'] #main-collection-filters .facet-filters__field {
+  padding: 0 1.8rem 0 0;
+}
+
+[dir='rtl'] #main-collection-filters .facet-filters__sort {
+  padding: 0 0 0 4rem;
+  border-radius: 10rem 0 0 10rem;
+}
+
+[dir='rtl'] #main-collection-filters .facet-filters .select .svg-wrapper {
+  right: auto;
+  left: 1.6rem;
+}
+
+@media screen and (max-width: 749px) {
+  [dir='rtl'] .dunas-collection-chips__list {
+    scroll-padding-left: 0;
+    scroll-padding-right: 1.5rem;
+  }
+}
+
+/* Chip product count (option) */
+.dunas-collection-chips__count {
+  margin-inline-start: 0.6rem;
+  font-size: 1.2rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+}
+
+/* Phones, sticky: the pill itself carries the glass, and the loose count steps away
+   (it would float over the products with nothing behind it) */
+@media screen and (max-width: 749px) {
+  .dunas-collection-grid--toolbar-sticky #main-collection-filters.is-stuck .facets-container {
+    background: none;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .dunas-collection-grid--toolbar-sticky #main-collection-filters.is-stuck .mobile-facets__open {
+    background: rgba(var(--dunas-cream), var(--float-tint));
+    -webkit-backdrop-filter: blur(var(--float-blur)) saturate(170%);
+    backdrop-filter: blur(var(--float-blur)) saturate(170%);
+    box-shadow:
+      inset 0 0.1rem 0.1rem rgba(255, 255, 255, 0.7),
+      0 0.8rem 2.4rem -1rem rgba(var(--dunas-ink), 0.3);
+  }
+
+  .dunas-collection-grid--toolbar-sticky #main-collection-filters .product-count,
+  .dunas-collection-grid--toolbar-sticky #main-collection-filters .active-facets-mobile {
+    transition: opacity 200ms ease;
+  }
+
+  .dunas-collection-grid--toolbar-sticky #main-collection-filters.is-stuck .product-count,
+  .dunas-collection-grid--toolbar-sticky #main-collection-filters.is-stuck .active-facets-mobile {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* Phones: "Filter and sort" and the count share one row (pill on the start side, count on the end) */
+@media screen and (max-width: 749px) {
+  #main-collection-filters .facets-container {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 1.6rem;
+  }
+
+  #main-collection-filters .facets-container > .mobile-facets__wrapper {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  #main-collection-filters .facets-container > .product-count {
+    grid-column: 2;
+    grid-row: 1;
+    min-height: 4.4rem;
+  }
+
+  #main-collection-filters .facets-container > .active-facets-mobile {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+/* Product cards: the name leads, the price follows (it was louder than the name) */
+.dunas-collection-grid .product-card-wrapper .price,
+.dunas-collection-grid .product-card-wrapper .price-item {
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+/* Dawn keeps an empty "active filters" row in the form even with no filter chosen; its row gap
+   made the bar 12px taller than when stuck (a visible nudge). It only shows when it has pills. */
+#main-collection-filters .facets__form > .active-facets:not(:has(.active-facets__button)) {
+  display: none;
+}
+
+/* =====================================================================
+   5. Phone "Filter and sort": a bottom sheet
+   Dawn's drawer script still opens, closes and filters; only its presentation changes.
+   Rounded cream sheet that slides up, a handle, a category chooser at the top, rows with
+   hairlines, sub-lists that slide in inside the sheet, green checkboxes, and a sticky
+   footer with "Remove all" and a green "Apply".
+   ===================================================================== */
+
+#main-collection-filters .dunas-sheet__close,
+#main-collection-filters .dunas-sheet__categories {
+  display: none;
+}
+
+@media screen and (max-width: 749px) {
+  #main-collection-filters .mobile-facets {
+    background-color: rgba(var(--dunas-ink), 0.38);
+  }
+
+  #main-collection-filters .mobile-facets__inner {
+    position: absolute;
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    max-height: calc(100dvh - 4.8rem);
+    margin: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 2.8rem 2.8rem 0 0;
+    background: rgb(var(--dunas-cream));
+    color: rgb(var(--dunas-ink));
+    filter: none;
+    box-shadow: 0 -1.6rem 4.8rem -1.6rem rgba(var(--dunas-ink), 0.35);
+    transition: transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .js #main-collection-filters .disclosure-has-popup:not(.menu-opening) .mobile-facets__inner {
+    transform: translateY(105%);
+  }
+
+  #main-collection-filters .menu-opening .mobile-facets__inner {
+    transform: none;
+  }
+
+  /* the sheet has its own close button, so the floating X at the top of the screen goes */
+  #main-collection-filters details.menu-opening .mobile-facets__close {
+    display: none;
+  }
+
+  /* ---- Header: handle, title, count, close ---- */
+  #main-collection-filters .mobile-facets__header {
+    position: relative;
+    padding: 2.4rem 2.4rem 1.6rem;
+    border-bottom: 0.1rem solid rgba(var(--dunas-ink), 0.1);
+    background: transparent;
+    text-align: start;
+  }
+
+  #main-collection-filters .mobile-facets__header::before {
+    content: '';
+    position: absolute;
+    top: 0.9rem;
+    left: 50%;
+    width: 3.6rem;
+    height: 0.4rem;
+    border-radius: 1rem;
+    background: rgba(var(--dunas-ink), 0.18);
+    transform: translateX(-50%);
+  }
+
+  #main-collection-filters .mobile-facets__header-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 1.2rem;
+  }
+
+  #main-collection-filters .mobile-facets__heading {
+    grid-column: 1;
+    font-family: var(--font-heading-family);
+    font-size: 2.2rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: rgb(var(--dunas-ink));
+  }
+
+  #main-collection-filters .mobile-facets__count {
+    grid-column: 1;
+    margin-top: 0.2rem;
+    font-family: var(--font-body-family);
+    font-size: 1.3rem;
+    color: rgba(var(--dunas-ink), 0.72);
+  }
+
+  #main-collection-filters .dunas-sheet__close {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 4.4rem;
+    height: 4.4rem;
+    padding: 0.5rem;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(var(--dunas-ink), 0.07);
+    background-clip: content-box;
+    color: rgb(var(--dunas-ink));
+    cursor: pointer;
+  }
+
+  #main-collection-filters .dunas-sheet__close .svg-wrapper,
+  #main-collection-filters .dunas-sheet__close svg {
+    display: block;
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  /* ---- Body ---- */
+  #main-collection-filters .mobile-facets__main {
+    min-height: 38dvh;
+    padding: 0;
+    background: transparent;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* Category chooser */
+  #main-collection-filters .dunas-sheet__categories {
+    display: block;
+    padding: 2rem 0 1.6rem;
+    border-bottom: 0.1rem solid rgba(var(--dunas-ink), 0.1);
+  }
+
+  #main-collection-filters .dunas-sheet__label {
+    margin: 0 2.4rem 1.2rem;
+    font-family: var(--font-body-family);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: rgba(var(--dunas-ink), 0.72);
+  }
+
+  #main-collection-filters .dunas-sheet__chips {
+    display: flex;
+    gap: 0.8rem;
+    margin: 0;
+    padding: 0 2.4rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  #main-collection-filters .dunas-sheet__chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  #main-collection-filters .dunas-sheet__chips > li {
+    flex: none;
+  }
+
+  #main-collection-filters .dunas-sheet__chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 4rem;
+    padding: 0 1.8rem;
+    border: 0.1rem solid rgba(var(--dunas-ink), 0.16);
+    border-radius: 10rem;
+    color: rgb(var(--dunas-ink));
+    font-family: var(--font-body-family);
+    font-size: 1.4rem;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  #main-collection-filters .dunas-sheet__chip[aria-current='page'] {
+    border-color: rgb(var(--dunas-green));
+    background: rgb(var(--dunas-green));
+    color: rgb(var(--dunas-cream));
+  }
+
+  /* Filter rows */
+  #main-collection-filters .mobile-facets__details {
+    border-bottom: 0.1rem solid rgba(var(--dunas-ink), 0.1);
+  }
+
+  #main-collection-filters .mobile-facets__summary {
+    display: block;
+    min-height: 5.6rem;
+    padding: 0 2.4rem;
+  }
+
+  #main-collection-filters .mobile-facets__summary > div {
+    min-height: 5.6rem;
+    font-family: var(--font-body-family);
+    font-size: 1.6rem;
+    color: rgb(var(--dunas-ink));
+  }
+
+  #main-collection-filters .mobile-facets__arrow,
+  #main-collection-filters .mobile-facets__summary .icon-caret {
+    width: 1.2rem;
+    color: rgba(var(--dunas-ink), 0.55);
+  }
+
+  /* Sub-list (slides in inside the sheet) */
+  #main-collection-filters .mobile-facets__submenu {
+    background: rgb(var(--dunas-cream));
+  }
+
+  #main-collection-filters .mobile-facets__close-button {
+    width: 100%;
+    margin: 0;
+    padding: 1.6rem 2.4rem;
+    border-bottom: 0.1rem solid rgba(var(--dunas-ink), 0.1);
+    color: rgb(var(--dunas-ink));
+    font-family: var(--font-body-family);
+    font-size: 1.6rem;
+    font-weight: 600;
+  }
+
+  #main-collection-filters .mobile-facets__close-button .icon-arrow {
+    width: 1.4rem;
+  }
+
+  #main-collection-filters .mobile-facets__list {
+    padding: 0.8rem 1.2rem;
+  }
+
+  #main-collection-filters .mobile-facets__label {
+    position: relative;
+    align-items: center;
+    gap: 1.2rem;
+    min-height: 5.2rem;
+    padding: 0 1.2rem;
+    border-radius: 1.4rem;
+    font-family: var(--font-body-family);
+    font-size: 1.6rem;
+    color: rgb(var(--dunas-ink));
+  }
+
+  #main-collection-filters .mobile-facets__label:active {
+    background: rgba(var(--dunas-green), 0.08);
+  }
+
+  #main-collection-filters .mobile-facets__highlight,
+  #main-collection-filters .mobile-facets__label > svg:not(.icon-checkmark) {
+    display: none;
+  }
+
+  #main-collection-filters input.mobile-facets__checkbox {
+    position: static;
+    z-index: auto;
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    margin: 0;
+    border: 0.1rem solid rgba(var(--dunas-ink), 0.35);
+    border-radius: 0.6rem;
+    background: rgba(255, 255, 255, 0.7);
+    -webkit-appearance: none;
+    appearance: none;
+    transition: background-color 150ms ease, border-color 150ms ease;
+  }
+
+  #main-collection-filters input.mobile-facets__checkbox:checked {
+    border-color: rgb(var(--dunas-green));
+    background: rgb(var(--dunas-green));
+  }
+
+  #main-collection-filters .mobile-facets__label .icon-checkmark {
+    top: 50%;
+    left: calc(1.2rem + 0.45rem);
+    z-index: 1;
+    width: 1.1rem;
+    height: 0.9rem;
+    margin: 0;
+    color: rgb(var(--dunas-cream));
+    background: none;
+    transform: translateY(-50%);
+  }
+
+  #main-collection-filters .mobile-facets__label .facet-checkbox__text-label {
+    text-decoration: none;
+  }
+
+  #main-collection-filters .mobile-facets__label.disabled {
+    opacity: 0.4;
+  }
+
+  /* Sort row */
+  #main-collection-filters .mobile-facets__sort {
+    align-items: center;
+    min-height: 5.6rem;
+    padding: 0;
+    font-family: var(--font-body-family);
+    font-size: 1.6rem;
+    color: rgb(var(--dunas-ink));
+  }
+
+  #main-collection-filters .mobile-facets__sort .select {
+    display: flex;
+    align-items: center;
+    min-height: 4rem;
+    padding: 0 1.4rem 0 1.6rem;
+    border: 0.1rem solid rgba(var(--dunas-ink), 0.16);
+    border-radius: 10rem;
+  }
+
+  #main-collection-filters .mobile-facets__sort .select__select {
+    margin: 0;
+    padding: 0 2.2rem 0 0;
+    color: rgb(var(--dunas-ink));
+    font-family: var(--font-body-family);
+    font-size: 1.4rem;
+  }
+
+  #main-collection-filters .mobile-facets__sort .select .icon-caret,
+  #main-collection-filters .mobile-facets__sort .select .svg-wrapper {
+    right: 1.4rem;
+  }
+
+  /* Footer: "Remove all" outline pill + green "Apply" */
+  #main-collection-filters .mobile-facets__footer {
+    gap: 1rem;
+    padding: 1.2rem 2.4rem calc(1.2rem + env(safe-area-inset-bottom, 0px));
+    border-top: 0.1rem solid rgba(var(--dunas-ink), 0.1);
+    background: rgba(var(--dunas-cream), 0.94);
+    -webkit-backdrop-filter: blur(1.2rem);
+    backdrop-filter: blur(1.2rem);
+  }
+
+  #main-collection-filters .mobile-facets__footer > * + * {
+    margin-left: 0;
+  }
+
+  #main-collection-filters .mobile-facets__clear-wrapper {
+    display: flex;
+  }
+
+  #main-collection-filters .mobile-facets__clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 4.8rem;
+    border: 0.1rem solid rgba(var(--dunas-green), 0.5);
+    border-radius: 10rem;
+    color: rgb(var(--dunas-green));
+    font-family: var(--font-body-family);
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  #main-collection-filters .mobile-facets__footer .button {
+    min-height: 4.8rem;
+    border-radius: 10rem;
+    background: rgb(var(--dunas-green));
+    color: rgb(var(--dunas-cream));
+    font-family: var(--font-body-family);
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    box-shadow: none;
+  }
+
+  #main-collection-filters .mobile-facets__footer .button::before,
+  #main-collection-filters .mobile-facets__footer .button::after {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 749px) and (prefers-reduced-motion: reduce) {
+  #main-collection-filters .mobile-facets__inner {
+    transition: none;
+  }
+}
+
+/* RTL: the checkmark sits on the other side */
+@media screen and (max-width: 749px) {
+  [dir='rtl'] #main-collection-filters .mobile-facets__label .icon-checkmark {
+    left: auto;
+    right: calc(1.2rem + 0.45rem);
+  }
+}

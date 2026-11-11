@@ -1,0 +1,224 @@
+{{ 'section-dunas-collection.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign hero_title = collection.title
+  if section.settings.title != blank and collection.handle == 'all'
+    assign hero_title = section.settings.title
+  endif
+
+  assign hero_image = collection.image
+  if hero_image == blank
+    assign hero_image = section.settings.image
+  endif
+-%}
+
+<section class="dunas-collection-hero color-{{ section.settings.color_scheme }} gradient">
+  <div class="dunas-collection-hero__inner page-width{% if section.settings.show_image %} dunas-collection-hero__inner--with-image{% endif %}">
+    <div class="dunas-collection-hero__text">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="dunas-collection-hero__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+
+      <h1 class="dunas-collection-hero__title dunas-display">
+        <span class="visually-hidden">{{ 'sections.collection_template.title' | t }}: </span>
+        {{- hero_title | escape -}}
+      </h1>
+
+      <div class="dunas-collection-hero__meta">
+        {%- if collection.description != blank -%}
+          <div class="dunas-collection-hero__description rte">{{ collection.description }}</div>
+        {%- elsif section.settings.description != blank -%}
+          <p class="dunas-collection-hero__description">{{ section.settings.description | escape }}</p>
+        {%- endif -%}
+
+      </div>
+    </div>
+
+    {%- if section.settings.show_image -%}
+      <div class="dunas-collection-hero__media">
+        {%- if hero_image != blank -%}
+          {{
+            hero_image
+            | image_url: width: 1400
+            | image_tag:
+              loading: 'eager',
+              fetchpriority: 'high',
+              widths: '500, 700, 900, 1100, 1400',
+              sizes: '(min-width: 990px) 36vw, 100vw',
+              alt: ''
+          }}
+        {%- else -%}
+          <img
+            src="{{ 'dunas-banner.jpg' | asset_url }}"
+            alt=""
+            width="1600"
+            height="1000"
+            fetchpriority="high"
+          >
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if section.settings.show_chips -%}
+    {%- liquid
+      assign chip_menu = section.settings.chips_menu
+      assign on_all = false
+      if collection.handle == 'all'
+        assign on_all = true
+      endif
+      assign chip_count = 0
+    -%}
+    {%- comment -%}
+      The chips are captured first and counted: with no other collection to switch to,
+      the row is not shown at all (a lone "All" pill is noise).
+    {%- endcomment -%}
+    {%- capture chip_items -%}
+      {%- if chip_menu != blank -%}
+        {%- for link in chip_menu.links -%}
+          {%- assign chip_count = chip_count | plus: 1 -%}
+          <li>
+            <a
+              href="{{ link.url }}"
+              class="dunas-collection-chips__chip"
+              {% if link.active %}
+                aria-current="page"
+              {% endif %}
+            >
+              {{- link.title | escape -}}
+              {%- if section.settings.chips_counts and link.type == 'collection_link' -%}
+                <span class="dunas-collection-chips__count">{{ link.object.products_count }}</span>
+              {%- endif -%}
+            </a>
+          </li>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for chip_collection in collections limit: 12 -%}
+          {%- if chip_collection.handle != 'all'
+            and chip_collection.handle != 'frontpage'
+            and chip_collection.products_count > 0
+          -%}
+            {%- assign chip_count = chip_count | plus: 1 -%}
+            <li>
+              <a
+                href="{{ chip_collection.url }}"
+                class="dunas-collection-chips__chip"
+                {% if chip_collection.handle == collection.handle %}
+                  aria-current="page"
+                {% endif %}
+              >
+                {{- chip_collection.title | escape -}}
+                {%- if section.settings.chips_counts -%}
+                  <span class="dunas-collection-chips__count">{{ chip_collection.products_count }}</span>
+                {%- endif -%}
+              </a>
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+    {%- endcapture -%}
+
+    {%- if chip_count > 0 -%}
+      <nav class="dunas-collection-chips page-width" aria-label="{{ 'sections.collection_template.title' | t }}">
+        <ul class="dunas-collection-chips__list list-unstyled" role="list">
+          <li>
+            <a
+              href="{{ routes.all_products_collection_url }}"
+              class="dunas-collection-chips__chip"
+              {% if on_all %}
+                aria-current="page"
+              {% endif %}
+            >
+              {%- if section.settings.all_label != blank -%}
+                {{ section.settings.all_label | escape }}
+              {%- else -%}
+                {{ 'sections.featured_collection.view_all' | t }}
+              {%- endif -%}
+              {%- if section.settings.chips_counts -%}
+                <span class="dunas-collection-chips__count">{{ collections.all.products_count }}</span>
+              {%- endif -%}
+            </a>
+          </li>
+          {{ chip_items }}
+        </ul>
+      </nav>
+    {%- endif -%}
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "DUNAS collection header",
+  "tag": "div",
+  "class": "section section-dunas-collection-hero",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Shop DUNAS"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title for all products",
+      "default": "Products",
+      "info": "Used on the all-products page. Other collections show their own title."
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "Fallback description",
+      "default": "Considered skincare for every skin, every day.",
+      "info": "Shown when the collection has no description of its own."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "Show image",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Fallback image",
+      "info": "Used when the collection has no image of its own. The DUNAS desert image is used when both are empty."
+    },
+    {
+      "type": "header",
+      "content": "Collection chips"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_chips",
+      "label": "Show collection chips",
+      "default": true,
+      "info": "Hidden automatically when there are no other collections to switch to."
+    },
+    {
+      "type": "text",
+      "id": "all_label",
+      "label": "First chip label",
+      "info": "Leave empty to use \"View all\" in each language."
+    },
+    {
+      "type": "link_list",
+      "id": "chips_menu",
+      "label": "Chips menu",
+      "info": "Optional. Leave empty to list your collections automatically."
+    },
+    {
+      "type": "checkbox",
+      "id": "chips_counts",
+      "label": "Show product counts in chips",
+      "default": false
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-1"
+    }
+  ]
+}
+{% endschema %}

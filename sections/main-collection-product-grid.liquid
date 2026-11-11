@@ -1,6 +1,8 @@
 {{ 'template-collection.css' | asset_url | stylesheet_tag }}
 {{ 'component-card.css' | asset_url | stylesheet_tag }}
 {{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'section-dunas-collection.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'dunas-collection.js' | asset_url }}" defer="defer"></script>
 
 {% if section.settings.image_shape == 'blob' %}
   {{ 'mask-blobs.css' | asset_url | stylesheet_tag }}
@@ -40,7 +42,30 @@
   view-event-payload="{{ collection | standard_event_data: 'view' | escape }}"
   data-collection-id="{{ collection.id }}"
 >
-  <div class="section-{{ section.id }}-padding gradient color-{{ section.settings.color_scheme }}">
+  {%- liquid
+    assign float_classes = ''
+    if section.settings.dunas_toolbar_sticky
+      assign float_classes = float_classes | append: ' dunas-collection-grid--toolbar-sticky'
+      if section.settings.dunas_float_style == 'full'
+        assign float_classes = float_classes | append: ' dunas-collection-grid--float-full'
+      elsif section.settings.dunas_float_align == 'start'
+        assign float_classes = float_classes | append: ' dunas-collection-grid--float-start'
+      elsif section.settings.dunas_float_align == 'end'
+        assign float_classes = float_classes | append: ' dunas-collection-grid--float-end'
+      endif
+      if section.settings.dunas_float_count
+        assign float_classes = float_classes | append: ' dunas-collection-grid--float-count'
+      endif
+      unless section.settings.dunas_float_mobile
+        assign float_classes = float_classes | append: ' dunas-collection-grid--float-no-mobile'
+      endunless
+    endif
+    assign float_tint = section.settings.dunas_float_tint | default: 78 | divided_by: 100.0
+  -%}
+  <div
+    class="dunas-collection-grid{{ float_classes }}{% if section.settings.dunas_toolbar_label %} dunas-collection-grid--toolbar-label{% endif %}{% unless section.settings.dunas_toolbar_count %} dunas-collection-grid--toolbar-no-count{% endunless %} section-{{ section.id }}-padding gradient color-{{ section.settings.color_scheme }}"
+    style="--float-gap: {{ section.settings.dunas_float_gap | default: 8 }}px; --float-blur: {{ section.settings.dunas_float_blur | default: 20 }}px; --float-tint: {{ float_tint }};"
+  >
     {%- paginate collection.products by section.settings.products_per_page -%}
       {% comment %} Sort is the first tabbable element when filter type is vertical {% endcomment %}
       {%- if section.settings.enable_sorting and section.settings.filter_type == 'vertical' -%}
@@ -115,7 +140,8 @@
               results: collection,
               enable_filtering: section.settings.enable_filtering,
               enable_sorting: section.settings.enable_sorting,
-              filter_type: section.settings.filter_type
+              filter_type: section.settings.filter_type,
+              show_categories: section.settings.dunas_sheet_categories
             %}
           </aside>
         {%- endif -%}
@@ -183,6 +209,66 @@
                     %}
                   </li>
                   {%- assign skip_card_product_styles = true -%}
+
+                  {%- comment -%}
+                    DUNAS: one brand tile after the Nth product on the first page. It spans two
+                    columns (the full row on phones) and is part of the grid markup, so filtering
+                    and sorting keep it.
+                  {%- endcomment -%}
+                  {%- if section.settings.dunas_story_enable
+                    and paginate.current_page == 1
+                    and forloop.index == section.settings.dunas_story_position
+                  -%}
+                    {%- liquid
+                      assign story_link = section.settings.dunas_story_link | default: routes.root_url
+                      assign story_style = section.settings.dunas_story_button_style | default: 'liquid'
+                    -%}
+                    <li class="grid__item dunas-collection-story">
+                      <a href="{{ story_link }}" class="dunas-collection-story__link">
+                        <span class="dunas-collection-story__media" aria-hidden="true">
+                          {%- if section.settings.dunas_story_image != blank -%}
+                            {{
+                              section.settings.dunas_story_image
+                              | image_url: width: 1600
+                              | image_tag:
+                                loading: 'lazy',
+                                widths: '600, 900, 1200, 1600',
+                                sizes: '(min-width: 990px) 50vw, 100vw',
+                                alt: ''
+                            }}
+                          {%- else -%}
+                            <img src="{{ 'dunas-banner.jpg' | asset_url }}" alt="" loading="lazy" width="1600" height="1000">
+                          {%- endif -%}
+                        </span>
+                        <span class="dunas-collection-story__content">
+                          {%- if section.settings.dunas_story_heading != blank -%}
+                            {%- assign story_lines = section.settings.dunas_story_heading | newline_to_br | split: '<br />' -%}
+                            <span class="dunas-collection-story__heading dunas-display">
+                              {%- for line in story_lines -%}
+                                {%- assign line_text = line | strip -%}
+                                {%- if line_text != blank -%}
+                                  <span class="dunas-collection-story__line">{{ line_text | escape }}</span>
+                                {%- endif -%}
+                              {%- endfor -%}
+                            </span>
+                          {%- endif -%}
+                          {%- if section.settings.dunas_story_text != blank -%}
+                            <span class="dunas-collection-story__text">{{ section.settings.dunas_story_text | escape }}</span>
+                          {%- endif -%}
+                          {%- if section.settings.dunas_story_button != blank -%}
+                            <span
+                              class="dunas-btn dunas-btn--{{ story_style }} dunas-collection-story__button"
+                              {% if story_style == 'liquid' %}
+                                data-liquid-glass data-glass-bend="{{ settings.dunas_button_glass_bend | default: 16 }}"
+                              {% endif %}
+                            >
+                              {{- section.settings.dunas_story_button | escape -}}
+                            </span>
+                          {%- endif -%}
+                        </span>
+                      </a>
+                    </li>
+                  {%- endif -%}
                 {%- endfor -%}
               </ul>
 
@@ -409,6 +495,183 @@
       "unit": "px",
       "label": "t:sections.all.padding.padding_bottom",
       "default": 36
+    },
+    {
+      "type": "header",
+      "content": "DUNAS filters"
+    },
+    {
+      "type": "checkbox",
+      "id": "dunas_toolbar_sticky",
+      "label": "Float filters while scrolling",
+      "default": true,
+      "info": "The filter bar stays under the navbar as glass while customers scroll the products."
+    },
+    {
+      "type": "select",
+      "id": "dunas_float_style",
+      "label": "Floating style",
+      "options": [
+        {
+          "value": "compact",
+          "label": "Compact pill"
+        },
+        {
+          "value": "full",
+          "label": "Full-width bar"
+        }
+      ],
+      "default": "compact"
+    },
+    {
+      "type": "select",
+      "id": "dunas_float_align",
+      "label": "Compact pill position",
+      "options": [
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "start",
+          "label": "Start"
+        },
+        {
+          "value": "end",
+          "label": "End"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "dunas_float_gap",
+      "label": "Distance below navbar",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "dunas_float_count",
+      "label": "Show product count while floating",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "dunas_float_blur",
+      "label": "Glass blur",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "dunas_float_tint",
+      "label": "Glass opacity",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 80
+    },
+    {
+      "type": "checkbox",
+      "id": "dunas_float_mobile",
+      "label": "Float on phones too",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "dunas_sheet_categories",
+      "label": "Show categories in the phone filter",
+      "default": true,
+      "info": "Lists your collections at the top of \"Filter and sort\" on phones."
+    },
+    {
+      "type": "checkbox",
+      "id": "dunas_toolbar_label",
+      "label": "Show \"Filter:\" label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "dunas_toolbar_count",
+      "label": "Show product count",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "DUNAS brand tile"
+    },
+    {
+      "type": "checkbox",
+      "id": "dunas_story_enable",
+      "label": "Show brand tile in the grid",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "dunas_story_position",
+      "label": "Show after product",
+      "min": 1,
+      "max": 16,
+      "step": 1,
+      "default": 4,
+      "info": "The tile spans two columns, or the full row on phones. Shown on the first page only."
+    },
+    {
+      "type": "image_picker",
+      "id": "dunas_story_image",
+      "label": "Image",
+      "info": "Uses the DUNAS desert image when empty."
+    },
+    {
+      "type": "textarea",
+      "id": "dunas_story_heading",
+      "label": "Heading",
+      "default": "Every Skin.\nEvery Day."
+    },
+    {
+      "type": "text",
+      "id": "dunas_story_text",
+      "label": "Text",
+      "default": "Gentle rituals, made for the climate you live in."
+    },
+    {
+      "type": "text",
+      "id": "dunas_story_button",
+      "label": "Button label",
+      "default": "Our story"
+    },
+    {
+      "type": "url",
+      "id": "dunas_story_link",
+      "label": "Link"
+    },
+    {
+      "type": "select",
+      "id": "dunas_story_button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "liquid",
+          "label": "Liquid glass"
+        },
+        {
+          "value": "glass",
+          "label": "Frosted glass"
+        },
+        {
+          "value": "light",
+          "label": "Light"
+        }
+      ],
+      "default": "liquid"
     }
   ]
 }
