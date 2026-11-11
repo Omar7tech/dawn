@@ -1,0 +1,626 @@
+/*
+  DUNAS editorial sections: page opening, image with text, values, statement, cards, quote,
+  call to action. Built for the About page and reusable on any page.
+
+  One system: eyebrow (small, muted), heading in the light display type with every second
+  line in the brand accent, quiet body text, rounded media (2rem phones, 2.4–2.8rem desktop),
+  fine hairlines instead of boxes. Spacing comes from each section's "Space above/below"
+  (75% on phones). The accent is taupe on light schemes and sand on the brand green scheme,
+  so the second line always reads.
+*/
+
+/* ---------- Base ---------- */
+
+.dunas-ed {
+  --ed-ink: var(--color-foreground);
+  --ed-muted: rgba(var(--color-foreground), 0.72);
+  --ed-rule: rgba(var(--color-foreground), 0.14);
+  --ed-accent: 169, 137, 112; /* DUNAS taupe: readable on cream and white */
+  padding-top: calc(var(--ed-pt, 64px) * 0.75);
+  padding-bottom: calc(var(--ed-pb, 64px) * 0.75);
+  color: rgb(var(--ed-ink));
+}
+
+/* On the brand green scheme the accent is sand, as in the footer */
+.dunas-ed.color-scheme-3 {
+  --ed-accent: 214, 182, 157;
+}
+
+@media screen and (min-width: 750px) {
+  .dunas-ed {
+    padding-top: var(--ed-pt, 64px);
+    padding-bottom: var(--ed-pb, 64px);
+  }
+}
+
+.dunas-ed__eyebrow {
+  margin: 0 0 1.6rem;
+  font-family: var(--font-body-family);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--ed-muted);
+}
+
+.dunas-ed__heading {
+  margin: 0;
+  font-size: clamp(3.6rem, 5.4vw, 6.8rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: rgb(var(--ed-ink));
+  overflow-wrap: anywhere;
+}
+
+.dunas-ed__line {
+  display: block;
+}
+
+.dunas-ed__line:nth-child(2n) {
+  color: rgb(var(--ed-accent));
+}
+
+.dunas-ed__rte {
+  max-width: 52rem;
+  margin-top: 2.4rem;
+  font-family: var(--font-body-family);
+  font-size: 1.6rem;
+  line-height: 1.7;
+  letter-spacing: 0;
+  color: rgba(var(--ed-ink), 0.85);
+}
+
+.dunas-ed__rte > * {
+  margin: 0;
+}
+
+.dunas-ed__rte > * + * {
+  margin-top: 1.4rem;
+}
+
+.dunas-ed__rte a {
+  color: rgb(var(--ed-ink));
+  text-underline-offset: 0.3rem;
+}
+
+.dunas-ed__lede {
+  max-width: 44rem;
+  margin: 2rem 0 0;
+  font-family: var(--font-body-family);
+  font-size: 1.6rem;
+  line-height: 1.6;
+  color: var(--ed-muted);
+}
+
+.dunas-ed__button {
+  margin-top: 3.2rem;
+}
+
+.dunas-ed__intro {
+  max-width: 72rem;
+  margin-bottom: clamp(3.2rem, 5vw, 5.6rem);
+}
+
+.dunas-ed__intro--split {
+  max-width: none;
+}
+
+@media screen and (min-width: 990px) {
+  .dunas-ed__intro--split {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 4rem;
+  }
+
+  .dunas-ed__intro--split .dunas-ed__lede {
+    margin: 0 0 0.6rem;
+    text-align: end;
+  }
+}
+
+/* ---------- 1. Page opening ---------- */
+
+.dunas-ed-hero__top {
+  display: grid;
+  gap: 2.4rem;
+}
+
+.dunas-ed-hero__heading {
+  font-size: clamp(4.4rem, 7.6vw, 11.2rem);
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+  overflow-wrap: anywhere;
+}
+
+.dunas-ed-hero__text {
+  max-width: 44rem;
+  margin: 0;
+}
+
+.dunas-ed-hero__media {
+  margin-top: clamp(3.2rem, 5vw, 5.6rem);
+  overflow: hidden;
+  border-radius: 2rem;
+  background: rgba(var(--ed-ink), 0.06);
+  aspect-ratio: 4 / 3;
+}
+
+.dunas-ed-hero__media--short {
+  aspect-ratio: 16 / 10;
+}
+
+.dunas-ed-hero__media--tall {
+  aspect-ratio: 4 / 5;
+}
+
+.dunas-ed-hero__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media screen and (min-width: 750px) {
+  /* the headline spans the full width (two strong lines); the intro sits under it, on the right */
+  .dunas-ed-hero__top {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    row-gap: clamp(2.4rem, 3vw, 4rem);
+    column-gap: clamp(3.2rem, 6vw, 9.6rem);
+  }
+
+  .dunas-ed-hero__titles {
+    grid-column: 1 / -1;
+  }
+
+  .dunas-ed-hero__text {
+    grid-column: 2;
+  }
+
+  .dunas-ed-hero__media {
+    border-radius: 2.8rem;
+    aspect-ratio: 16 / 9;
+  }
+
+  .dunas-ed-hero__media--short {
+    aspect-ratio: 21 / 9;
+  }
+
+  .dunas-ed-hero__media--tall {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* ---------- 2. Image with text ---------- */
+
+.dunas-ed-split__inner {
+  display: grid;
+  gap: 3.2rem;
+}
+
+.dunas-ed-split__media {
+  overflow: hidden;
+  border-radius: 2rem;
+  background: rgba(var(--ed-ink), 0.06);
+  aspect-ratio: 4 / 5;
+}
+
+.dunas-ed-split--square .dunas-ed-split__media {
+  aspect-ratio: 1 / 1;
+}
+
+.dunas-ed-split--landscape .dunas-ed-split__media {
+  aspect-ratio: 4 / 3;
+}
+
+.dunas-ed-split__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dunas-ed-split__content {
+  max-width: 56rem;
+}
+
+@media screen and (min-width: 750px) {
+  .dunas-ed-split__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(4rem, 7vw, 11.2rem);
+  }
+
+  .dunas-ed-split__media {
+    border-radius: 2.4rem;
+  }
+
+  .dunas-ed-split--image-right .dunas-ed-split__media {
+    order: 2;
+  }
+}
+
+/* ---------- 3. Values ---------- */
+
+.dunas-ed-values__list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.dunas-ed-values__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 1.6rem;
+  align-items: start;
+  padding: 2.4rem 0;
+  border-top: 0.1rem solid var(--ed-rule);
+}
+
+.dunas-ed-values__item:last-child {
+  border-bottom: 0.1rem solid var(--ed-rule);
+}
+
+.dunas-ed-values__icon {
+  grid-row: 1 / span 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.4rem;
+  height: 4.4rem;
+  border-radius: 50%;
+  background: rgba(var(--ed-accent), 0.16);
+  color: rgb(var(--ed-ink));
+}
+
+.dunas-ed-values__icon .dunas-icon {
+  width: 2.2rem;
+  height: 2.2rem;
+}
+
+.dunas-ed-values__title {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-heading-family);
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: rgb(var(--ed-ink));
+}
+
+.dunas-ed-values__text {
+  grid-column: 2;
+  margin: 0.6rem 0 0;
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  line-height: 1.6;
+  color: var(--ed-muted);
+}
+
+@media screen and (min-width: 750px) {
+  .dunas-ed-values__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(2.4rem, 4vw, 4.8rem);
+  }
+
+  /* desktop: icon on top, text under it, a hairline above each column */
+  .dunas-ed-values__item {
+    display: flex;
+    flex-direction: column;
+    padding: 2.8rem 0 0;
+  }
+
+  .dunas-ed-values__item:last-child {
+    border-bottom: 0;
+  }
+
+  .dunas-ed-values__title {
+    margin-top: 2rem;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .dunas-ed-values__list {
+    grid-template-columns: repeat(var(--ed-cols, 4), minmax(0, 1fr));
+  }
+}
+
+/* ---------- 4. Statement ---------- */
+
+.dunas-ed-statement__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.dunas-ed-statement--start .dunas-ed-statement__inner {
+  align-items: flex-start;
+  text-align: start;
+}
+
+.dunas-ed-statement__logo {
+  display: block;
+  width: clamp(9.6rem, 12vw, 13.6rem);
+  margin-bottom: clamp(2.8rem, 4vw, 4.8rem);
+  color: rgb(var(--ed-ink));
+  line-height: 0;
+}
+
+.dunas-ed-statement__logo .dunas-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.dunas-ed-statement__text {
+  margin: 0;
+  font-size: clamp(4.8rem, 11vw, 13.6rem);
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+  color: rgb(var(--ed-ink));
+  overflow-wrap: anywhere;
+}
+
+.dunas-ed-statement__caption {
+  margin: clamp(2.4rem, 3vw, 3.6rem) 0 0;
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  line-height: 1.6;
+  color: var(--ed-muted);
+}
+
+/* ---------- 5. Cards ---------- */
+
+.dunas-ed-cards__list {
+  display: flex;
+  gap: 1.6rem;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dunas-ed-cards__list::-webkit-scrollbar {
+  display: none;
+}
+
+.dunas-ed-cards__item {
+  flex: 0 0 78%;
+  scroll-snap-align: start;
+}
+
+.dunas-ed-cards__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  color: rgb(var(--ed-ink));
+  text-decoration: none;
+}
+
+.dunas-ed-cards__media {
+  display: block;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  border-radius: 2rem;
+  background: rgba(var(--ed-ink), 0.06);
+  aspect-ratio: 4 / 5;
+}
+
+.dunas-ed-cards__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .dunas-ed-cards__media img {
+    transition: transform 900ms var(--dunas-ease, ease);
+  }
+
+  a.dunas-ed-cards__card:hover .dunas-ed-cards__media img {
+    transform: scale(1.04);
+  }
+}
+
+.dunas-ed-cards__title {
+  font-family: var(--font-heading-family);
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.dunas-ed-cards__text {
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  line-height: 1.6;
+  color: var(--ed-muted);
+}
+
+a.dunas-ed-cards__card:focus-visible {
+  outline: 0.2rem solid rgb(var(--ed-ink));
+  outline-offset: 0.4rem;
+  border-radius: 2rem;
+}
+
+@media screen and (min-width: 750px) {
+  .dunas-ed-cards__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(2rem, 3vw, 3.2rem);
+    overflow: visible;
+  }
+
+  .dunas-ed-cards__media {
+    border-radius: 2.4rem;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .dunas-ed-cards__list {
+    grid-template-columns: repeat(var(--ed-cols, 3), minmax(0, 1fr));
+  }
+}
+
+/* ---------- 6. Quote ---------- */
+
+.dunas-ed-quote__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 104rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.dunas-ed-quote__text {
+  position: relative;
+  margin: 0;
+  /* Dawn styles blockquote with italics and a left rule; this one is upright and clean */
+  padding: 6.4rem 0 0;
+  border: 0;
+  font-style: normal;
+  font-size: clamp(2.8rem, 4vw, 4.8rem);
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  color: rgb(var(--ed-ink));
+}
+
+/* the opening quote mark, drawn (the light display font renders the glyph like two slashes) */
+.dunas-ed-quote__text::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 4.8rem;
+  height: 3.6rem;
+  background: rgb(var(--ed-accent));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 36'%3E%3Cpath d='M0 36V22C0 9.6 6.4 2.3 19.2 0l2 4.6C14.4 6.8 11 11 10.6 17.4H20V36H0Zm27.4 0V22c0-12.4 6.4-19.7 19.2-22L48 4.6c-6.8 2.2-10.2 6.4-10.6 12.8H48V36H27.4Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 36'%3E%3Cpath d='M0 36V22C0 9.6 6.4 2.3 19.2 0l2 4.6C14.4 6.8 11 11 10.6 17.4H20V36H0Zm27.4 0V22c0-12.4 6.4-19.7 19.2-22L48 4.6c-6.8 2.2-10.2 6.4-10.6 12.8H48V36H27.4Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  transform: translateX(-50%);
+}
+
+.dunas-ed-quote__text p {
+  margin: 0;
+}
+
+.dunas-ed-quote__by {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  margin-top: 3.2rem;
+  text-align: start;
+}
+
+.dunas-ed-quote__portrait {
+  width: 5.6rem;
+  height: 5.6rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.dunas-ed-quote__name,
+.dunas-ed-quote__role {
+  display: block;
+  font-family: var(--font-body-family);
+}
+
+.dunas-ed-quote__name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgb(var(--ed-ink));
+}
+
+.dunas-ed-quote__role {
+  margin-top: 0.2rem;
+  font-size: 1.3rem;
+  color: var(--ed-muted);
+}
+
+/* ---------- 7. Call to action ---------- */
+
+.dunas-ed-cta__card {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  padding: clamp(4.8rem, 8vw, 9.6rem) clamp(2.4rem, 5vw, 6.4rem);
+  border-radius: 2rem;
+  background: rgba(var(--ed-ink), 0.04);
+  text-align: center;
+}
+
+.dunas-ed-cta__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 64rem;
+}
+
+.dunas-ed-cta__content .dunas-ed__lede {
+  margin-inline: auto;
+}
+
+/* with an image: a photo card, content on the lower part, cream type */
+.dunas-ed-cta--image .dunas-ed-cta__card {
+  align-items: flex-end;
+  min-height: clamp(44rem, 60vw, 60rem);
+  color: rgb(var(--dunas-cream));
+  text-align: start;
+  justify-content: flex-start;
+}
+
+.dunas-ed-cta--image .dunas-ed-cta__content {
+  align-items: flex-start;
+}
+
+.dunas-ed-cta--image .dunas-ed-cta__content .dunas-ed__lede {
+  margin-inline: 0;
+  color: rgba(var(--dunas-cream), 0.88);
+}
+
+.dunas-ed-cta--image .dunas-ed__eyebrow {
+  color: rgba(var(--dunas-cream), 0.8);
+}
+
+.dunas-ed-cta--image .dunas-ed__heading {
+  color: rgb(var(--dunas-cream));
+}
+
+.dunas-ed-cta--image .dunas-ed__line:nth-child(2n) {
+  color: rgb(var(--dunas-sand));
+}
+
+.dunas-ed-cta__media {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+
+.dunas-ed-cta__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dunas-ed-cta--image .dunas-ed-cta__card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to top, rgba(31, 32, 29, 0.62) 0%, rgba(31, 32, 29, 0.18) 55%, rgba(31, 32, 29, 0) 80%);
+  pointer-events: none;
+}
+
+@media screen and (min-width: 750px) {
+  .dunas-ed-cta__card {
+    border-radius: 2.8rem;
+  }
+}

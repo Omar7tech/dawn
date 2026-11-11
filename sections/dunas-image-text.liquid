@@ -1,0 +1,202 @@
+{{ 'section-dunas-editorial.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign reveal = ''
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+<section
+  class="dunas-ed dunas-ed-split dunas-ed-split--image-{{ section.settings.image_side }} dunas-ed-split--{{ section.settings.image_ratio }} color-{{ section.settings.color_scheme }} gradient"
+  style="--ed-pt: {{ section.settings.padding_top }}px; --ed-pb: {{ section.settings.padding_bottom }}px;"
+>
+  <div class="page-width dunas-ed-split__inner">
+    <div class="dunas-ed-split__media{{ reveal }}">
+      {%- if section.settings.image != blank -%}
+        {{
+          section.settings.image
+          | image_url: width: 1600
+          | image_tag:
+            loading: 'lazy',
+            widths: '500, 800, 1100, 1600',
+            sizes: '(min-width: 990px) 50vw, 100vw',
+            alt: section.settings.image.alt
+        }}
+      {%- else -%}
+        {%- comment -%} Until a photo is chosen: the portrait on the left, the desert on the right (less repetition) {%- endcomment -%}
+        {%- if section.settings.image_side == 'right' -%}
+          <img src="{{ 'dunas-banner.jpg' | asset_url }}" alt="" loading="lazy" width="1600" height="1000">
+        {%- else -%}
+          <img src="{{ 'dunas-hero.jpg' | asset_url }}" alt="" loading="lazy" width="1200" height="1500">
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+    <div class="dunas-ed-split__content{{ reveal }}">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="dunas-ed__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="dunas-ed__heading dunas-display">
+{%- assign ed_lines = section.settings.heading | newline_to_br | split: '<br />' -%}
+{%- for line in ed_lines -%}
+  {%- assign line_text = line | strip -%}
+  {%- if line_text != blank -%}
+    <span class="dunas-ed__line">{{ line_text | escape }}</span>
+  {%- endif -%}
+{%- endfor -%}
+        </h2>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="dunas-ed__rte">{{ section.settings.text }}</div>
+      {%- endif -%}
+      {%- render 'dunas-button',
+        label: section.settings.button_label,
+        link: section.settings.button_link,
+        style: section.settings.button_style,
+        class: 'dunas-ed__button'
+      -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "DUNAS image with text",
+  "tag": "div",
+  "class": "section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "Uses a DUNAS image when empty (portrait on the left, desert on the right)."
+    },
+    {
+      "type": "select",
+      "id": "image_side",
+      "label": "Image position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Image shape",
+      "options": [
+        {
+          "value": "portrait",
+          "label": "Portrait"
+        },
+        {
+          "value": "square",
+          "label": "Square"
+        },
+        {
+          "value": "landscape",
+          "label": "Landscape"
+        }
+      ],
+      "default": "portrait"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Our story"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Care, shaped\nby the climate."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>We grew up between sand and sea, where skin is asked to do a lot. DUNAS is our answer: gentle formulas, honest ingredients and a short routine you actually keep.</p><p>Every product is tested through real summers and dry winters before it reaches you.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "liquid",
+          "label": "Liquid glass"
+        },
+        {
+          "value": "glass",
+          "label": "Frosted glass"
+        },
+        {
+          "value": "solid",
+          "label": "Solid green"
+        },
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "outline",
+          "label": "Outline"
+        }
+      ],
+      "default": "outline"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 64
+    }
+  ],
+  "presets": [
+    {
+      "name": "DUNAS image with text"
+    }
+  ]
+}
+{% endschema %}

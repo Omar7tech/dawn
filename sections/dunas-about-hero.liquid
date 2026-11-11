@@ -1,0 +1,150 @@
+{{ 'section-dunas-editorial.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign reveal = ''
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+<section
+  class="dunas-ed dunas-ed-hero color-{{ section.settings.color_scheme }} gradient"
+  style="--ed-pt: {{ section.settings.padding_top }}px; --ed-pb: {{ section.settings.padding_bottom }}px;"
+>
+  <div class="page-width">
+    <div class="dunas-ed-hero__top{{ reveal }}">
+      <div class="dunas-ed-hero__titles">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="dunas-ed__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h1 class="dunas-ed-hero__heading dunas-display">
+{%- assign ed_lines = section.settings.heading | newline_to_br | split: '<br />' -%}
+{%- for line in ed_lines -%}
+  {%- assign line_text = line | strip -%}
+  {%- if line_text != blank -%}
+    <span class="dunas-ed__line">{{ line_text | escape }}</span>
+  {%- endif -%}
+{%- endfor -%}
+          </h1>
+        {%- endif -%}
+      </div>
+      {%- if section.settings.text != blank -%}
+        <div class="dunas-ed-hero__text dunas-ed__rte">{{ section.settings.text }}</div>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.show_image -%}
+      <div class="dunas-ed-hero__media dunas-ed-hero__media--{{ section.settings.image_height }}{{ reveal }}">
+        {%- if section.settings.image != blank -%}
+          {{
+            section.settings.image
+            | image_url: width: 2400
+            | image_tag:
+              loading: 'eager',
+              fetchpriority: 'high',
+              widths: '750, 1100, 1500, 2000, 2400',
+              sizes: '(min-width: 1200px) 1200px, 100vw',
+              alt: section.settings.image.alt
+          }}
+        {%- else -%}
+          <img src="{{ 'dunas-banner.jpg' | asset_url }}" alt="" width="1600" height="1000" fetchpriority="high">
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "DUNAS page opening",
+  "tag": "div",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "About DUNAS"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Born in the desert.\nMade for every skin.",
+      "info": "Each line on its own row; every second line in brand sand."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Intro",
+      "default": "<p>DUNAS began with a simple question: what does skin really need when the air is dry, the sun is strong and the days are long? The answer became a small, considered range of rituals, made to be used every day.</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "Show image",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "Uses the DUNAS desert image when empty."
+    },
+    {
+      "type": "select",
+      "id": "image_height",
+      "label": "Image height",
+      "options": [
+        {
+          "value": "short",
+          "label": "Short"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "tall",
+          "label": "Tall"
+        }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 64
+    }
+  ],
+  "presets": [
+    {
+      "name": "DUNAS page opening"
+    }
+  ]
+}
+{% endschema %}

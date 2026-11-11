@@ -1,0 +1,187 @@
+{
+  "sections": {
+    "opening": {
+      "type": "dunas-about-hero",
+      "settings": {
+        "eyebrow": "About DUNAS",
+        "heading": "Born in the desert.\nMade for every skin.",
+        "text": "<p>DUNAS began with a simple question: what does skin really need when the air is dry, the sun is strong and the days are long? The answer became a small, considered range of rituals, made to be used every day.</p>",
+        "show_image": true,
+        "image_height": "medium",
+        "color_scheme": "scheme-1",
+        "padding_top": 48,
+        "padding_bottom": 64
+      }
+    },
+    "story": {
+      "type": "dunas-image-text",
+      "settings": {
+        "image_side": "left",
+        "image_ratio": "portrait",
+        "eyebrow": "Our story",
+        "heading": "Care, shaped\nby the climate.",
+        "text": "<p>We grew up between sand and sea, where skin is asked to do a lot. DUNAS is our answer: gentle formulas, honest ingredients and a short routine you actually keep.</p><p>Every product is tested through real summers and dry winters before it reaches you.</p>",
+        "button_label": "",
+        "button_style": "outline",
+        "color_scheme": "scheme-1",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "values": {
+      "type": "dunas-values",
+      "blocks": {
+        "v1": {
+          "type": "value",
+          "settings": {
+            "icon": "leaf",
+            "title": "Gentle",
+            "text": "Formulas that respect the skin barrier, every single day."
+          }
+        },
+        "v2": {
+          "type": "value",
+          "settings": {
+            "icon": "drop",
+            "title": "Hydrating",
+            "text": "Moisture that lasts through dry air and long, warm days."
+          }
+        },
+        "v3": {
+          "type": "value",
+          "settings": {
+            "icon": "sun",
+            "title": "Made for the climate",
+            "text": "Tested in real summers, not only in the lab."
+          }
+        },
+        "v4": {
+          "type": "value",
+          "settings": {
+            "icon": "shield",
+            "title": "Honest",
+            "text": "Clear ingredient lists. Nothing hidden, nothing extra."
+          }
+        }
+      },
+      "block_order": [
+        "v1",
+        "v2",
+        "v3",
+        "v4"
+      ],
+      "settings": {
+        "eyebrow": "What we stand for",
+        "heading": "Less, but better.",
+        "columns": 4,
+        "color_scheme": "scheme-1",
+        "padding_top": 64,
+        "padding_bottom": 80
+      }
+    },
+    "statement": {
+      "type": "dunas-statement",
+      "settings": {
+        "statement": "Every Skin.\nEvery Day.",
+        "caption": "A promise we keep in every formula.",
+        "show_logo": true,
+        "alignment": "center",
+        "color_scheme": "scheme-3",
+        "padding_top": 112,
+        "padding_bottom": 112
+      }
+    },
+    "process": {
+      "type": "dunas-image-text",
+      "settings": {
+        "image_side": "right",
+        "image_ratio": "portrait",
+        "eyebrow": "How we make it",
+        "heading": "Slow, small,\nand on purpose.",
+        "text": "<p>We make in small batches, so every formula is fresh and every detail is checked by hand. Fewer products, made properly, instead of a shelf of things you will never finish.</p>",
+        "button_label": "Shop the collection",
+        "button_link": "shopify://collections/all",
+        "button_style": "outline",
+        "color_scheme": "scheme-1",
+        "padding_top": 96,
+        "padding_bottom": 64
+      }
+    },
+    "ingredients": {
+      "type": "dunas-cards",
+      "blocks": {
+        "c1": {
+          "type": "card",
+          "settings": {
+            "title": "Desert botanicals",
+            "text": "Plants that thrive in dry heat, and help skin do the same."
+          }
+        },
+        "c2": {
+          "type": "card",
+          "settings": {
+            "title": "Ceramides",
+            "text": "Support the barrier so moisture stays where it belongs."
+          }
+        },
+        "c3": {
+          "type": "card",
+          "settings": {
+            "title": "Mineral SPF",
+            "text": "Daily protection that feels light, even in the sun."
+          }
+        }
+      },
+      "block_order": [
+        "c1",
+        "c2",
+        "c3"
+      ],
+      "settings": {
+        "eyebrow": "What goes in",
+        "heading": "Few ingredients.\nChosen with care.",
+        "text": "Each one earns its place in the formula.",
+        "columns": 3,
+        "color_scheme": "scheme-1",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "founder": {
+      "type": "dunas-quote",
+      "settings": {
+        "quote": "I wanted a routine that felt like a breath of cool air at the end of a hot day. Simple, kind to the skin, and made for the place we live.",
+        "name": "The DUNAS founder",
+        "role": "Founder",
+        "color_scheme": "scheme-1",
+        "padding_top": 96,
+        "padding_bottom": 96
+      }
+    },
+    "cta": {
+      "type": "dunas-cta",
+      "settings": {
+        "eyebrow": "Begin your ritual",
+        "heading": "Your skin,\nevery day.",
+        "text": "Discover the collection, made for the climate you live in.",
+        "use_brand_image": true,
+        "button_label": "Discover the collection",
+        "button_link": "shopify://collections/all",
+        "button_style": "liquid",
+        "color_scheme": "scheme-1",
+        "padding_top": 32,
+        "padding_bottom": 96
+      }
+    }
+  },
+  "order": [
+    "opening",
+    "story",
+    "values",
+    "statement",
+    "process",
+    "ingredients",
+    "founder",
+    "cta"
+  ]
+}

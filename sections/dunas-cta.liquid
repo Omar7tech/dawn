@@ -1,0 +1,167 @@
+{{ 'section-dunas-editorial.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign reveal = ''
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+<section
+  class="dunas-ed dunas-ed-cta{% if section.settings.image != blank or section.settings.use_brand_image %} dunas-ed-cta--image{% endif %} color-{{ section.settings.color_scheme }} gradient"
+  style="--ed-pt: {{ section.settings.padding_top }}px; --ed-pb: {{ section.settings.padding_bottom }}px;"
+>
+  <div class="page-width">
+    <div class="dunas-ed-cta__card{{ reveal }}">
+      {%- if section.settings.image != blank or section.settings.use_brand_image -%}
+        <span class="dunas-ed-cta__media" aria-hidden="true">
+          {%- if section.settings.image != blank -%}
+            {{
+              section.settings.image
+              | image_url: width: 2400
+              | image_tag: loading: 'lazy', widths: '750, 1200, 1800, 2400', sizes: '100vw', alt: ''
+            }}
+          {%- else -%}
+            <img src="{{ 'dunas-hero.jpg' | asset_url }}" alt="" loading="lazy" width="1600" height="1000">
+          {%- endif -%}
+        </span>
+      {%- endif -%}
+      <div class="dunas-ed-cta__content">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="dunas-ed__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="dunas-ed__heading dunas-display">
+{%- assign ed_lines = section.settings.heading | newline_to_br | split: '<br />' -%}
+{%- for line in ed_lines -%}
+  {%- assign line_text = line | strip -%}
+  {%- if line_text != blank -%}
+    <span class="dunas-ed__line">{{ line_text | escape }}</span>
+  {%- endif -%}
+{%- endfor -%}
+          </h2>
+        {%- endif -%}
+        {%- if section.settings.text != blank -%}
+          <p class="dunas-ed__lede">{{ section.settings.text | escape }}</p>
+        {%- endif -%}
+        {%- render 'dunas-button',
+          label: section.settings.button_label,
+          link: section.settings.button_link,
+          style: section.settings.button_style,
+          class: 'dunas-ed__button'
+        -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "DUNAS call to action",
+  "tag": "div",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Begin your ritual"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Your skin,\nevery day."
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Discover the collection, made for the climate you live in."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background image"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_brand_image",
+      "label": "Use the DUNAS image when no image is chosen",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Discover the collection"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "liquid",
+          "label": "Liquid glass"
+        },
+        {
+          "value": "glass",
+          "label": "Frosted glass"
+        },
+        {
+          "value": "solid",
+          "label": "Solid green"
+        },
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "outline",
+          "label": "Outline"
+        }
+      ],
+      "default": "liquid"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    }
+  ],
+  "presets": [
+    {
+      "name": "DUNAS call to action"
+    }
+  ]
+}
+{% endschema %}

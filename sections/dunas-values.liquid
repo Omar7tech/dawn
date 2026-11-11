@@ -1,0 +1,213 @@
+{{ 'section-dunas-editorial.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign reveal = ''
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+<section
+  class="dunas-ed dunas-ed-values color-{{ section.settings.color_scheme }} gradient"
+  style="--ed-pt: {{ section.settings.padding_top }}px; --ed-pb: {{ section.settings.padding_bottom }}px;"
+>
+  <div class="page-width">
+    {%- if section.settings.eyebrow != blank or section.settings.heading != blank -%}
+      <div class="dunas-ed__intro{{ reveal }}">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="dunas-ed__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="dunas-ed__heading dunas-display">
+{%- assign ed_lines = section.settings.heading | newline_to_br | split: '<br />' -%}
+{%- for line in ed_lines -%}
+  {%- assign line_text = line | strip -%}
+  {%- if line_text != blank -%}
+    <span class="dunas-ed__line">{{ line_text | escape }}</span>
+  {%- endif -%}
+{%- endfor -%}
+          </h2>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <ul class="dunas-ed-values__list list-unstyled" role="list" style="--ed-cols: {{ section.settings.columns }};">
+      {%- for block in section.blocks -%}
+        <li class="dunas-ed-values__item{{ reveal }}" {{ block.shopify_attributes }} style="--animation-order: {{ forloop.index }};">
+          {%- if block.settings.icon != 'none' -%}
+            <span class="dunas-ed-values__icon">{%- render 'dunas-icon', name: block.settings.icon -%}</span>
+          {%- endif -%}
+          {%- if block.settings.title != blank -%}
+            <h3 class="dunas-ed-values__title">{{ block.settings.title | escape }}</h3>
+          {%- endif -%}
+          {%- if block.settings.text != blank -%}
+            <p class="dunas-ed-values__text">{{ block.settings.text | escape }}</p>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "DUNAS values",
+  "tag": "div",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "What we stand for"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Less, but better."
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns on desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 64
+    }
+  ],
+  "blocks": [
+    {
+      "type": "value",
+      "name": "Value",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "leaf",
+              "label": "Leaf"
+            },
+            {
+              "value": "drop",
+              "label": "Drop"
+            },
+            {
+              "value": "sun",
+              "label": "Sun"
+            },
+            {
+              "value": "hand",
+              "label": "Hand"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "sparkle",
+              "label": "Sparkle"
+            },
+            {
+              "value": "dune",
+              "label": "Dune"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            }
+          ],
+          "default": "leaf"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Gentle"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Formulas that respect the skin barrier, every single day."
+        }
+      ]
+    }
+  ],
+  "max_blocks": 8,
+  "presets": [
+    {
+      "name": "DUNAS values",
+      "blocks": [
+        {
+          "type": "value",
+          "settings": {
+            "icon": "leaf",
+            "title": "Gentle",
+            "text": "Formulas that respect the skin barrier, every single day."
+          }
+        },
+        {
+          "type": "value",
+          "settings": {
+            "icon": "drop",
+            "title": "Hydrating",
+            "text": "Moisture that lasts through dry air and long, warm days."
+          }
+        },
+        {
+          "type": "value",
+          "settings": {
+            "icon": "sun",
+            "title": "Made for the climate",
+            "text": "Tested in real summers, not only in the lab."
+          }
+        },
+        {
+          "type": "value",
+          "settings": {
+            "icon": "shield",
+            "title": "Honest",
+            "text": "Clear ingredient lists. Nothing hidden, nothing extra."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,107 @@
+{{ 'section-dunas-editorial.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign reveal = ''
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+<section
+  class="dunas-ed dunas-ed-quote color-{{ section.settings.color_scheme }} gradient"
+  style="--ed-pt: {{ section.settings.padding_top }}px; --ed-pb: {{ section.settings.padding_bottom }}px;"
+>
+  <figure class="page-width dunas-ed-quote__inner{{ reveal }}">
+    {%- if section.settings.quote != blank -%}
+      <blockquote class="dunas-ed-quote__text dunas-display">
+        <p>{{ section.settings.quote | escape | newline_to_br }}</p>
+      </blockquote>
+    {%- endif -%}
+    {%- if section.settings.name != blank or section.settings.portrait != blank -%}
+      <figcaption class="dunas-ed-quote__by">
+        {%- if section.settings.portrait != blank -%}
+          {{
+            section.settings.portrait
+            | image_url: width: 160
+            | image_tag: loading: 'lazy', class: 'dunas-ed-quote__portrait', width: 56, height: 56, alt: ''
+          }}
+        {%- endif -%}
+        <span>
+          {%- if section.settings.name != blank -%}
+            <span class="dunas-ed-quote__name">{{ section.settings.name | escape }}</span>
+          {%- endif -%}
+          {%- if section.settings.role != blank -%}
+            <span class="dunas-ed-quote__role">{{ section.settings.role | escape }}</span>
+          {%- endif -%}
+        </span>
+      </figcaption>
+    {%- endif -%}
+  </figure>
+</section>
+
+{% schema %}
+{
+  "name": "DUNAS quote",
+  "tag": "div",
+  "class": "section",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "quote",
+      "label": "Quote",
+      "default": "I wanted a routine that felt like a breath of cool air at the end of a hot day. Simple, kind to the skin, and made for the place we live."
+    },
+    {
+      "type": "text",
+      "id": "name",
+      "label": "Name",
+      "default": "The DUNAS founder"
+    },
+    {
+      "type": "text",
+      "id": "role",
+      "label": "Role",
+      "default": "Founder"
+    },
+    {
+      "type": "image_picker",
+      "id": "portrait",
+      "label": "Portrait",
+      "info": "A small round photo next to the name. Optional."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    }
+  ],
+  "presets": [
+    {
+      "name": "DUNAS quote"
+    }
+  ]
+}
+{% endschema %}

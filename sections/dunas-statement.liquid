@@ -1,0 +1,111 @@
+{{ 'section-dunas-editorial.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign reveal = ''
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+<section
+  class="dunas-ed dunas-ed-statement dunas-ed-statement--{{ section.settings.alignment }} color-{{ section.settings.color_scheme }} gradient"
+  style="--ed-pt: {{ section.settings.padding_top }}px; --ed-pb: {{ section.settings.padding_bottom }}px;"
+>
+  <div class="page-width dunas-ed-statement__inner{{ reveal }}">
+    {%- if section.settings.show_logo -%}
+      <span class="dunas-ed-statement__logo">{%- render 'dunas-logo' -%}</span>
+    {%- endif -%}
+    {%- if section.settings.statement != blank -%}
+      <p class="dunas-ed-statement__text dunas-display">
+{%- assign ed_lines = section.settings.statement | newline_to_br | split: '<br />' -%}
+{%- for line in ed_lines -%}
+  {%- assign line_text = line | strip -%}
+  {%- if line_text != blank -%}
+    <span class="dunas-ed__line">{{ line_text | escape }}</span>
+  {%- endif -%}
+{%- endfor -%}
+      </p>
+    {%- endif -%}
+    {%- if section.settings.caption != blank -%}
+      <p class="dunas-ed-statement__caption">{{ section.settings.caption | escape }}</p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "DUNAS statement",
+  "tag": "div",
+  "class": "section",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "statement",
+      "label": "Statement",
+      "default": "Every Skin.\nEvery Day.",
+      "info": "Every second line in brand sand."
+    },
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Caption",
+      "default": "A promise we keep in every formula."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_logo",
+      "label": "Show DUNAS logo",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "Start"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-3"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    }
+  ],
+  "presets": [
+    {
+      "name": "DUNAS statement"
+    }
+  ]
+}
+{% endschema %}

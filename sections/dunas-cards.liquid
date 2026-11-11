@@ -1,0 +1,196 @@
+{{ 'section-dunas-editorial.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign reveal = ''
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+<section
+  class="dunas-ed dunas-ed-cards color-{{ section.settings.color_scheme }} gradient"
+  style="--ed-pt: {{ section.settings.padding_top }}px; --ed-pb: {{ section.settings.padding_bottom }}px;"
+>
+  <div class="page-width">
+    {%- if section.settings.eyebrow != blank or section.settings.heading != blank or section.settings.text != blank -%}
+      <div class="dunas-ed__intro dunas-ed__intro--split{{ reveal }}">
+        <div>
+          {%- if section.settings.eyebrow != blank -%}
+            <p class="dunas-ed__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+          {%- endif -%}
+          {%- if section.settings.heading != blank -%}
+            <h2 class="dunas-ed__heading dunas-display">
+{%- assign ed_lines = section.settings.heading | newline_to_br | split: '<br />' -%}
+{%- for line in ed_lines -%}
+  {%- assign line_text = line | strip -%}
+  {%- if line_text != blank -%}
+    <span class="dunas-ed__line">{{ line_text | escape }}</span>
+  {%- endif -%}
+{%- endfor -%}
+            </h2>
+          {%- endif -%}
+        </div>
+        {%- if section.settings.text != blank -%}
+          <p class="dunas-ed__lede">{{ section.settings.text | escape }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  <div class="dunas-ed-cards__track page-width">
+    <ul class="dunas-ed-cards__list list-unstyled" role="list" style="--ed-cols: {{ section.settings.columns }};">
+      {%- for block in section.blocks -%}
+        <li class="dunas-ed-cards__item{{ reveal }}" {{ block.shopify_attributes }} style="--animation-order: {{ forloop.index }};">
+          {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}" class="dunas-ed-cards__card">{%- else -%}<div class="dunas-ed-cards__card">{%- endif -%}
+            <span class="dunas-ed-cards__media">
+              {%- if block.settings.image != blank -%}
+                {{
+                  block.settings.image
+                  | image_url: width: 900
+                  | image_tag:
+                    loading: 'lazy',
+                    widths: '400, 600, 900',
+                    sizes: '(min-width: 990px) 30vw, 75vw',
+                    alt: block.settings.image.alt
+                }}
+              {%- else -%}
+                {%- capture card_fallback -%}{%- cycle 'dunas-banner.jpg', 'dunas-hero.jpg' -%}{%- endcapture -%}
+                <img src="{{ card_fallback | asset_url }}" alt="" loading="lazy" width="900" height="1100">
+              {%- endif -%}
+            </span>
+            {%- if block.settings.title != blank -%}
+              <span class="dunas-ed-cards__title">{{ block.settings.title | escape }}</span>
+            {%- endif -%}
+            {%- if block.settings.text != blank -%}
+              <span class="dunas-ed-cards__text">{{ block.settings.text | escape }}</span>
+            {%- endif -%}
+          {%- if block.settings.link != blank -%}</a>{%- else -%}</div>{%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "DUNAS cards",
+  "tag": "div",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "What goes in"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Few ingredients.\nChosen with care."
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Each one earns its place in the formula."
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns on desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 64
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Desert botanicals"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Plants that thrive in dry heat, and help skin do the same."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 8,
+  "presets": [
+    {
+      "name": "DUNAS cards",
+      "blocks": [
+        {
+          "type": "card",
+          "settings": {
+            "title": "Desert botanicals",
+            "text": "Plants that thrive in dry heat, and help skin do the same."
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "title": "Ceramides",
+            "text": "Support the barrier so moisture stays where it belongs."
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "title": "Mineral SPF",
+            "text": "Daily protection that feels light, even in the sun."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

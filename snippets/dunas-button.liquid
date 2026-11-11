@@ -1,0 +1,28 @@
+{% doc %}
+  DUNAS button: one place that renders every section's button the same way, including the
+  liquid glass style (which needs the data attributes read by snippets/dunas-liquid-glass.liquid).
+
+  @param {string} label - Button text. Nothing is rendered when blank.
+  @param {string} [link] - URL. Without one the button is shown as disabled.
+  @param {string} [style] - liquid, glass, solid, light, muted or outline. Defaults to `liquid`.
+  @param {string} [class] - Extra classes.
+
+  @example
+  {% render 'dunas-button', label: section.settings.button_label, link: section.settings.button_link, style: section.settings.button_style %}
+{% enddoc %}
+{%- if label != blank -%}
+  {%- assign btn_style = style | default: 'liquid' -%}
+  <a
+    {% if link != blank %}
+      href="{{ link }}"
+    {% else %}
+      role="link" aria-disabled="true"
+    {% endif %}
+    class="dunas-btn dunas-btn--{{ btn_style }} {{ class }}"
+    {% if btn_style == 'liquid' %}
+      data-liquid-glass data-glass-bend="{{ settings.dunas_button_glass_bend | default: 16 }}"
+    {% endif %}
+  >
+    {{- label | escape -}}
+  </a>
+{%- endif -%}
