@@ -122,6 +122,22 @@
         if dunas_display_font
           echo dunas_display_font | font_face: font_display: 'swap'
         endif
+        comment
+          Medium and semibold cuts of the heading font, for the current page's menu link
+        endcomment
+        comment
+          Loaded under their own names so other text asking for weight 400 keeps the light cut
+        endcomment
+        assign dunas_heading_500 = settings.type_header_font | font_modify: 'weight', '500'
+        if dunas_heading_500
+          assign dunas_heading_500_url = dunas_heading_500 | font_url
+          echo '@font-face { font-family: "Dunas Heading 500"; font-weight: 500; font-style: normal; font-display: swap; src: url("' | append: dunas_heading_500_url | append: '") format("woff2"); }'
+        endif
+        assign dunas_heading_600 = settings.type_header_font | font_modify: 'weight', '600'
+        if dunas_heading_600
+          assign dunas_heading_600_url = dunas_heading_600 | font_url
+          echo '@font-face { font-family: "Dunas Heading 600"; font-weight: 600; font-style: normal; font-display: swap; src: url("' | append: dunas_heading_600_url | append: '") format("woff2"); }'
+        endif
         assign dunas_body_light = settings.type_body_font | font_modify: 'weight', '300'
         if dunas_body_light
           echo dunas_body_light | font_face: font_display: 'swap'

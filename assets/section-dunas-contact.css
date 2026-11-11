@@ -104,9 +104,9 @@
 
 .dunas-ct__title {
   margin: 0;
-  font-size: clamp(5.2rem, 10.4vw, 16.8rem);
-  line-height: 0.92;
-  letter-spacing: -0.045em;
+  font-size: clamp(4.2rem, 6vw, 8.8rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
   color: rgb(var(--ct-ink));
   overflow-wrap: anywhere;
 }

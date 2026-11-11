@@ -4,6 +4,7 @@
 {{ 'component-dunas-menu.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'dunas-menu.js' | asset_url }}" defer="defer"></script>
 <script src="{{ 'dunas-locale.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'dunas-nav-lens.js' | asset_url }}" defer="defer"></script>
 <link
   rel="stylesheet"
   href="{{ 'component-cart-notification.css' | asset_url }}"
@@ -175,6 +176,22 @@
     class="header header--dunas{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}"
     data-liquid-glass
     data-glass-bend="{{ section.settings.dunas_glass_bend | default: 22 }}"
+    data-nav-lens="{{ section.settings.dunas_nav_lens | default: 'glass' }}"
+    data-nav-motion="{{ section.settings.dunas_nav_motion | default: 'liquid' }}"
+    data-nav-speed="{{ section.settings.dunas_nav_speed | default: 'normal' }}"
+    data-nav-stretch="{{ section.settings.dunas_nav_stretch | default: 30 }}"
+    data-nav-lift="{{ section.settings.dunas_nav_lift }}"
+    {% unless section.settings.dunas_nav_fringe %}
+      data-nav-no-fringe
+    {% endunless %}
+    {%- liquid
+      assign nav_weight = section.settings.dunas_nav_active_weight | default: '500'
+      assign nav_family = 'inherit'
+      if nav_weight != '400'
+        assign nav_family = '"Dunas Heading ' | append: nav_weight | append: '", var(--font-heading-family)'
+      endif
+    -%}
+    style="--nav-active-weight: {{ nav_weight }}; --nav-active-family: {{ nav_family | escape }}; --lens-magnify: {{ section.settings.dunas_nav_magnify | default: 0 | divided_by: 100.0 }}; --lens-shadow: {{ section.settings.dunas_nav_shadow | default: 0 | divided_by: 100.0 }};"
   >
     <div class="header__left">
       {%- if section.settings.menu != blank -%}
@@ -520,6 +537,94 @@
       "label": "Glass refraction",
       "info": "How strongly the glass bends the page behind it at its edges. Shown in Chrome, Edge and Android; other browsers show clear glass without bending.",
       "default": 22
+    },
+    {
+      "type": "select",
+      "id": "dunas_nav_lens",
+      "label": "Menu link highlight",
+      "info": "A drop of glass that rests on the current page's link and glides to the link you point at. Desktop menu only.",
+      "options": [
+        { "value": "glass", "label": "Clear glass" },
+        { "value": "green", "label": "Green glass" },
+        { "value": "off", "label": "Off (underline)" }
+      ],
+      "default": "glass"
+    },
+    {
+      "type": "select",
+      "id": "dunas_nav_motion",
+      "label": "Highlight motion",
+      "options": [
+        { "value": "liquid", "label": "Liquid: stretches and wobbles" },
+        { "value": "calm", "label": "Calm: glides and settles" }
+      ],
+      "default": "liquid"
+    },
+    {
+      "type": "select",
+      "id": "dunas_nav_active_weight",
+      "label": "Current page link weight",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semibold" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "select",
+      "id": "dunas_nav_speed",
+      "label": "Highlight speed",
+      "options": [
+        { "value": "slow", "label": "Slow" },
+        { "value": "normal", "label": "Normal" },
+        { "value": "fast", "label": "Fast" }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "range",
+      "id": "dunas_nav_stretch",
+      "label": "Stretch while moving",
+      "info": "Liquid motion only.",
+      "min": 0,
+      "max": 40,
+      "step": 5,
+      "unit": "%",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "dunas_nav_magnify",
+      "label": "Magnify the word under the glass",
+      "min": 0,
+      "max": 8,
+      "step": 1,
+      "unit": "%",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "dunas_nav_shadow",
+      "label": "Glass shadow",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "checkbox",
+      "id": "dunas_nav_fringe",
+      "label": "Colour fringe while moving",
+      "info": "The word under the glass splits into a faint red and blue edge as the glass travels, as real glass disperses light.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "dunas_nav_lift",
+      "label": "Lift the glass when a link is pressed",
+      "default": true
     },
     {
       "type": "header",

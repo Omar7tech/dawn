@@ -2584,3 +2584,160 @@ body,
 .main-blog {
   margin-bottom: clamp(3.2rem, 6vw, 8rem);
 }
+
+/* =====================================================================
+   Nav lens: a drop of liquid glass behind the desktop menu links
+   (moved by assets/dunas-nav-lens.js; style and motion set in the header section)
+   ===================================================================== */
+
+.header--dunas .list-menu--inline.has-lens {
+  position: relative;
+  isolation: isolate;
+}
+
+.dunas-lens {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: center;
+  will-change: transform, width;
+  transition: opacity 260ms ease;
+}
+
+.dunas-lens.is-on {
+  opacity: 1;
+}
+
+.dunas-lens__body {
+  position: absolute;
+  inset: 0.2rem 0;
+  overflow: hidden;
+  border-radius: 10rem;
+  /* clear glass: a bright top edge, a darker lower rim, a soft cast shadow */
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.4));
+  box-shadow:
+    inset 0 0.1rem 0 rgba(255, 255, 255, 0.95),
+    inset 0 -0.1rem 0.1rem rgba(var(--dunas-ink), 0.07),
+    inset 0 0 0 0.05rem rgba(255, 255, 255, 0.5),
+    0 0.6rem 1.4rem -0.6rem rgba(var(--dunas-ink), calc(0.28 * var(--lens-shadow, 1))),
+    0 0.1rem 0.3rem rgba(var(--dunas-ink), calc(0.06 * var(--lens-shadow, 1)));
+  -webkit-backdrop-filter: saturate(1.8) brightness(1.05);
+  backdrop-filter: saturate(1.8) brightness(1.05);
+  transition: transform 460ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 300ms ease, background 300ms ease;
+}
+
+/* the highlight that follows the pointer */
+.dunas-lens__shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(60% 120% at var(--mx, 50%) -10%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 70%);
+  opacity: 0.55;
+  transition: opacity 300ms ease;
+}
+
+/* pressed: the glass lifts off the bar like a lens */
+.dunas-lens.is-lifted .dunas-lens__body {
+  transform: scale(1.14, 1.2);
+  box-shadow:
+    inset 0 0.1rem 0 rgba(255, 255, 255, 1),
+    inset 0 -0.1rem 0.1rem rgba(var(--dunas-ink), 0.06),
+    inset 0 0 0 0.05rem rgba(255, 255, 255, 0.6),
+    0 1.2rem 2.4rem -0.8rem rgba(var(--dunas-ink), calc(0.32 * var(--lens-shadow, 1))),
+    0 0.2rem 0.6rem rgba(var(--dunas-ink), calc(0.08 * var(--lens-shadow, 1)));
+}
+
+.dunas-lens.is-lifted .dunas-lens__shine {
+  opacity: 0.9;
+}
+
+/* the word under the glass: a touch larger, as through a lens, in full ink */
+.has-lens > li > .header__menu-item > span,
+.has-lens > li > header-menu > details > .header__menu-item > span {
+  display: inline-block;
+  transition: transform 460ms cubic-bezier(0.34, 1.56, 0.64, 1), text-shadow 260ms ease, color 260ms ease;
+}
+
+.header--dunas .header__inline-menu .has-lens > li .header__menu-item.is-lensed {
+  color: rgb(var(--dunas-ink));
+}
+
+.has-lens .header__menu-item.is-lensed > span {
+  transform: scale(calc(1 + var(--lens-magnify, 0.04)));
+}
+
+/* while the glass travels, the word under it disperses into a faint colour fringe */
+.has-lens.is-moving:not(.has-lens--no-fringe) .header__menu-item.is-lensed > span {
+  text-shadow:
+    -0.06em 0 0 rgba(255, 60, 90, 0.28),
+    0.06em 0 0 rgba(40, 140, 255, 0.28);
+}
+
+/* the glass replaces Dawn's underline for the current page */
+.has-lens .header__active-menu-item {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Green glass */
+.has-lens--green .dunas-lens__body {
+  background: linear-gradient(180deg, rgba(var(--dunas-green), 0.88), rgba(var(--dunas-green), 0.98));
+  box-shadow:
+    inset 0 0.1rem 0 rgba(255, 255, 255, 0.35),
+    inset 0 -0.1rem 0.1rem rgba(0, 0, 0, 0.12),
+    0 0.6rem 1.4rem -0.6rem rgba(var(--dunas-green), calc(0.55 * var(--lens-shadow, 1)));
+}
+
+.has-lens--green .dunas-lens__shine {
+  opacity: 0.22;
+}
+
+.header--dunas .header__inline-menu .has-lens--green > li .header__menu-item.is-lensed,
+.dunas-header--overlay .header--dunas .header__inline-menu .has-lens--green > li .header__menu-item.is-lensed {
+  color: rgb(var(--dunas-cream));
+  text-shadow: none;
+}
+
+/* Over the home hero photo: thinner, clearer glass so the photo still reads through it */
+.dunas-header--overlay .header--dunas .has-lens--glass .dunas-lens__body {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+  box-shadow:
+    inset 0 0.1rem 0 rgba(255, 255, 255, 0.7),
+    inset 0 -0.1rem 0.1rem rgba(255, 255, 255, 0.15),
+    inset 0 0 0 0.05rem rgba(255, 255, 255, 0.35),
+    0 0.6rem 1.6rem -0.6rem rgba(0, 0, 0, calc(0.3 * var(--lens-shadow, 1)));
+}
+
+.dunas-header--overlay .header--dunas .header__inline-menu .has-lens--glass > li .header__menu-item.is-lensed {
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dunas-lens__body,
+  .has-lens > li > .header__menu-item > span,
+  .has-lens > li > header-menu > details > .header__menu-item > span {
+    transition: none;
+  }
+}
+
+.header--dunas .has-lens .header__menu-item,
+.header--dunas .has-lens .header__menu-item:hover,
+.header--dunas .has-lens .header__menu-item > span,
+.header--dunas .has-lens .header__menu-item:hover > span {
+  text-decoration: none;
+}
+
+/* The current page's menu link: a little heavier (Header > DUNAS > Current page link weight) */
+.header--dunas .header__inline-menu .header__active-menu-item,
+.header--dunas .header__inline-menu .header__menu-item[aria-current='page'] {
+  font-family: var(--nav-active-family, inherit);
+  font-weight: var(--nav-active-weight, 500);
+}
