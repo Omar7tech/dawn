@@ -4,39 +4,73 @@
       "type": "dunas-contact",
       "blocks": {
         "email": {
-          "type": "detail",
+          "type": "channel",
           "settings": {
             "label": "Email",
             "value": "hello@dunas.com",
+            "note": "",
             "link": "mailto:hello@dunas.com"
           }
         },
-        "hours": {
-          "type": "detail",
+        "shipping": {
+          "type": "help",
           "settings": {
-            "label": "Hours",
-            "value": "Monday to Friday\n9:00 to 18:00"
+            "title": "Shipping",
+            "text": "Delivery times and costs.",
+            "link": "/policies/shipping-policy"
+          }
+        },
+        "returns": {
+          "type": "help",
+          "settings": {
+            "title": "Returns",
+            "text": "How returns and refunds work.",
+            "link": "/policies/refund-policy"
+          }
+        },
+        "order": {
+          "type": "help",
+          "settings": {
+            "title": "Your order",
+            "text": "Track it from your account.",
+            "link": "/account"
           }
         }
       },
-      "block_order": [
-        "email",
-        "hours"
-      ],
+      "block_order": ["email", "shipping", "returns", "order"],
       "settings": {
         "eyebrow": "Contact",
-        "heading": "We would love\nto hear from you.",
-        "text": "<p>Questions about your skin, an order or the right routine? Write to us and we will reply within one working day.</p>",
+        "heading": "Let's talk\nabout your skin.",
+        "text": "<p>Ask about a product, your routine or an order. Pick a topic in the form and we will answer by email.</p>",
         "show_page_content": false,
+        "show_status": true,
+        "timezone": "",
+        "city": "",
+        "open_days": "mon_fri",
+        "open_hour": 9,
+        "close_hour": 18,
+        "status_open": "Open now",
+        "status_closed": "Closed now",
+        "channels_heading": "Reach us directly",
         "show_social": true,
-        "form_heading": "Send a message",
+        "copy_label": "Copy",
+        "copied_label": "Copied",
+        "form_heading": "Write to us",
+        "topic_label": "Topic",
+        "topics": "Skin advice, My order, Returns, Wholesale, Press",
+        "show_phone": false,
+        "max_length": 1500,
+        "email_error": "Write an email address with an @, like name@mail.com",
+        "sending_label": "Sending",
+        "form_note": "We only use your details to reply to you.",
+        "success_heading": "Message received.",
+        "success_text": "Thank you for writing. We will answer at the email address you gave.",
+        "help_heading": "Before you write",
         "color_scheme": "scheme-1",
-        "padding_top": 48,
-        "padding_bottom": 96
+        "padding_top": 32,
+        "padding_bottom": 120
       }
     }
   },
-  "order": [
-    "contact"
-  ]
+  "order": ["contact"]
 }

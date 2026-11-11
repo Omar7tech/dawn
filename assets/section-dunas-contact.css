@@ -1,0 +1,856 @@
+/*
+  DUNAS contact page.
+  A big two-tone headline that rises in once on load, the ways to reach us as large rows, and
+  a white form card with topic chips. Hairlines instead of boxes, green for every action,
+  taupe for the accent line. Motion stays small: arrows move 3px, cards lift 2px, buttons step
+  1px, and hover only answers a mouse (keyboard focus shows the same state).
+*/
+
+.dunas-ct {
+  --ct-ink: var(--color-foreground);
+  --ct-muted: rgba(var(--color-foreground), 0.66);
+  --ct-rule: rgba(var(--color-foreground), 0.12);
+  --ct-accent: 169, 137, 112;
+  --ct-green: var(--dunas-green, 85, 99, 97);
+  --ct-cream: var(--dunas-cream, 241, 239, 231);
+  --ct-dark: var(--dunas-ink, 49, 50, 45);
+  --ct-error: 166, 52, 52;
+  --ct-ease: var(--dunas-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  padding-top: calc(var(--ct-pt, 32px) * 0.75);
+  padding-bottom: calc(var(--ct-pb, 120px) * 0.6);
+  color: rgb(var(--ct-ink));
+}
+
+.dunas-ct.color-scheme-3 {
+  --ct-accent: 214, 182, 157;
+}
+
+@media screen and (min-width: 750px) {
+  .dunas-ct {
+    padding-top: var(--ct-pt, 32px);
+    padding-bottom: var(--ct-pb, 120px);
+  }
+}
+
+/* ---------- Opening ---------- */
+
+.dunas-ct__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem 2.4rem;
+  margin-bottom: clamp(2.4rem, 4vw, 4.8rem);
+}
+
+.dunas-ct__eyebrow {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--ct-muted);
+}
+
+/* open now pill: filled once by the script from the real hours, hidden without them */
+.dunas-ct__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0.7rem 1.4rem 0.7rem 1.2rem;
+  border: 0.1rem solid var(--ct-rule);
+  border-radius: 10rem;
+  background: rgba(255, 255, 255, 0.6);
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.dunas-ct__status[hidden] {
+  display: none;
+}
+
+.dunas-ct__dot {
+  flex: none;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  background: rgb(var(--ct-green));
+}
+
+.dunas-ct__status[data-state='closed'] .dunas-ct__dot {
+  background: rgb(var(--ct-accent));
+}
+
+.dunas-ct__clock {
+  font-variant-numeric: tabular-nums;
+  color: var(--ct-muted);
+}
+
+.dunas-ct__clock:empty {
+  display: none;
+}
+
+.dunas-ct__clock::before {
+  content: '';
+  display: inline-block;
+  width: 0.1rem;
+  height: 1.1rem;
+  margin-inline-end: 0.8rem;
+  vertical-align: -0.1rem;
+  background: var(--ct-rule);
+}
+
+.dunas-ct__title {
+  margin: 0;
+  font-size: clamp(5.2rem, 10.4vw, 16.8rem);
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  color: rgb(var(--ct-ink));
+  overflow-wrap: anywhere;
+}
+
+.dunas-ct__line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+
+/* the page's one entrance: the headline line by line, then the lead, about a second in all */
+.dunas-ct__line > span {
+  display: block;
+  animation: dunas-ct-rise 0.85s var(--ct-ease) both;
+  animation-delay: calc(var(--i, 0) * 90ms);
+}
+
+.dunas-ct__line:nth-child(2n) {
+  color: rgb(var(--ct-accent));
+}
+
+@keyframes dunas-ct-rise {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.dunas-ct__sub,
+.dunas-ct__body {
+  display: grid;
+  gap: 4rem;
+}
+
+.dunas-ct__sub {
+  margin-top: clamp(2.4rem, 4vw, 4.8rem);
+}
+
+.dunas-ct__lede {
+  max-width: 46rem;
+  font-family: var(--font-body-family);
+  font-size: 1.6rem;
+  line-height: 1.65;
+  color: rgba(var(--ct-ink), 0.8);
+  animation: dunas-ct-fade 0.6s var(--ct-ease) 0.3s both;
+}
+
+.dunas-ct__lede > * {
+  margin: 0;
+}
+
+.dunas-ct__lede > * + * {
+  margin-top: 1.2rem;
+}
+
+.dunas-ct__lede a {
+  color: rgb(var(--ct-ink));
+  text-underline-offset: 0.3rem;
+}
+
+@keyframes dunas-ct-fade {
+  from {
+    opacity: 0;
+    transform: translateY(1.2rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Body: ways to reach us + form ---------- */
+
+.dunas-ct__body {
+  margin-top: clamp(4.8rem, 8vw, 11.2rem);
+}
+
+.dunas-ct__label {
+  margin: 0 0 1.6rem;
+  font-family: var(--font-body-family);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--ct-muted);
+}
+
+.dunas-ct__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 0.1rem solid var(--ct-rule);
+}
+
+.dunas-ct__channel {
+  position: relative;
+  border-bottom: 0.1rem solid var(--ct-rule);
+}
+
+.dunas-ct__channel-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'label arrow'
+    'value arrow'
+    'note arrow';
+  align-items: center;
+  column-gap: 1.6rem;
+  padding: 2.2rem 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.dunas-ct__channel-label {
+  grid-area: label;
+  margin-bottom: 0.6rem;
+  font-family: var(--font-body-family);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--ct-muted);
+}
+
+.dunas-ct__channel-value {
+  grid-area: value;
+  font-family: var(--dunas-display-font, var(--font-heading-family));
+  font-weight: var(--dunas-display-weight, 300);
+  font-size: clamp(2.4rem, 2.6vw, 3.4rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.dunas-ct__channel-note {
+  grid-area: note;
+  margin-top: 0.6rem;
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  color: var(--ct-muted);
+}
+
+.dunas-ct__arrow {
+  grid-area: arrow;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.8rem;
+  height: 4.8rem;
+  border: 0.1rem solid var(--ct-rule);
+  border-radius: 50%;
+  color: rgb(var(--ct-ink));
+  transition: background-color 300ms var(--ct-ease), border-color 300ms var(--ct-ease),
+    color 300ms var(--ct-ease);
+}
+
+.dunas-ct__arrow svg {
+  transition: transform 300ms var(--ct-ease);
+}
+
+[dir='rtl'] .dunas-ct__arrow svg {
+  transform: scaleX(-1);
+}
+
+.dunas-ct__channel-link:focus-visible {
+  outline: 0.2rem solid rgb(var(--ct-green));
+  outline-offset: 0.4rem;
+  border-radius: 0.8rem;
+}
+
+/* copy button sits just before the arrow */
+.dunas-ct__channel--copy .dunas-ct__arrow {
+  margin-inline-start: 10rem;
+}
+
+.dunas-ct__copy {
+  position: absolute;
+  top: 50%;
+  inset-inline-end: 6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  height: 4.4rem;
+  padding: 0 1.6rem;
+  border: 0.1rem solid var(--ct-rule);
+  border-radius: 10rem;
+  background: rgba(255, 255, 255, 0.7);
+  color: rgb(var(--ct-ink));
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+}
+
+.dunas-ct__copy:focus-visible {
+  outline: 0.2rem solid rgb(var(--ct-green));
+  outline-offset: 0.2rem;
+}
+
+.dunas-ct__copy.is-copied {
+  border-color: rgba(var(--ct-green), 0.3);
+  background: rgba(var(--ct-green), 0.1);
+  color: rgb(var(--ct-green));
+}
+
+.dunas-ct__social {
+  justify-content: flex-start;
+  margin: 2rem 0 0 -1.2rem;
+}
+
+[dir='rtl'] .dunas-ct__social {
+  margin: 2rem -1.2rem 0 0;
+}
+
+.dunas-ct__social .list-social__link {
+  color: var(--ct-muted);
+  transition: color 200ms ease;
+}
+
+/* ---------- Form card ---------- */
+
+.dunas-ct__card {
+  padding: clamp(2.4rem, 4vw, 4.8rem);
+  border-radius: 2.8rem;
+  background: #fff;
+  color: rgb(var(--ct-dark));
+  box-shadow: 0 0.1rem 0 rgba(var(--ct-dark), 0.04), 0 3.2rem 6.4rem -3.2rem rgba(var(--ct-dark), 0.18);
+}
+
+.dunas-ct__form-title {
+  margin: 0 0 2.8rem;
+  font-family: var(--dunas-display-font, var(--font-heading-family));
+  font-weight: var(--dunas-display-weight, 300);
+  font-size: clamp(2.8rem, 3vw, 3.6rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* topic chips */
+.dunas-ct__topics {
+  min-width: 0;
+  margin: 0 0 2.4rem;
+  padding: 0;
+  border: 0;
+}
+
+.dunas-ct__legend,
+.dunas-ct__field label {
+  margin-bottom: 0.8rem;
+  padding: 0;
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: rgba(var(--ct-dark), 0.8);
+}
+
+.dunas-ct__legend {
+  margin-bottom: 1.2rem;
+}
+
+.dunas-ct__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.dunas-ct__chip {
+  position: relative;
+  cursor: pointer;
+}
+
+.dunas-ct__chip input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.dunas-ct__chip span {
+  display: inline-flex;
+  align-items: center;
+  height: 4.4rem;
+  padding: 0 1.8rem;
+  border: 0.1rem solid rgba(var(--ct-dark), 0.14);
+  border-radius: 10rem;
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color 200ms var(--ct-ease), border-color 200ms var(--ct-ease),
+    color 200ms var(--ct-ease);
+}
+
+.dunas-ct__chip input:checked + span {
+  border-color: rgb(var(--ct-green));
+  background: rgb(var(--ct-green));
+  color: rgb(var(--ct-cream));
+}
+
+.dunas-ct__chip input:focus-visible + span {
+  outline: 0.2rem solid rgb(var(--ct-green));
+  outline-offset: 0.2rem;
+}
+
+/* fields: the label above, in words */
+.dunas-ct__row {
+  display: grid;
+  gap: 1.6rem;
+  margin-bottom: 1.6rem;
+}
+
+.dunas-ct__field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.6rem;
+}
+
+.dunas-ct__row .dunas-ct__field {
+  margin-bottom: 0;
+}
+
+.dunas-ct__field input,
+.dunas-ct__field textarea {
+  display: block;
+  width: 100%;
+  height: 5.2rem;
+  padding: 0 1.8rem;
+  border: 0.1rem solid transparent;
+  border-radius: 1.6rem;
+  background: rgba(var(--ct-dark), 0.045);
+  color: rgb(var(--ct-dark));
+  font-family: var(--font-body-family);
+  font-size: 1.6rem;
+  line-height: 1.5;
+  -webkit-appearance: none;
+  appearance: none;
+  box-shadow: none;
+  transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.dunas-ct__field textarea {
+  height: auto;
+  min-height: 16rem;
+  padding: 1.4rem 1.8rem 3.6rem;
+  resize: vertical;
+}
+
+.dunas-ct__field input:focus,
+.dunas-ct__field textarea:focus {
+  outline: none;
+  border-color: rgb(var(--ct-green));
+  background: #fff;
+  box-shadow: 0 0 0 0.4rem rgba(var(--ct-green), 0.12);
+}
+
+.dunas-ct__field input[aria-invalid='true'] {
+  border-color: rgb(var(--ct-error));
+  background: rgba(var(--ct-error), 0.04);
+}
+
+.dunas-ct__field input[aria-invalid='true']:focus {
+  box-shadow: 0 0 0 0.4rem rgba(var(--ct-error), 0.12);
+}
+
+.dunas-ct__field-error {
+  margin: 0.8rem 0 0;
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  line-height: 1.4;
+  color: rgb(var(--ct-error));
+}
+
+.dunas-ct__field-error:empty {
+  display: none;
+}
+
+.dunas-ct__count {
+  position: absolute;
+  bottom: 1.2rem;
+  inset-inline-end: 1.6rem;
+  font-family: var(--font-body-family);
+  font-size: 1.2rem;
+  font-variant-numeric: tabular-nums;
+  color: rgba(var(--ct-dark), 0.5);
+  pointer-events: none;
+}
+
+.dunas-ct__count.is-near {
+  color: rgb(var(--ct-accent));
+}
+
+/* send */
+.dunas-ct__submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  height: 5.6rem;
+  margin-top: 0.8rem;
+  padding: 0 2.4rem;
+  border: 0;
+  border-radius: 10rem;
+  background: rgb(var(--ct-green));
+  color: rgb(var(--ct-cream));
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background-color 250ms var(--ct-ease), transform 150ms ease;
+}
+
+.dunas-ct__submit:active {
+  transform: translateY(0.1rem) scale(0.985);
+}
+
+.dunas-ct__submit:focus-visible {
+  outline: 0.2rem solid rgb(var(--ct-green));
+  outline-offset: 0.3rem;
+}
+
+.dunas-ct__submit.is-sending {
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.dunas-ct__submit.is-sending::after {
+  content: '';
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 0.15rem solid rgba(var(--ct-cream), 0.35);
+  border-top-color: rgb(var(--ct-cream));
+  border-radius: 50%;
+  animation: dunas-ct-spin 700ms linear infinite;
+}
+
+@keyframes dunas-ct-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.dunas-ct__note {
+  margin: 1.6rem 0 0;
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  text-align: center;
+  color: rgba(var(--ct-dark), 0.6);
+}
+
+/* thank-you state */
+.dunas-ct__done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(2.4rem, 5vw, 5.6rem) 0;
+  text-align: center;
+  outline: none;
+}
+
+.dunas-ct__tick {
+  width: 6.4rem;
+  height: 6.4rem;
+  margin-bottom: 2.4rem;
+  stroke: rgb(var(--ct-green));
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dunas-ct__tick circle {
+  stroke-dasharray: 189;
+  stroke-dashoffset: 189;
+  animation: dunas-ct-draw 700ms var(--ct-ease) 100ms forwards;
+}
+
+.dunas-ct__tick path {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  animation: dunas-ct-draw 400ms var(--ct-ease) 600ms forwards;
+}
+
+@keyframes dunas-ct-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.dunas-ct__done-title {
+  margin: 0;
+  font-family: var(--dunas-display-font, var(--font-heading-family));
+  font-weight: var(--dunas-display-weight, 300);
+  font-size: clamp(3.2rem, 3.6vw, 4.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+.dunas-ct__done-text {
+  max-width: 36rem;
+  margin: 1.2rem 0 2.8rem;
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  line-height: 1.6;
+  color: rgba(var(--ct-dark), 0.7);
+}
+
+.dunas-ct__ghost {
+  display: inline-flex;
+  align-items: center;
+  height: 4.8rem;
+  padding: 0 2.4rem;
+  border: 0.1rem solid rgba(var(--ct-dark), 0.16);
+  border-radius: 10rem;
+  color: inherit;
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: border-color 200ms ease, background-color 200ms ease, transform 150ms ease;
+}
+
+.dunas-ct__ghost:active {
+  transform: translateY(0.1rem) scale(0.985);
+}
+
+/* ---------- Before you write ---------- */
+
+.dunas-ct__help {
+  margin-top: clamp(6.4rem, 10vw, 14.4rem);
+}
+
+.dunas-ct__help-grid {
+  display: grid;
+  gap: 1.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dunas-ct__help-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  min-height: 14rem;
+  padding: 2.4rem;
+  border: 0.1rem solid var(--ct-rule);
+  border-radius: 2.4rem;
+  background: rgba(255, 255, 255, 0.45);
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 300ms var(--ct-ease), border-color 300ms var(--ct-ease),
+    transform 300ms var(--ct-ease);
+}
+
+.dunas-ct__help-card:focus-visible {
+  outline: 0.2rem solid rgb(var(--ct-green));
+  outline-offset: 0.3rem;
+}
+
+.dunas-ct__help-title {
+  align-self: flex-start;
+  font-family: var(--dunas-display-font, var(--font-heading-family));
+  font-weight: var(--dunas-display-weight, 300);
+  font-size: 2.6rem;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 0.1rem;
+  transition: background-size 400ms var(--ct-ease);
+}
+
+[dir='rtl'] .dunas-ct__help-title {
+  background-position: 100% 100%;
+}
+
+.dunas-ct__help-text {
+  margin-top: 0.6rem;
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  line-height: 1.5;
+  color: var(--ct-muted);
+}
+
+/* ---------- Hover (mouse only) and the same state on keyboard focus ---------- */
+
+a.dunas-ct__channel-link:focus-visible .dunas-ct__arrow {
+  border-color: rgb(var(--ct-green));
+  background: rgb(var(--ct-green));
+  color: rgb(var(--ct-cream));
+}
+
+.dunas-ct__help-card:focus-visible {
+  border-color: transparent;
+  background: #fff;
+}
+
+.dunas-ct__help-card:focus-visible .dunas-ct__help-title {
+  background-size: 100% 0.1rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a.dunas-ct__channel-link:hover .dunas-ct__arrow {
+    border-color: rgb(var(--ct-green));
+    background: rgb(var(--ct-green));
+    color: rgb(var(--ct-cream));
+  }
+
+  a.dunas-ct__channel-link:hover .dunas-ct__arrow svg {
+    transform: translate(0.2rem, -0.2rem);
+  }
+
+  [dir='rtl'] a.dunas-ct__channel-link:hover .dunas-ct__arrow svg {
+    transform: scaleX(-1) translate(0.2rem, -0.2rem);
+  }
+
+  .dunas-ct__copy:hover {
+    border-color: rgba(var(--ct-ink), 0.3);
+    background: #fff;
+  }
+
+  .dunas-ct__social .list-social__link:hover {
+    color: rgb(var(--ct-ink));
+  }
+
+  .dunas-ct__chip:hover span {
+    border-color: rgba(var(--ct-dark), 0.32);
+  }
+
+  .dunas-ct__field input:hover:not(:focus),
+  .dunas-ct__field textarea:hover:not(:focus) {
+    background: rgba(var(--ct-dark), 0.065);
+  }
+
+  .dunas-ct__submit:hover {
+    background: rgb(var(--ct-dark));
+    transform: translateY(-0.1rem);
+  }
+
+  .dunas-ct__submit:hover:active {
+    transform: translateY(0.1rem) scale(0.985);
+  }
+
+  .dunas-ct__ghost:hover {
+    border-color: rgb(var(--ct-green));
+    background: rgba(var(--ct-green), 0.06);
+  }
+
+  .dunas-ct__help-card:hover {
+    border-color: transparent;
+    background: #fff;
+    transform: translateY(-0.2rem);
+  }
+
+  .dunas-ct__help-card:hover .dunas-ct__help-title {
+    background-size: 100% 0.1rem;
+  }
+}
+
+/* ---------- Larger screens ---------- */
+
+@media screen and (min-width: 750px) {
+  .dunas-ct__row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dunas-ct__help-grid {
+    grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .dunas-ct__sub,
+  .dunas-ct__body {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    column-gap: clamp(4.8rem, 7vw, 12rem);
+  }
+
+  .dunas-ct__lede {
+    grid-column: 2;
+    font-size: 1.8rem;
+  }
+
+  .dunas-ct__body {
+    align-items: start;
+  }
+
+  .dunas-ct__reach {
+    position: sticky;
+    top: calc(var(--header-height, 8rem) + 3.2rem);
+  }
+
+  /* the form alone (no contact rows): keep it in the right column */
+  .dunas-ct__body > .dunas-ct__card:only-child {
+    grid-column: 2;
+  }
+}
+
+/* phones: the copy button folds under the value */
+@media screen and (max-width: 749px) {
+  .dunas-ct__channel--copy .dunas-ct__arrow {
+    margin-inline-start: 0;
+  }
+
+  .dunas-ct__channel--copy .dunas-ct__channel-link {
+    padding-bottom: 8rem;
+  }
+
+  .dunas-ct__copy {
+    top: auto;
+    bottom: 2.2rem;
+    inset-inline-start: 0;
+    inset-inline-end: auto;
+    transform: none;
+  }
+
+  .dunas-ct__status {
+    font-size: 1.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dunas-ct__line > span,
+  .dunas-ct__lede {
+    animation: none;
+  }
+
+  .dunas-ct__tick circle,
+  .dunas-ct__tick path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+
+  .dunas-ct *,
+  .dunas-ct *::after {
+    transition-duration: 0.01ms !important;
+  }
+
+  .dunas-ct__submit.is-sending::after {
+    animation-duration: 1.5s;
+  }
+}

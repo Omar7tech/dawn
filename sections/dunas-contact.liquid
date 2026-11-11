@@ -1,137 +1,279 @@
-{{ 'section-dunas-editorial.css' | asset_url | stylesheet_tag }}
+{{ 'section-dunas-contact.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'dunas-contact.js' | asset_url }}" defer="defer"></script>
+
 {%- liquid
-  assign reveal = ''
-  if settings.animations_reveal_on_scroll
-    assign reveal = ' scroll-trigger animate--slide-in'
-  endif
+  assign s = section.settings
+  assign channels = section.blocks | where: 'type', 'channel'
+  assign helps = section.blocks | where: 'type', 'help'
+  assign topics = s.topics | split: ','
+  assign arrow = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>'
 -%}
+
 <section
-  class="dunas-ed dunas-ed-contact color-{{ section.settings.color_scheme }} gradient"
-  style="--ed-pt: {{ section.settings.padding_top }}px; --ed-pb: {{ section.settings.padding_bottom }}px;"
+  class="dunas-ct color-{{ s.color_scheme }} gradient"
+  style="--ct-pt: {{ s.padding_top }}px; --ct-pb: {{ s.padding_bottom }}px;"
+  data-dunas-contact
+  data-email-error="{{ s.email_error | escape }}"
 >
-  <div class="page-width dunas-ed-contact__inner">
-    <div class="dunas-ed-contact__intro{{ reveal }}">
-      {%- if section.settings.eyebrow != blank -%}
-        <p class="dunas-ed__eyebrow">{{ section.settings.eyebrow | escape }}</p>
-      {%- endif -%}
-      {%- if section.settings.heading != blank -%}
-        {%- assign ed_lines = section.settings.heading | newline_to_br | split: '<br />' -%}
-        <h1 class="dunas-ed__heading dunas-display">
-          {%- for line in ed_lines -%}
+  <div class="page-width">
+    {%- comment -%} Opening {%- endcomment -%}
+    <header class="dunas-ct__head">
+      <div class="dunas-ct__meta">
+        {%- if s.eyebrow != blank -%}
+          <p class="dunas-ct__eyebrow">{{ s.eyebrow | escape }}</p>
+        {%- endif -%}
+        {%- comment -%} Only shown once the real studio hours and time zone are set {%- endcomment -%}
+        {%- if s.show_status and s.timezone != blank -%}
+          <p
+            class="dunas-ct__status"
+            data-ct-status
+            data-tz="{{ s.timezone | strip | escape }}"
+            data-open="{{ s.open_hour }}"
+            data-close="{{ s.close_hour }}"
+            data-days="{{ s.open_days }}"
+            data-open-text="{{ s.status_open | escape }}"
+            data-closed-text="{{ s.status_closed | escape }}"
+            data-city="{{ s.city | escape }}"
+            hidden
+          >
+            <span class="dunas-ct__dot" aria-hidden="true"></span>
+            <span data-ct-status-text></span>
+            <span class="dunas-ct__clock" data-ct-clock></span>
+          </p>
+        {%- endif -%}
+      </div>
+
+      {%- if s.heading != blank -%}
+        {%- assign ct_lines = s.heading | newline_to_br | split: '<br />' -%}
+        <h1 class="dunas-ct__title dunas-display">
+          {%- for line in ct_lines -%}
             {%- assign line_text = line | strip -%}
             {%- if line_text != blank -%}
-              <span class="dunas-ed__line">{{ line_text | escape }}</span>
+              <span class="dunas-ct__line" style="--i: {{ forloop.index0 }};"><span>{{ line_text | escape }}</span></span>
             {%- endif -%}
           {%- endfor -%}
         </h1>
       {%- endif -%}
-      {%- if section.settings.text != blank -%}
-        <div class="dunas-ed__rte">{{ section.settings.text }}</div>
-      {%- endif -%}
-      {%- if section.settings.show_page_content and page.content != blank -%}
-        <div class="dunas-ed__rte">{{ page.content }}</div>
-      {%- endif -%}
 
-      {%- if section.blocks.size > 0 -%}
-        <dl class="dunas-ed-contact__details">
-          {%- for block in section.blocks -%}
-            <div class="dunas-ed-contact__detail" {{ block.shopify_attributes }}>
-              <dt>{{ block.settings.label | escape }}</dt>
-              <dd>
-                {%- if block.settings.link != blank -%}
-                  <a href="{{ block.settings.link }}">{{ block.settings.value | escape }}</a>
-                {%- else -%}
-                  {{ block.settings.value | escape | newline_to_br }}
-                {%- endif -%}
-              </dd>
-            </div>
-          {%- endfor -%}
-        </dl>
+      {%- if s.text != blank or s.show_page_content -%}
+        <div class="dunas-ct__sub">
+          <div class="dunas-ct__lede">
+            {{ s.text }}
+            {%- if s.show_page_content and page.content != blank -%}
+              {{ page.content }}
+            {%- endif -%}
+          </div>
+        </div>
       {%- endif -%}
+    </header>
 
-      {%- if section.settings.show_social -%}
-        {%- render 'social-icons', class: 'dunas-ed-contact__social' -%}
-      {%- endif -%}
-    </div>
+    <div class="dunas-ct__body">
+      {%- comment -%} Ways to reach us {%- endcomment -%}
+      {%- if channels.size > 0 or s.show_social -%}
+        <div class="dunas-ct__reach">
+          {%- if s.channels_heading != blank and channels.size > 0 -%}
+            <h2 class="dunas-ct__label">{{ s.channels_heading | escape }}</h2>
+          {%- endif -%}
 
-    <div class="dunas-ed-contact__card{{ reveal }}">
-      {%- form 'contact', id: 'ContactForm', class: 'dunas-ed-contact__form' -%}
-        {%- if form.posted_successfully? -%}
-          <p class="dunas-ed-contact__status dunas-ed-contact__status--success" tabindex="-1" autofocus>
-            <span class="svg-wrapper" aria-hidden="true">{{- 'icon-success.svg' | inline_asset_content -}}</span>
-            {{ 'templates.contact.form.post_success' | t }}
-          </p>
-        {%- elsif form.errors -%}
-          <div class="dunas-ed-contact__status dunas-ed-contact__status--error" role="alert" tabindex="-1" autofocus>
-            <p>{{ 'templates.contact.form.error_heading' | t }}</p>
-            <ul class="list-unstyled" role="list">
-              <li>
-                <a href="#ContactForm-email">{{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}</a>
-              </li>
+          {%- if channels.size > 0 -%}
+            <ul class="dunas-ct__list" role="list">
+              {%- for block in channels -%}
+                {%- liquid
+                  assign is_mail = false
+                  if block.settings.link contains 'mailto:'
+                    assign is_mail = true
+                  endif
+                -%}
+                <li class="dunas-ct__channel{% if is_mail %} dunas-ct__channel--copy{% endif %}" {{ block.shopify_attributes }}>
+                  {%- if block.settings.link != blank -%}
+                    <a
+                      class="dunas-ct__channel-link"
+                      href="{{ block.settings.link }}"
+                      {% if block.settings.link contains 'http' %}
+                        target="_blank" rel="noopener"
+                      {% endif %}
+                    >
+                  {%- else -%}
+                    <div class="dunas-ct__channel-link">
+                  {%- endif -%}
+                  <span class="dunas-ct__channel-label">{{ block.settings.label | escape }}</span>
+                  <span class="dunas-ct__channel-value">{{ block.settings.value | escape }}</span>
+                  {%- if block.settings.note != blank -%}
+                    <span class="dunas-ct__channel-note">{{ block.settings.note | escape }}</span>
+                  {%- endif -%}
+                  {%- if block.settings.link != blank -%}
+                    <span class="dunas-ct__arrow" aria-hidden="true">{{ arrow }}</span>
+                    </a>
+                  {%- else -%}
+                    </div>
+                  {%- endif -%}
+
+                  {%- if is_mail -%}
+                    {%- assign mail = block.settings.link | remove: 'mailto:' | split: '?' | first -%}
+                    <button
+                      type="button"
+                      class="dunas-ct__copy"
+                      data-ct-copy="{{ mail | escape }}"
+                      data-copied="{{ s.copied_label | escape }}"
+                    >
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="8" y="8" width="12" height="12" rx="3"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+                      <span aria-live="polite">{{ s.copy_label | escape }}</span>
+                    </button>
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
             </ul>
-          </div>
-        {%- endif -%}
+          {%- endif -%}
 
-        {%- if section.settings.form_heading != blank -%}
-          <h2 class="dunas-ed-contact__form-heading">{{ section.settings.form_heading | escape }}</h2>
-        {%- endif -%}
-
-        <div class="dunas-ed-contact__row">
-          <div class="dunas-ed-contact__field">
-            <label for="ContactForm-name">{{ 'templates.contact.form.name' | t }}</label>
-            <input
-              id="ContactForm-name"
-              type="text"
-              name="contact[{{ 'templates.contact.form.name' | t }}]"
-              value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
-              autocomplete="name"
-            >
-          </div>
-          <div class="dunas-ed-contact__field">
-            <label for="ContactForm-email">
-              {{- 'templates.contact.form.email' | t }} <span aria-hidden="true">*</span>
-            </label>
-            <input
-              id="ContactForm-email"
-              type="email"
-              name="contact[email]"
-              value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
-              autocomplete="email"
-              spellcheck="false"
-              autocapitalize="off"
-              aria-required="true"
-              required
-              {% if form.errors contains 'email' %}
-                aria-invalid="true"
-              {% endif %}
-            >
-          </div>
+          {%- if s.show_social -%}
+            {%- render 'social-icons', class: 'dunas-ct__social' -%}
+          {%- endif -%}
         </div>
+      {%- endif -%}
 
-        <div class="dunas-ed-contact__field">
-          <label for="ContactForm-phone">{{ 'templates.contact.form.phone' | t }}</label>
-          <input
-            id="ContactForm-phone"
-            type="tel"
-            name="contact[{{ 'templates.contact.form.phone' | t }}]"
-            value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
-            autocomplete="tel"
-            pattern="[0-9\-]*"
-          >
-        </div>
+      {%- comment -%} Form {%- endcomment -%}
+      <div class="dunas-ct__card">
+        {%- form 'contact', id: 'ContactForm', class: 'dunas-ct__form', novalidate: 'novalidate' -%}
+          {%- if form.posted_successfully? -%}
+            <div class="dunas-ct__done" tabindex="-1" autofocus>
+              <svg class="dunas-ct__tick" viewBox="0 0 64 64" width="64" height="64" fill="none" aria-hidden="true" focusable="false">
+                <circle cx="32" cy="32" r="30" />
+                <path d="m20 33 8 8 16-17" />
+              </svg>
+              <h2 class="dunas-ct__done-title">{{ s.success_heading | escape }}</h2>
+              <p class="dunas-ct__done-text">{{ s.success_text | escape }}</p>
+              <a class="dunas-ct__ghost" href="{{ routes.all_products_collection_url }}">
+                {{- 'general.continue_shopping' | t -}}
+              </a>
+            </div>
+          {%- else -%}
+            {%- liquid
+              assign email_failed = false
+              if form.errors contains 'email'
+                assign email_failed = true
+              endif
+            -%}
+            {%- if s.form_heading != blank -%}
+              <h2 class="dunas-ct__form-title">{{ s.form_heading | escape }}</h2>
+            {%- endif -%}
 
-        <div class="dunas-ed-contact__field">
-          <label for="ContactForm-body">{{ 'templates.contact.form.comment' | t }}</label>
-          <textarea id="ContactForm-body" rows="6" name="contact[{{ 'templates.contact.form.comment' | t }}]">
-            {{- form.body -}}
-          </textarea>
-        </div>
+            {%- if s.topics != blank -%}
+              <fieldset class="dunas-ct__topics">
+                <legend class="dunas-ct__legend">{{ s.topic_label | escape }}</legend>
+                <div class="dunas-ct__chips">
+                  {%- for topic in topics -%}
+                    {%- assign topic_text = topic | strip -%}
+                    {%- if topic_text != blank -%}
+                      <label class="dunas-ct__chip">
+                        <input
+                          type="radio"
+                          name="contact[{{ s.topic_label | escape }}]"
+                          value="{{ topic_text | escape }}"
+                          {% if forloop.first %}
+                            checked
+                          {% endif %}
+                        >
+                        <span>{{ topic_text | escape }}</span>
+                      </label>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </div>
+              </fieldset>
+            {%- endif -%}
 
-        <button type="submit" class="dunas-btn dunas-btn--solid dunas-ed-contact__submit">
-          {{- 'templates.contact.form.send' | t -}}
-        </button>
-      {%- endform -%}
+            <div class="dunas-ct__row">
+              <div class="dunas-ct__field">
+                <label for="ContactForm-name">{{ 'templates.contact.form.name' | t }}</label>
+                <input
+                  id="ContactForm-name"
+                  type="text"
+                  name="contact[{{ 'templates.contact.form.name' | t }}]"
+                  value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+                  autocomplete="name"
+                >
+              </div>
+              <div class="dunas-ct__field">
+                <label for="ContactForm-email">{{ 'templates.contact.form.email' | t }} <span aria-hidden="true">*</span></label>
+                <input
+                  id="ContactForm-email"
+                  type="email"
+                  name="contact[email]"
+                  value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+                  autocomplete="email"
+                  spellcheck="false"
+                  autocapitalize="off"
+                  aria-required="true"
+                  required
+                  aria-describedby="ContactForm-email-error"
+                  {% if email_failed %}
+                    aria-invalid="true" autofocus
+                  {% endif %}
+                >
+                <p class="dunas-ct__field-error" id="ContactForm-email-error" data-ct-error>
+                  {%- if email_failed -%}
+                    {{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}
+                  {%- endif -%}
+                </p>
+              </div>
+            </div>
+
+            {%- if s.show_phone -%}
+              <div class="dunas-ct__field">
+                <label for="ContactForm-phone">{{ 'templates.contact.form.phone' | t }}</label>
+                <input
+                  id="ContactForm-phone"
+                  type="tel"
+                  name="contact[{{ 'templates.contact.form.phone' | t }}]"
+                  value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
+                  autocomplete="tel"
+                >
+              </div>
+            {%- endif -%}
+
+            <div class="dunas-ct__field dunas-ct__field--area">
+              <label for="ContactForm-body">{{ 'templates.contact.form.comment' | t }}</label>
+              <textarea
+                id="ContactForm-body"
+                name="contact[{{ 'templates.contact.form.comment' | t }}]"
+                rows="5"
+                maxlength="{{ s.max_length }}"
+                data-ct-count-for
+              >{{ form.body }}</textarea>
+              <span class="dunas-ct__count" aria-hidden="true"><span data-ct-count>0</span> / {{ s.max_length }}</span>
+            </div>
+
+            <button type="submit" class="dunas-ct__submit" data-sending="{{ s.sending_label | escape }}">
+              <span data-ct-label>{{ 'templates.contact.form.send' | t }}</span>
+            </button>
+
+            {%- if s.form_note != blank -%}
+              <p class="dunas-ct__note">{{ s.form_note | escape }}</p>
+            {%- endif -%}
+          {%- endif -%}
+        {%- endform -%}
+      </div>
     </div>
+
+    {%- comment -%} Before you write {%- endcomment -%}
+    {%- if helps.size > 0 -%}
+      <nav class="dunas-ct__help" aria-label="{{ s.help_heading | escape }}">
+        {%- if s.help_heading != blank -%}
+          <h2 class="dunas-ct__label">{{ s.help_heading | escape }}</h2>
+        {%- endif -%}
+        <ul class="dunas-ct__help-grid" role="list">
+          {%- for block in helps -%}
+            <li {{ block.shopify_attributes }}>
+              <a class="dunas-ct__help-card" href="{{ block.settings.link | default: '#' }}">
+                <span class="dunas-ct__help-title">{{ block.settings.title | escape }}</span>
+                {%- if block.settings.text != blank -%}
+                  <span class="dunas-ct__help-text">{{ block.settings.text | escape }}</span>
+                {%- endif -%}
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
   </div>
 </section>
 
@@ -141,40 +283,125 @@
   "tag": "div",
   "class": "section",
   "settings": [
+    { "type": "header", "content": "Opening" },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Contact" },
-    { "type": "textarea", "id": "heading", "label": "Heading", "default": "We would love\nto hear from you." },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Let's talk\nabout your skin.",
+      "info": "Each line rises in once on load. Every second line takes the brand accent."
+    },
     {
       "type": "richtext",
       "id": "text",
       "label": "Text",
-      "default": "<p>Questions about your skin, an order or the right routine? Write to us and we will reply within one working day.</p>"
+      "default": "<p>Ask about a product, your routine or an order. Pick a topic in the form and we will answer by email.</p>"
     },
     { "type": "checkbox", "id": "show_page_content", "label": "Also show the page's own content", "default": false },
+
+    { "type": "header", "content": "Open now pill" },
+    {
+      "type": "paragraph",
+      "content": "Shows a clock and whether you are open right now. It only appears once a time zone is set, so enter your real hours first."
+    },
+    { "type": "checkbox", "id": "show_status", "label": "Show the open now pill", "default": true },
+    {
+      "type": "text",
+      "id": "timezone",
+      "label": "Studio time zone",
+      "info": "For example Europe/Lisbon or Asia/Beirut."
+    },
+    { "type": "text", "id": "city", "label": "City next to the clock" },
+    {
+      "type": "select",
+      "id": "open_days",
+      "label": "Open on",
+      "options": [
+        { "value": "mon_fri", "label": "Monday to Friday" },
+        { "value": "mon_sat", "label": "Monday to Saturday" },
+        { "value": "all", "label": "Every day" }
+      ],
+      "default": "mon_fri"
+    },
+    { "type": "range", "id": "open_hour", "label": "Opens at", "min": 0, "max": 23, "step": 1, "default": 9 },
+    { "type": "range", "id": "close_hour", "label": "Closes at", "min": 1, "max": 24, "step": 1, "default": 18 },
+    { "type": "text", "id": "status_open", "label": "Open text", "default": "Open now" },
+    { "type": "text", "id": "status_closed", "label": "Closed text", "default": "Closed now" },
+
+    { "type": "header", "content": "Ways to reach us" },
+    { "type": "text", "id": "channels_heading", "label": "Heading", "default": "Reach us directly" },
     { "type": "checkbox", "id": "show_social", "label": "Show social links", "default": true, "info": "Links come from Theme settings > Social media." },
-    { "type": "text", "id": "form_heading", "label": "Form heading", "default": "Send a message" },
+    { "type": "text", "id": "copy_label", "label": "Copy button", "default": "Copy" },
+    { "type": "text", "id": "copied_label", "label": "Copied message", "default": "Copied" },
+
+    { "type": "header", "content": "Form" },
+    { "type": "text", "id": "form_heading", "label": "Heading", "default": "Write to us" },
+    { "type": "text", "id": "topic_label", "label": "Topic label", "default": "Topic" },
+    {
+      "type": "text",
+      "id": "topics",
+      "label": "Topics",
+      "default": "Skin advice, My order, Returns, Wholesale, Press",
+      "info": "Separate with commas. The chosen topic arrives with the message. Leave empty to hide."
+    },
+    { "type": "checkbox", "id": "show_phone", "label": "Ask for a phone number", "default": false },
+    { "type": "range", "id": "max_length", "label": "Message length limit", "min": 500, "max": 3000, "step": 100, "default": 1500 },
+    {
+      "type": "text",
+      "id": "email_error",
+      "label": "Email error",
+      "default": "Write an email address with an @, like name@mail.com"
+    },
+    { "type": "text", "id": "sending_label", "label": "Button while sending", "default": "Sending" },
+    { "type": "text", "id": "form_note", "label": "Note under the button", "default": "We only use your details to reply to you." },
+    { "type": "text", "id": "success_heading", "label": "Thank-you heading", "default": "Message received." },
+    { "type": "text", "id": "success_text", "label": "Thank-you text", "default": "Thank you for writing. We will answer at the email address you gave." },
+
+    { "type": "header", "content": "Before you write" },
+    { "type": "text", "id": "help_heading", "label": "Heading", "default": "Before you write" },
+
     { "type": "header", "content": "Layout" },
     { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
-    { "type": "range", "id": "padding_top", "label": "Space above", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 48 },
-    { "type": "range", "id": "padding_bottom", "label": "Space below", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 }
+    { "type": "range", "id": "padding_top", "label": "Space above", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 32 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 120 }
   ],
   "blocks": [
     {
-      "type": "detail",
-      "name": "Contact detail",
+      "type": "channel",
+      "name": "Way to reach us",
+      "limit": 6,
       "settings": [
         { "type": "text", "id": "label", "label": "Label", "default": "Email" },
-        { "type": "textarea", "id": "value", "label": "Value", "default": "hello@dunas.com" },
-        { "type": "url", "id": "link", "label": "Link", "info": "For email use mailto:you@example.com, for phone tel:+123456789." }
+        { "type": "text", "id": "value", "label": "Value", "default": "hello@dunas.com" },
+        { "type": "text", "id": "note", "label": "Small note", "info": "Only facts you can keep, for example your real hours." },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Email: mailto:you@example.com (adds a copy button). Phone: tel:+123456789. WhatsApp: https://wa.me/123456789"
+        }
+      ]
+    },
+    {
+      "type": "help",
+      "name": "Help card",
+      "limit": 4,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Shipping" },
+        { "type": "text", "id": "text", "label": "Text", "default": "Delivery times and costs." },
+        { "type": "url", "id": "link", "label": "Link" }
       ]
     }
   ],
-  "max_blocks": 6,
   "presets": [
     {
       "name": "DUNAS contact",
       "blocks": [
-        { "type": "detail", "settings": { "label": "Email", "value": "hello@dunas.com" } },
-        { "type": "detail", "settings": { "label": "Hours", "value": "Monday to Friday\n9:00 to 18:00" } }
+        { "type": "channel", "settings": { "label": "Email", "value": "hello@dunas.com" } },
+        { "type": "help", "settings": { "title": "Shipping", "text": "Delivery times and costs." } },
+        { "type": "help", "settings": { "title": "Returns", "text": "How returns and refunds work." } },
+        { "type": "help", "settings": { "title": "Your order", "text": "Track it from your account." } }
       ]
     }
   ]
