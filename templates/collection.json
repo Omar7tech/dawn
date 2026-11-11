@@ -45,8 +45,8 @@
         "dunas_float_count": false,
         "dunas_float_blur": 20,
         "dunas_float_tint": 80,
-        "dunas_float_mobile": true,
-        "dunas_sheet_categories": true
+        "dunas_sheet_categories": true,
+        "dunas_float_mobile_style": "fab"
       }
     }
   },

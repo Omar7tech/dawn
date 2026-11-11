@@ -56,9 +56,14 @@
       if section.settings.dunas_float_count
         assign float_classes = float_classes | append: ' dunas-collection-grid--float-count'
       endif
-      unless section.settings.dunas_float_mobile
-        assign float_classes = float_classes | append: ' dunas-collection-grid--float-no-mobile'
-      endunless
+      case section.settings.dunas_float_mobile_style
+        when 'top'
+          assign float_classes = float_classes | append: ''
+        when 'off'
+          assign float_classes = float_classes | append: ' dunas-collection-grid--float-no-mobile'
+        else
+          assign float_classes = float_classes | append: ' dunas-collection-grid--float-fab'
+      endcase
     endif
     assign float_tint = section.settings.dunas_float_tint | default: 78 | divided_by: 100.0
   -%}
@@ -144,6 +149,26 @@
               show_categories: section.settings.dunas_sheet_categories
             %}
           </aside>
+
+          {%- comment -%}
+            DUNAS phone filter badge: floats at the bottom of the screen once the filter bar has
+            scrolled away; opens the same "Filter and sort" sheet. Shown/hidden by dunas-collection.js.
+          {%- endcomment -%}
+          {%- if section.settings.dunas_toolbar_sticky and section.settings.enable_filtering -%}
+            {%- unless section.settings.dunas_float_mobile_style == 'top' or section.settings.dunas_float_mobile_style == 'off' -%}
+              <button type="button" class="dunas-filter-fab" aria-hidden="true" tabindex="-1">
+                <span class="svg-wrapper" aria-hidden="true">{{- 'icon-filter.svg' | inline_asset_content -}}</span>
+                <span class="dunas-filter-fab__label">
+                  {%- if section.settings.enable_sorting -%}
+                    {{ 'products.facets.filter_and_sort' | t }}
+                  {%- else -%}
+                    {{ 'products.facets.filter_button' | t }}
+                  {%- endif -%}
+                </span>
+                <span class="dunas-filter-fab__count" hidden></span>
+              </button>
+            {%- endunless -%}
+          {%- endif -%}
         {%- endif -%}
 
         <div
@@ -580,10 +605,25 @@
       "default": 80
     },
     {
-      "type": "checkbox",
-      "id": "dunas_float_mobile",
-      "label": "Float on phones too",
-      "default": true
+      "type": "select",
+      "id": "dunas_float_mobile_style",
+      "label": "On phones",
+      "options": [
+        {
+          "value": "fab",
+          "label": "Floating badge at the bottom"
+        },
+        {
+          "value": "top",
+          "label": "Bar under the navbar"
+        },
+        {
+          "value": "off",
+          "label": "Don't float"
+        }
+      ],
+      "default": "fab",
+      "info": "The badge appears once the filter bar scrolls away and opens Filter and sort."
     },
     {
       "type": "checkbox",
