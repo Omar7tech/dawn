@@ -511,15 +511,38 @@ body,
   height: 2.2rem;
 }
 
-/* Dawn's bag icon is drawn on a larger 40px canvas */
+/* ---------- Icon row: account, bag, search ----------
+   Three equal slots, no negative margins, so the gaps between the drawn icons are even.
+   Dawn's bag is drawn small inside a 40px canvas; it is scaled up so it reads with the same
+   weight as the person and magnifier icons. The oversized svg overflows its slot evenly
+   on both sides (centred), so it never pushes its neighbours. */
+.header--dunas .header__icons > .header__icon,
+.header--dunas .header__icons .header__search .header__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.4rem;
+  height: 4.4rem;
+  margin: 0;
+  overflow: visible;
+}
+
 .header--dunas .header__icon--cart .svg-wrapper,
 .header--dunas .header__icon--cart svg {
-  width: 3.8rem;
-  height: 3.8rem;
+  flex: none;
+  width: 4.6rem;
+  height: 4.6rem;
 }
 
 .header--dunas .header__icon--cart .svg-wrapper {
-  margin: 0 -0.8rem;
+  margin: 0;
+}
+
+/* Phones: the last icon sits as far from the pill's right edge as the menu icon from the left */
+@media screen and (max-width: 989px) {
+  .header--dunas .header__icons {
+    margin-right: -0.6rem;
+  }
 }
 
 /* ---------- Desktop inline menu inside the pill ---------- */
@@ -613,8 +636,14 @@ body,
 
   .header--dunas .header__icon--cart .svg-wrapper,
   .header--dunas .header__icon--cart svg {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  /* A little tighter on desktop: 40px slots */
+  .header--dunas .header__icons > .header__icon,
+  .header--dunas .header__icons .header__search .header__icon {
     width: 4rem;
-    height: 4rem;
   }
 
   .header--dunas .header__locale {
