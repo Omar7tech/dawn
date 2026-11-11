@@ -3,7 +3,7 @@
     "banner": {
       "type": "dunas-collection-hero",
       "settings": {
-        "eyebrow": "Shop DUNAS",
+        "eyebrow": "",
         "title": "Products",
         "description": "Considered skincare for every skin, every day.",
         "show_image": true,

@@ -1,7 +1,18 @@
 {
   "sections": {
     "main": {
-      "type": "main-404"
+      "type": "dunas-404",
+      "settings": {
+        "heading": "This page\ndrifted away.",
+        "text": "Like sand in the wind. Try a search, or start again from the collection.",
+        "show_search": true,
+        "button_label": "Shop the collection",
+        "button_style": "solid",
+        "show_trending": true,
+        "color_scheme": "scheme-1",
+        "padding_top": 64,
+        "padding_bottom": 96
+      }
     }
   },
   "order": [

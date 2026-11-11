@@ -1,0 +1,477 @@
+/*
+  DUNAS cart: the "added to cart" pop-up (snippets/cart-notification.liquid, every page) and the
+  cart page (sections/main-cart-items.liquid, main-cart-footer.liquid).
+  Pop-up: the cream glass card used by search and the language list, rounded thumbnail,
+  outline "View cart" and solid green "Check out". Cart page: title in the display type,
+  rounded product images, the pill quantity control from the product page, a calm summary
+  and a solid green checkout. Dawn's behaviour is untouched.
+*/
+
+/* =====================================================================
+   1. "Added to cart" pop-up
+   ===================================================================== */
+
+.cart-notification {
+  padding: 2rem;
+  border: 0;
+  border-radius: 2.4rem;
+  background:
+    radial-gradient(120% 60% at 20% -10%, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 60%),
+    rgba(var(--dunas-cream), 0.92);
+  -webkit-backdrop-filter: blur(2.4rem) saturate(180%);
+  backdrop-filter: blur(2.4rem) saturate(180%);
+  box-shadow:
+    inset 0 0.1rem 0.1rem rgba(255, 255, 255, 0.7),
+    0 0 0 0.1rem rgba(255, 255, 255, 0.7),
+    0 2rem 5rem -1.6rem rgba(var(--dunas-ink), 0.35);
+  color: rgb(var(--dunas-ink));
+}
+
+.cart-notification.focused,
+.cart-notification:focus-visible {
+  box-shadow:
+    inset 0 0.1rem 0.1rem rgba(255, 255, 255, 0.7),
+    0 0 0 0.2rem rgba(var(--dunas-green), 0.5),
+    0 2rem 5rem -1.6rem rgba(var(--dunas-ink), 0.35);
+}
+
+/* sits 12px below the navbar pill (not the header's padding around it), like search */
+.cart-notification-wrapper {
+  margin-top: calc(1.2rem - var(--dunas-header-pad-y, 1.2rem));
+}
+
+/* desktop: its right edge lines up with the pill's right edge */
+@media screen and (min-width: 990px) {
+  .cart-notification-wrapper:is(.page-width) > .cart-notification {
+    right: 0;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .cart-notification-wrapper {
+    padding: 0 1.2rem;
+  }
+
+  /* the same width as the navbar pill above it */
+  .cart-notification {
+    width: calc(100% - 3.2rem);
+    right: 1.6rem;
+  }
+}
+
+.cart-notification__header {
+  align-items: center;
+  padding-bottom: 1.4rem;
+  border-bottom: 0.1rem solid rgba(var(--dunas-ink), 0.1);
+}
+
+.cart-notification__heading {
+  gap: 0.8rem;
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: rgb(var(--dunas-ink));
+}
+
+/* the tick in a small green circle */
+.cart-notification__heading .svg-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 2.2rem;
+  height: 2.2rem;
+  margin: 0;
+  border-radius: 50%;
+  background: rgb(var(--dunas-green));
+  color: rgb(var(--dunas-cream));
+}
+
+/* Dawn renders the tick as a bare svg: the svg itself becomes the green circle */
+.cart-notification__heading > .icon-checkmark {
+  box-sizing: border-box;
+  flex: none;
+  width: 2.2rem;
+  height: 2.2rem;
+  margin: 0;
+  padding: 0.65rem 0.55rem;
+  border-radius: 50%;
+  background: rgb(var(--dunas-green));
+  color: rgb(var(--dunas-cream));
+}
+
+.cart-notification__close {
+  width: 3.6rem;
+  height: 3.6rem;
+  margin: -0.4rem -0.4rem -0.4rem 0;
+  border-radius: 50%;
+  background: rgba(var(--dunas-ink), 0.06);
+  color: rgb(var(--dunas-ink));
+}
+
+.cart-notification__close .svg-wrapper,
+.cart-notification__close svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.cart-notification__close:hover {
+  background: rgba(var(--dunas-ink), 0.12);
+}
+
+/* product row */
+.cart-notification-product {
+  align-items: center;
+  gap: 1.4rem;
+  padding: 1.6rem 0 1.8rem;
+}
+
+.cart-notification-product__image {
+  width: 6.4rem;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 1.4rem;
+  background: #fff;
+}
+
+.cart-notification-product__image img {
+  border-radius: 1.4rem;
+}
+
+.cart-notification-product__name {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: rgb(var(--dunas-ink));
+}
+
+.cart-notification-product dl,
+.cart-notification-product .product-option {
+  margin: 0;
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  color: rgba(var(--dunas-ink), 0.72);
+}
+
+/* buttons */
+.cart-notification__links {
+  gap: 0.8rem;
+}
+
+.cart-notification__links .button {
+  min-height: 4.8rem;
+  margin: 0;
+  border-radius: 10rem;
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: none;
+}
+
+.cart-notification__links .button::before,
+.cart-notification__links .button::after {
+  display: none;
+}
+
+.cart-notification__links .button--secondary {
+  border: 0.1rem solid rgba(var(--dunas-green), 0.8);
+  background: transparent;
+  color: rgb(var(--dunas-green));
+}
+
+.cart-notification__links .button--secondary:hover {
+  background: rgba(var(--dunas-green), 0.06);
+}
+
+.cart-notification__links .button--primary {
+  border: 0;
+  background: rgb(var(--dunas-green));
+  color: rgb(var(--dunas-cream));
+}
+
+.cart-notification__links .button--primary:hover {
+  background: rgba(var(--dunas-green), 0.9);
+}
+
+.cart-notification__links .link {
+  margin-top: 0.4rem;
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  color: rgba(var(--dunas-ink), 0.72);
+  text-underline-offset: 0.3rem;
+}
+
+/* =====================================================================
+   2. Cart page
+   ===================================================================== */
+
+/* title */
+cart-items .title-wrapper-with-link {
+  align-items: flex-end;
+  margin: 1.6rem 0 3.2rem;
+}
+
+cart-items .title-wrapper-with-link .title {
+  margin: 0;
+  font-family: var(--dunas-display-font, var(--font-heading-family));
+  font-weight: var(--dunas-display-weight, 300);
+  font-size: clamp(3.6rem, 5vw, 6rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+cart-items .title-wrapper-with-link .underlined-link {
+  margin-bottom: 0.8rem;
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  color: rgb(var(--dunas-green));
+  text-underline-offset: 0.4rem;
+}
+
+/* table header */
+cart-items .cart-items thead th {
+  padding-bottom: 1.2rem;
+  border-bottom: 0.1rem solid rgba(var(--dunas-ink), 0.12);
+  font-family: var(--font-body-family);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: rgba(var(--dunas-ink), 0.72);
+  opacity: 1;
+}
+
+/* rows */
+cart-items .cart-item {
+  border-bottom: 0.1rem solid rgba(var(--dunas-ink), 0.1);
+}
+
+cart-items .cart-item > td {
+  padding-top: 2.4rem;
+  padding-bottom: 2.4rem;
+}
+
+cart-items .cart-item__image-container {
+  overflow: hidden;
+  border-radius: 1.6rem;
+  background: #fff;
+}
+
+cart-items .cart-item__image {
+  border-radius: 1.6rem;
+}
+
+cart-items .cart-item__name {
+  font-family: var(--font-body-family);
+  font-size: 1.6rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: rgb(var(--dunas-ink));
+  text-decoration: none;
+}
+
+cart-items .cart-item__name:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+cart-items .cart-item__details .product-option,
+cart-items .cart-item__details dl {
+  font-family: var(--font-body-family);
+  font-size: 1.35rem;
+  color: rgba(var(--dunas-ink), 0.72);
+}
+
+cart-items .cart-item__totals .price,
+cart-items .cart-item__price-wrapper .price {
+  font-family: var(--font-body-family);
+  font-size: 1.6rem;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+/* quantity: the product page pill */
+cart-items .quantity {
+  min-height: 4.4rem;
+  width: 12.8rem;
+  border-radius: 10rem;
+}
+
+cart-items .quantity::before,
+cart-items .quantity::after {
+  border-radius: 10rem;
+}
+
+cart-items .quantity::after {
+  box-shadow: 0 0 0 0.1rem rgba(var(--dunas-ink), 0.18);
+}
+
+cart-items .quantity:focus-within::after {
+  box-shadow: 0 0 0 0.1rem rgb(var(--dunas-green));
+}
+
+cart-items .quantity__input {
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+cart-items .quantity__button svg {
+  width: 1.1rem;
+}
+
+/* remove: a small round button */
+cart-items cart-remove-button .button {
+  width: 4rem;
+  height: 4rem;
+  min-width: 4rem;
+  min-height: 4rem;
+  margin: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(var(--dunas-ink), 0.6);
+  box-shadow: none;
+}
+
+cart-items cart-remove-button .button::before,
+cart-items cart-remove-button .button::after {
+  display: none;
+}
+
+cart-items cart-remove-button .button:hover {
+  background: rgba(var(--dunas-ink), 0.06);
+  color: rgb(var(--dunas-ink));
+}
+
+/* empty cart */
+cart-items .cart__warnings {
+  padding: clamp(4.8rem, 8vw, 9.6rem) 0;
+}
+
+cart-items .cart__empty-text {
+  margin-bottom: 2.4rem;
+  font-family: var(--dunas-display-font, var(--font-heading-family));
+  font-weight: var(--dunas-display-weight, 300);
+  font-size: clamp(3.6rem, 5vw, 5.6rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+cart-items .cart__warnings .button {
+  min-height: 5.2rem;
+  padding: 0 3.2rem;
+  border-radius: 10rem;
+  background: rgb(var(--dunas-green));
+  color: rgb(var(--dunas-cream));
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: none;
+}
+
+cart-items .cart__warnings .button::before,
+cart-items .cart__warnings .button::after {
+  display: none;
+}
+
+cart-items .cart__login-title {
+  margin-top: 4rem;
+  font-family: var(--font-heading-family);
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+cart-items .cart__login-paragraph {
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  color: rgba(var(--dunas-ink), 0.72);
+}
+
+/* =====================================================================
+   3. Cart summary (footer)
+   ===================================================================== */
+
+.cart__footer .totals {
+  align-items: baseline;
+  gap: 1.6rem;
+}
+
+.cart__footer .totals__total {
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: rgba(var(--dunas-ink), 0.72);
+}
+
+.cart__footer .totals__total-value {
+  font-family: var(--font-body-family);
+  font-size: 2.2rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: rgb(var(--dunas-ink));
+}
+
+.cart__footer .tax-note {
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  color: rgba(var(--dunas-ink), 0.72);
+}
+
+.cart__footer .tax-note a {
+  color: rgba(var(--dunas-ink), 0.72);
+  text-underline-offset: 0.3rem;
+}
+
+.cart__footer .cart__checkout-button {
+  min-height: 5.6rem;
+  border: 0;
+  border-radius: 10rem;
+  background: rgb(var(--dunas-green));
+  color: rgb(var(--dunas-cream));
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: none;
+}
+
+.cart__footer .cart__checkout-button::before,
+.cart__footer .cart__checkout-button::after {
+  display: none;
+}
+
+.cart__footer .cart__checkout-button:hover {
+  background: rgba(var(--dunas-green), 0.9);
+}
+
+.cart__footer .cart__checkout-button:focus-visible {
+  outline: 0.2rem solid rgb(var(--dunas-green));
+  outline-offset: 0.3rem;
+}
+
+/* order note */
+.cart__footer .cart__note .field__input {
+  border-radius: 1.6rem;
+}
+
+.cart__footer .cart__note .field::before,
+.cart__footer .cart__note .field::after {
+  border-radius: 1.6rem;
+}
+
+/* =====================================================================
+   Right-to-left
+   ===================================================================== */
+
+[dir='rtl'] .cart-notification__close {
+  margin: -0.4rem 0 -0.4rem -0.4rem;
+}

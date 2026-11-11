@@ -1,0 +1,530 @@
+/*
+  DUNAS product page (sections/main-product.liquid) and its related products.
+  Quiet eyebrow, the title in the light display type, a calm price, pill variant options and
+  quantity, DUNAS buttons (solid green "Add to cart", outline "Buy it now"), a trust row with
+  icons in soft accent circles, collapsible details with hairlines, rounded media.
+  The sticky phone bar is at the end.
+*/
+
+.product-section {
+  --pd-ink: var(--color-foreground);
+  --pd-muted: rgba(var(--color-foreground), 0.72);
+  --pd-rule: rgba(var(--color-foreground), 0.14);
+  --pd-accent: 169, 137, 112; /* taupe */
+}
+
+/* ---------- Media ---------- */
+
+.product-section .product__media-item .product-media-container,
+.product-section .product__media-wrapper .media {
+  border-radius: 2rem;
+  overflow: hidden;
+}
+
+.product-section .product__media-list .product__media-item + .product__media-item {
+  margin-top: 1.2rem;
+}
+
+.product-section .thumbnail {
+  border-radius: 1.2rem;
+  overflow: hidden;
+}
+
+.product-section .thumbnail[aria-current] {
+  box-shadow: 0 0 0 0.15rem rgb(var(--dunas-green));
+}
+
+@media screen and (min-width: 750px) {
+  .product-section .product__media-item .product-media-container,
+  .product-section .product__media-wrapper .media {
+    border-radius: 2.4rem;
+  }
+}
+
+/* ---------- Info column ---------- */
+
+.product-section .product__info-container > * + * {
+  margin: 0;
+}
+
+.product-section .product__info-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* eyebrow (the text block above the title) */
+.product-section .product__text.caption-with-letter-spacing {
+  order: 0;
+  margin: 0 0 1.2rem;
+  font-family: var(--font-body-family);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--pd-muted);
+}
+
+.product-section .product__title {
+  margin: 0;
+}
+
+.product-section .product__title h1 {
+  margin: 0;
+  font-family: var(--dunas-display-font, var(--font-heading-family));
+  font-weight: var(--dunas-display-weight, 300);
+  font-size: clamp(3.4rem, 4.2vw, 5.2rem);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  color: rgb(var(--pd-ink));
+}
+
+/* price */
+.product-section .price {
+  margin-top: 1.6rem;
+}
+
+.product-section .price .price-item {
+  font-family: var(--font-body-family);
+  font-size: 2rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: rgb(var(--pd-ink));
+}
+
+.product-section .price--on-sale .price-item--regular {
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--pd-muted);
+}
+
+.product-section .price .badge {
+  border-radius: 10rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.product-section .product__tax {
+  margin-top: 0.6rem;
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  color: var(--pd-muted);
+}
+
+.product-section .product__tax a {
+  color: var(--pd-muted);
+  text-underline-offset: 0.3rem;
+}
+
+/* a hairline between the price block and the choices */
+.product-section variant-selects,
+.product-section .product-form__input {
+  margin-top: 0;
+}
+
+.product-section variant-selects {
+  display: block;
+  margin-top: 2.8rem;
+  padding-top: 2.4rem;
+  border-top: 0.1rem solid var(--pd-rule);
+}
+
+/* ---------- Variant options: pills ---------- */
+
+.product-section .product-form__input {
+  margin-bottom: 2rem;
+}
+
+.product-section .product-form__input .form__label {
+  margin-bottom: 1rem;
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: rgb(var(--pd-ink));
+}
+
+.product-section .product-form__input--pill input[type='radio'] + label {
+  min-height: 4.2rem;
+  margin: 0 0.6rem 0.8rem 0;
+  padding: 0 1.8rem;
+  display: inline-flex;
+  align-items: center;
+  border: 0.1rem solid rgba(var(--pd-ink), 0.18);
+  border-radius: 10rem;
+  background: transparent;
+  color: rgb(var(--pd-ink));
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  letter-spacing: 0;
+  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+}
+
+.product-section .product-form__input--pill input[type='radio'] + label:hover {
+  border-color: rgba(var(--dunas-green), 0.7);
+}
+
+.product-section .product-form__input--pill input[type='radio']:checked + label {
+  border-color: rgb(var(--dunas-green));
+  background: rgb(var(--dunas-green));
+  color: rgb(var(--dunas-cream));
+}
+
+.product-section .product-form__input--pill input[type='radio'].disabled + label,
+.product-section .product-form__input--pill input[type='radio']:disabled + label {
+  color: rgba(var(--pd-ink), 0.4);
+  border-color: rgba(var(--pd-ink), 0.12);
+  text-decoration: line-through;
+}
+
+.product-section .product-form__input--pill input[type='radio'].disabled:checked + label {
+  background: rgba(var(--dunas-green), 0.5);
+  color: rgb(var(--dunas-cream));
+}
+
+.product-section .product-form__input--pill input[type='radio']:focus-visible + label {
+  outline: 0.2rem solid rgb(var(--dunas-green));
+  outline-offset: 0.2rem;
+}
+
+/* ---------- Quantity: a pill ---------- */
+
+.product-section .product-form__quantity {
+  margin-bottom: 2rem;
+}
+
+.product-section .quantity {
+  width: 14rem;
+  min-height: 4.8rem;
+  border-radius: 10rem;
+}
+
+.product-section .quantity::before,
+.product-section .quantity::after {
+  border-radius: 10rem;
+}
+
+.product-section .quantity::after {
+  box-shadow: 0 0 0 0.1rem rgba(var(--pd-ink), 0.18);
+}
+
+.product-section .quantity:focus-within::after {
+  box-shadow: 0 0 0 0.1rem rgb(var(--dunas-green));
+}
+
+.product-section .quantity__input {
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.product-section .quantity__button {
+  width: 4.4rem;
+  color: rgb(var(--pd-ink));
+}
+
+.product-section .quantity__button svg {
+  width: 1.1rem;
+}
+
+/* ---------- Buttons ---------- */
+
+.product-section .product-form__buttons {
+  max-width: none;
+}
+
+.product-section .product-form__submit,
+.product-section .shopify-payment-button__button--unbranded {
+  min-height: 5.4rem;
+  border-radius: 10rem;
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: none;
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, transform 150ms ease;
+}
+
+.product-section .product-form__submit::before,
+.product-section .product-form__submit::after,
+.product-section .shopify-payment-button__button--unbranded::before,
+.product-section .shopify-payment-button__button--unbranded::after {
+  display: none;
+}
+
+/* Add to cart: solid brand green */
+.product-section .product-form__submit {
+  margin-bottom: 1rem;
+  border: 0;
+  background: rgb(var(--dunas-green));
+  color: rgb(var(--dunas-cream));
+}
+
+.product-section .product-form__submit:hover {
+  background: rgba(var(--dunas-green), 0.9);
+}
+
+.product-section .product-form__submit:active {
+  transform: scale(0.99);
+}
+
+.product-section .product-form__submit[disabled],
+.product-section .product-form__submit[aria-disabled='true'] {
+  background: rgba(var(--pd-ink), 0.12);
+  color: rgba(var(--pd-ink), 0.55);
+}
+
+.product-section .product-form__submit:focus-visible {
+  outline: 0.2rem solid rgb(var(--dunas-green));
+  outline-offset: 0.3rem;
+}
+
+/* Buy it now: outline */
+.product-section .shopify-payment-button__button--unbranded {
+  border: 0.1rem solid rgba(var(--dunas-green), 0.8);
+  background: transparent;
+  color: rgb(var(--dunas-green));
+}
+
+.product-section .shopify-payment-button__button--unbranded:hover:not([disabled]) {
+  border-color: rgb(var(--dunas-green));
+  background: rgba(var(--dunas-green), 0.06);
+  text-decoration: none;
+}
+
+.product-section .shopify-payment-button__more-options {
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  color: var(--pd-muted);
+}
+
+/* ---------- Trust row ---------- */
+
+.product-section .icon-with-text {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.2rem;
+  margin: 2.4rem 0 0;
+  padding: 2rem 0;
+  border-top: 0.1rem solid var(--pd-rule);
+  border-bottom: 0.1rem solid var(--pd-rule);
+}
+
+.product-section .icon-with-text__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin: 0;
+  text-align: center;
+}
+
+/* the circle is the wrapper; the svg inside carries Dawn's "icon" class and must stay plain */
+.product-section .icon-with-text .svg-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.4rem;
+  height: 4.4rem;
+  padding: 1.1rem;
+  margin: 0;
+  border-radius: 50%;
+  background: rgba(var(--pd-accent), 0.16);
+  color: rgb(var(--pd-ink));
+}
+
+.product-section .icon-with-text .svg-wrapper svg {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: none;
+}
+
+.product-section .icon-with-text .h4 {
+  font-family: var(--font-body-family);
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0;
+  color: rgb(var(--pd-ink));
+}
+
+/* ---------- Description ---------- */
+
+.product-section .product__description {
+  margin-top: 2.4rem;
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  line-height: 1.7;
+  color: rgba(var(--pd-ink), 0.85);
+}
+
+/* ---------- Collapsible details ---------- */
+
+.product-section .product__accordion {
+  margin: 0;
+  border-top: 0;
+}
+
+.product-section .product__description + .product__accordion,
+.product-section .product__info-container > .product__accordion:first-of-type {
+  margin-top: 2rem;
+}
+
+.product-section .product__accordion .accordion {
+  border-color: var(--pd-rule);
+}
+
+.product-section .product__accordion details {
+  border-bottom: 0.1rem solid var(--pd-rule);
+}
+
+.product-section .product__accordion summary {
+  min-height: 5.6rem;
+  padding: 0;
+}
+
+.product-section .product__accordion .summary__title {
+  align-items: center;
+}
+
+.product-section .accordion__title {
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: rgb(var(--pd-ink));
+}
+
+/* Dawn pins the caret 26px from the top; centre it on the row instead */
+.product-section .product__accordion .icon-caret {
+  top: calc(50% - 0.3rem);
+  right: 0.2rem;
+  width: 1.2rem;
+  color: var(--pd-muted);
+  transition: transform 250ms var(--dunas-ease, ease);
+}
+
+.product-section .accordion__content {
+  padding: 0 0 2rem;
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  line-height: 1.7;
+  color: rgba(var(--pd-ink), 0.82);
+}
+
+/* ---------- Related products ---------- */
+
+.related-products__heading {
+  margin-bottom: 3.2rem;
+  font-family: var(--dunas-display-font, var(--font-heading-family));
+  font-weight: var(--dunas-display-weight, 300);
+  font-size: clamp(3.2rem, 4vw, 4.8rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+/* ---------- Sticky add to cart (phones) ---------- */
+
+.dunas-sticky-atc {
+  display: none;
+}
+
+@media screen and (max-width: 749px) {
+  .dunas-sticky-atc {
+    position: fixed;
+    left: 1.2rem;
+    right: 1.2rem;
+    bottom: calc(1.2rem + env(safe-area-inset-bottom, 0px));
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 0.6rem 0.6rem 0.6rem 1.6rem;
+    border-radius: 10rem;
+    background:
+      radial-gradient(120% 120% at 20% -20%, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 60%),
+      rgba(var(--dunas-cream), 0.82);
+    -webkit-backdrop-filter: blur(20px) saturate(170%);
+    backdrop-filter: blur(20px) saturate(170%);
+    box-shadow:
+      inset 0 0.1rem 0.1rem rgba(255, 255, 255, 0.75),
+      0 0 0 0.1rem rgba(255, 255, 255, 0.65),
+      0 1.2rem 3.2rem -1rem rgba(var(--dunas-ink), 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(140%);
+    transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1), opacity 240ms ease;
+  }
+
+  .dunas-sticky-atc.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  .dunas-sticky-atc__info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .dunas-sticky-atc__title {
+    overflow: hidden;
+    font-family: var(--font-body-family);
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: rgb(var(--dunas-ink));
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dunas-sticky-atc__price {
+    font-family: var(--font-body-family);
+    font-size: 1.3rem;
+    color: rgba(var(--dunas-ink), 0.72);
+  }
+
+  .dunas-sticky-atc__button {
+    flex: none;
+    min-height: 4.4rem;
+    padding: 0 2rem;
+    border: 0;
+    border-radius: 10rem;
+    background: rgb(var(--dunas-green));
+    color: rgb(var(--dunas-cream));
+    font-family: var(--font-body-family);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .dunas-sticky-atc__button[disabled] {
+    background: rgba(var(--dunas-ink), 0.12);
+    color: rgba(var(--dunas-ink), 0.55);
+  }
+}
+
+@media screen and (max-width: 749px) and (prefers-reduced-motion: reduce) {
+  .dunas-sticky-atc {
+    transition: opacity 150ms ease;
+  }
+}
+
+/* ---------- Right-to-left ---------- */
+
+[dir='rtl'] .product-section .product-form__input--pill input[type='radio'] + label {
+  margin: 0 0 0.8rem 0.6rem;
+}
+
+@media screen and (max-width: 749px) {
+  [dir='rtl'] .dunas-sticky-atc {
+    padding: 0.6rem 1.6rem 0.6rem 0.6rem;
+  }
+}

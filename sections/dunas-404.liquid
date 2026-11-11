@@ -1,0 +1,89 @@
+{{ 'section-dunas-editorial.css' | asset_url | stylesheet_tag }}
+<section
+  class="dunas-ed dunas-ed-404 color-{{ section.settings.color_scheme }} gradient"
+  style="--ed-pt: {{ section.settings.padding_top }}px; --ed-pb: {{ section.settings.padding_bottom }}px;"
+>
+  <div class="page-width dunas-ed-404__inner">
+    <p class="dunas-ed__eyebrow">{{ 'templates.404.subtext' | t }}</p>
+    {%- assign ed_lines = section.settings.heading | newline_to_br | split: '<br />' -%}
+    <h1 class="dunas-ed-404__heading dunas-display">
+      {%- if section.settings.heading != blank -%}
+        {%- for line in ed_lines -%}
+          {%- assign line_text = line | strip -%}
+          {%- if line_text != blank -%}
+            <span class="dunas-ed__line">{{ line_text | escape }}</span>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- else -%}
+        {{ 'templates.404.title' | t }}
+      {%- endif -%}
+    </h1>
+    {%- if section.settings.text != blank -%}
+      <p class="dunas-ed__lede dunas-ed-404__text">{{ section.settings.text | escape }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.show_search -%}
+      <form action="{{ routes.search_url }}" method="get" role="search" class="dunas-ed-404__search">
+        <label class="visually-hidden" for="NotFoundSearch">{{ 'general.search.search' | t }}</label>
+        <span class="svg-wrapper" aria-hidden="true">{{- 'icon-search.svg' | inline_asset_content -}}</span>
+        <input
+          id="NotFoundSearch"
+          type="search"
+          name="q"
+          placeholder="{% if settings.dunas_search_placeholder != blank %}{{ settings.dunas_search_placeholder | escape }}{% else %}{{ 'general.search.search' | t }}{% endif %}"
+          autocomplete="off"
+          enterkeyhint="search"
+        >
+        <input type="hidden" name="options[prefix]" value="last">
+      </form>
+    {%- endif -%}
+
+    <div class="dunas-ed-404__actions">
+      {%- assign notfound_link = section.settings.button_link | default: routes.all_products_collection_url -%}
+      {%- render 'dunas-button',
+        label: section.settings.button_label,
+        link: notfound_link,
+        style: section.settings.button_style
+      -%}
+      <a href="{{ routes.root_url }}" class="dunas-btn dunas-btn--outline">{{ 'general.continue_shopping' | t }}</a>
+    </div>
+  </div>
+
+  {%- if section.settings.show_trending -%}
+    <div class="page-width dunas-ed-404__trending">
+      {%- render 'dunas-search-trending' -%}
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "DUNAS page not found",
+  "tag": "div",
+  "class": "section",
+  "settings": [
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "This page\ndrifted away.", "info": "Leave empty to use the translated \"Page not found\"." },
+    { "type": "text", "id": "text", "label": "Text", "default": "Like sand in the wind. Try a search, or start again from the collection." },
+    { "type": "checkbox", "id": "show_search", "label": "Show search field", "default": true },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop the collection" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        { "value": "liquid", "label": "Liquid glass" },
+        { "value": "glass", "label": "Frosted glass" },
+        { "value": "solid", "label": "Solid green" },
+        { "value": "light", "label": "Light" }
+      ],
+      "default": "solid"
+    },
+    { "type": "checkbox", "id": "show_trending", "label": "Show trending products", "default": true, "info": "Uses the trending collection from Theme settings > DUNAS search." },
+    { "type": "header", "content": "Layout" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
+    { "type": "range", "id": "padding_top", "label": "Space above", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 }
+  ]
+}
+{% endschema %}

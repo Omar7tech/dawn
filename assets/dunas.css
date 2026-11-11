@@ -2439,3 +2439,148 @@ body,
 [dir='rtl'] .dunas-locale__toggle::after {
   inset: -1rem -0.6rem;
 }
+
+/* =====================================================================
+   Blog, article and policy pages
+   Same system as the editorial sections: the title in the light display type, quiet
+   meta, a comfortable reading column, rounded images, pill buttons.
+   ===================================================================== */
+
+/* ---------- Blog ---------- */
+
+.main-blog > .title--primary {
+  margin: clamp(1.6rem, 3vw, 3.2rem) 0 clamp(3.2rem, 5vw, 5.6rem);
+  font-family: var(--dunas-display-font, var(--font-heading-family));
+  font-weight: var(--dunas-display-weight, 300);
+  font-size: clamp(4.8rem, 9vw, 12rem);
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+}
+
+.article-card .card__inner,
+.article-card .article-card__image-wrapper,
+.article-card .card__media {
+  border-radius: 2rem;
+  overflow: hidden;
+}
+
+.article-card .card__heading {
+  font-family: var(--font-heading-family);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.article-card .article-card__info {
+  font-family: var(--font-body-family);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: rgba(var(--color-foreground), 0.72);
+}
+
+.article-card .article-card__excerpt {
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  line-height: 1.6;
+  color: rgba(var(--color-foreground), 0.8);
+}
+
+/* ---------- Article ---------- */
+
+.article-template__hero-container {
+  border-radius: 2.4rem;
+  overflow: hidden;
+}
+
+.article-template__title {
+  font-family: var(--dunas-display-font, var(--font-heading-family));
+  font-weight: var(--dunas-display-weight, 300);
+  font-size: clamp(3.6rem, 6vw, 6.4rem);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+}
+
+.article-template .caption-with-letter-spacing {
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: rgba(var(--color-foreground), 0.72);
+}
+
+.article-template__content {
+  font-family: var(--font-body-family);
+  font-size: 1.7rem;
+  line-height: 1.75;
+}
+
+.article-template__content img {
+  border-radius: 2rem;
+}
+
+.article-template__link {
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  color: rgb(var(--dunas-green));
+}
+
+.article-template__comment-wrapper {
+  background: rgba(var(--color-foreground), 0.03);
+}
+
+/* ---------- Policy pages (rendered by Shopify, outside the theme sections) ---------- */
+
+.shopify-policy__container {
+  max-width: 72rem;
+  margin-top: clamp(3.2rem, 5vw, 6.4rem);
+  margin-bottom: clamp(4.8rem, 7vw, 9.6rem);
+  padding: 0 2rem;
+}
+
+.shopify-policy__title {
+  margin-bottom: clamp(2.4rem, 4vw, 4rem);
+  text-align: start;
+}
+
+.shopify-policy__title h1 {
+  margin: 0;
+  font-family: var(--dunas-display-font, var(--font-heading-family));
+  font-weight: var(--dunas-display-weight, 300);
+  font-size: clamp(4rem, 7vw, 8rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.shopify-policy__body {
+  font-family: var(--font-body-family);
+  font-size: 1.6rem;
+  line-height: 1.75;
+  color: rgba(var(--color-foreground), 0.85);
+}
+
+.shopify-policy__body h2,
+.shopify-policy__body h3 {
+  margin: 3.2rem 0 1.2rem;
+  font-family: var(--font-heading-family);
+  font-size: 2.2rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: rgb(var(--color-foreground));
+}
+
+.shopify-policy__body a {
+  color: rgb(var(--dunas-green));
+  text-underline-offset: 0.3rem;
+}
+
+/* "Last updated" and similar opening meta */
+.shopify-policy__body > .rte > p:first-child,
+.shopify-policy__body > p:first-child {
+  font-size: 1.3rem;
+  color: rgba(var(--color-foreground), 0.65);
+}
+
+.main-blog {
+  margin-bottom: clamp(3.2rem, 6vw, 8rem);
+}

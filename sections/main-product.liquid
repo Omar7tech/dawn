@@ -1,6 +1,6 @@
 <product-info
   id="MainProduct-{{ section.id }}"
-  class="section-{{ section.id }}-padding gradient color-{{ section.settings.color_scheme }}"
+  class="product-section dunas-product section-{{ section.id }}-padding gradient color-{{ section.settings.color_scheme }}"
   data-section="{{ section.id }}"
   data-product-id="{{ product.id }}"
   data-update-url="true"
@@ -10,6 +10,7 @@
   {% endif %}
 >
   {{ 'section-main-product.css' | asset_url | stylesheet_tag }}
+  {{ 'section-dunas-product.css' | asset_url | stylesheet_tag }}
   {{ 'component-accordion.css' | asset_url | stylesheet_tag }}
   {{ 'component-price.css' | asset_url | stylesheet_tag }}
   {{ 'component-slider.css' | asset_url | stylesheet_tag }}
@@ -748,6 +749,29 @@
       </script>
     </div>
   </product-component>
+
+  {%- comment -%}
+    DUNAS: sticky add-to-cart bar on phones. Appears once the real "Add to cart" button scrolls
+    away, mirrors its label and state, and presses it. Behaviour: assets/dunas-product.js.
+  {%- endcomment -%}
+  {%- if section.settings.dunas_sticky_atc -%}
+    <div class="dunas-sticky-atc" data-section="{{ section.id }}" aria-hidden="true">
+      <div class="dunas-sticky-atc__info">
+        <span class="dunas-sticky-atc__title">{{ product.title | escape }}</span>
+        <span class="dunas-sticky-atc__price" data-dunas-sticky-price>
+          {{- product.selected_or_first_available_variant.price | money -}}
+        </span>
+      </div>
+      <button type="button" class="dunas-sticky-atc__button" tabindex="-1">
+        {%- if product.selected_or_first_available_variant.available -%}
+          {{ 'products.product.add_to_cart' | t }}
+        {%- else -%}
+          {{ 'products.product.sold_out' | t }}
+        {%- endif -%}
+      </button>
+    </div>
+    <script src="{{ 'dunas-product.js' | asset_url }}" defer="defer"></script>
+  {%- endif -%}
 </product-info>
 
 {% schema %}
@@ -2144,6 +2168,13 @@
     }
   ],
   "settings": [
+    {
+      "type": "checkbox",
+      "id": "dunas_sticky_atc",
+      "label": "Sticky add to cart on phones",
+      "default": true,
+      "info": "A glass bar with the price and Add to cart appears at the bottom once the main button scrolls away."
+    },
     {
       "type": "checkbox",
       "id": "enable_sticky_info",

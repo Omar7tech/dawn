@@ -1,10 +1,13 @@
 {{ 'component-card.css' | asset_url | stylesheet_tag }}
 {{ 'section-collection-list.css' | asset_url | stylesheet_tag }}
 
-<div class="page-width">
-  <h1 class="title title--primary inline-richtext{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
-    {{ section.settings.title }}
-  </h1>
+{{ 'section-dunas-editorial.css' | asset_url | stylesheet_tag }}
+<div class="page-width dunas-list-collections">
+  <div class="dunas-list-collections__head">
+    <h1 class="dunas-list-collections__title dunas-display inline-richtext{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
+      {{ section.settings.title }}
+    </h1>
+  </div>
   {%- liquid
     case section.settings.sort
       when 'products_high', 'products_low'
@@ -29,6 +32,10 @@
       role="list"
     >
       {%- for collection in collections -%}
+        {%- comment -%} DUNAS: system and empty collections are not shown to customers {%- endcomment -%}
+        {%- if collection.handle == 'frontpage' or collection.handle == 'all' or collection.products_count == 0 -%}
+          {%- continue -%}
+        {%- endif -%}
         <li
           class="collection-list__item grid__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
           {% if settings.animations_reveal_on_scroll %}

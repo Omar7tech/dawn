@@ -1,0 +1,182 @@
+{{ 'section-dunas-editorial.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign reveal = ''
+  if settings.animations_reveal_on_scroll
+    assign reveal = ' scroll-trigger animate--slide-in'
+  endif
+-%}
+<section
+  class="dunas-ed dunas-ed-contact color-{{ section.settings.color_scheme }} gradient"
+  style="--ed-pt: {{ section.settings.padding_top }}px; --ed-pb: {{ section.settings.padding_bottom }}px;"
+>
+  <div class="page-width dunas-ed-contact__inner">
+    <div class="dunas-ed-contact__intro{{ reveal }}">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="dunas-ed__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        {%- assign ed_lines = section.settings.heading | newline_to_br | split: '<br />' -%}
+        <h1 class="dunas-ed__heading dunas-display">
+          {%- for line in ed_lines -%}
+            {%- assign line_text = line | strip -%}
+            {%- if line_text != blank -%}
+              <span class="dunas-ed__line">{{ line_text | escape }}</span>
+            {%- endif -%}
+          {%- endfor -%}
+        </h1>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="dunas-ed__rte">{{ section.settings.text }}</div>
+      {%- endif -%}
+      {%- if section.settings.show_page_content and page.content != blank -%}
+        <div class="dunas-ed__rte">{{ page.content }}</div>
+      {%- endif -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <dl class="dunas-ed-contact__details">
+          {%- for block in section.blocks -%}
+            <div class="dunas-ed-contact__detail" {{ block.shopify_attributes }}>
+              <dt>{{ block.settings.label | escape }}</dt>
+              <dd>
+                {%- if block.settings.link != blank -%}
+                  <a href="{{ block.settings.link }}">{{ block.settings.value | escape }}</a>
+                {%- else -%}
+                  {{ block.settings.value | escape | newline_to_br }}
+                {%- endif -%}
+              </dd>
+            </div>
+          {%- endfor -%}
+        </dl>
+      {%- endif -%}
+
+      {%- if section.settings.show_social -%}
+        {%- render 'social-icons', class: 'dunas-ed-contact__social' -%}
+      {%- endif -%}
+    </div>
+
+    <div class="dunas-ed-contact__card{{ reveal }}">
+      {%- form 'contact', id: 'ContactForm', class: 'dunas-ed-contact__form' -%}
+        {%- if form.posted_successfully? -%}
+          <p class="dunas-ed-contact__status dunas-ed-contact__status--success" tabindex="-1" autofocus>
+            <span class="svg-wrapper" aria-hidden="true">{{- 'icon-success.svg' | inline_asset_content -}}</span>
+            {{ 'templates.contact.form.post_success' | t }}
+          </p>
+        {%- elsif form.errors -%}
+          <div class="dunas-ed-contact__status dunas-ed-contact__status--error" role="alert" tabindex="-1" autofocus>
+            <p>{{ 'templates.contact.form.error_heading' | t }}</p>
+            <ul class="list-unstyled" role="list">
+              <li>
+                <a href="#ContactForm-email">{{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}</a>
+              </li>
+            </ul>
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.form_heading != blank -%}
+          <h2 class="dunas-ed-contact__form-heading">{{ section.settings.form_heading | escape }}</h2>
+        {%- endif -%}
+
+        <div class="dunas-ed-contact__row">
+          <div class="dunas-ed-contact__field">
+            <label for="ContactForm-name">{{ 'templates.contact.form.name' | t }}</label>
+            <input
+              id="ContactForm-name"
+              type="text"
+              name="contact[{{ 'templates.contact.form.name' | t }}]"
+              value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+              autocomplete="name"
+            >
+          </div>
+          <div class="dunas-ed-contact__field">
+            <label for="ContactForm-email">
+              {{- 'templates.contact.form.email' | t }} <span aria-hidden="true">*</span>
+            </label>
+            <input
+              id="ContactForm-email"
+              type="email"
+              name="contact[email]"
+              value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+              autocomplete="email"
+              spellcheck="false"
+              autocapitalize="off"
+              aria-required="true"
+              required
+              {% if form.errors contains 'email' %}
+                aria-invalid="true"
+              {% endif %}
+            >
+          </div>
+        </div>
+
+        <div class="dunas-ed-contact__field">
+          <label for="ContactForm-phone">{{ 'templates.contact.form.phone' | t }}</label>
+          <input
+            id="ContactForm-phone"
+            type="tel"
+            name="contact[{{ 'templates.contact.form.phone' | t }}]"
+            value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
+            autocomplete="tel"
+            pattern="[0-9\-]*"
+          >
+        </div>
+
+        <div class="dunas-ed-contact__field">
+          <label for="ContactForm-body">{{ 'templates.contact.form.comment' | t }}</label>
+          <textarea id="ContactForm-body" rows="6" name="contact[{{ 'templates.contact.form.comment' | t }}]">
+            {{- form.body -}}
+          </textarea>
+        </div>
+
+        <button type="submit" class="dunas-btn dunas-btn--solid dunas-ed-contact__submit">
+          {{- 'templates.contact.form.send' | t -}}
+        </button>
+      {%- endform -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "DUNAS contact",
+  "tag": "div",
+  "class": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Contact" },
+    { "type": "textarea", "id": "heading", "label": "Heading", "default": "We would love\nto hear from you." },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Questions about your skin, an order or the right routine? Write to us and we will reply within one working day.</p>"
+    },
+    { "type": "checkbox", "id": "show_page_content", "label": "Also show the page's own content", "default": false },
+    { "type": "checkbox", "id": "show_social", "label": "Show social links", "default": true, "info": "Links come from Theme settings > Social media." },
+    { "type": "text", "id": "form_heading", "label": "Form heading", "default": "Send a message" },
+    { "type": "header", "content": "Layout" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
+    { "type": "range", "id": "padding_top", "label": "Space above", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 }
+  ],
+  "blocks": [
+    {
+      "type": "detail",
+      "name": "Contact detail",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Email" },
+        { "type": "textarea", "id": "value", "label": "Value", "default": "hello@dunas.com" },
+        { "type": "url", "id": "link", "label": "Link", "info": "For email use mailto:you@example.com, for phone tel:+123456789." }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "DUNAS contact",
+      "blocks": [
+        { "type": "detail", "settings": { "label": "Email", "value": "hello@dunas.com" } },
+        { "type": "detail", "settings": { "label": "Hours", "value": "Monday to Friday\n9:00 to 18:00" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

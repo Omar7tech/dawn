@@ -36,10 +36,40 @@
         "description": {
           "type": "description"
         },
-        "share": {
-          "type": "share",
+        "trust": {
+          "type": "icon-with-text",
           "settings": {
-            "share_label": "Share"
+            "layout": "vertical",
+            "icon_1": "truck",
+            "heading_1": "Free delivery over $50",
+            "icon_2": "return",
+            "heading_2": "Easy 30-day returns",
+            "icon_3": "leaf",
+            "heading_3": "Gentle, honest formulas"
+          }
+        },
+        "how_to_use": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "How to use",
+            "icon": "none",
+            "content": "<p>Apply a small amount to clean skin, morning and evening. Massage gently until absorbed. Follow with SPF during the day.</p>"
+          }
+        },
+        "ingredients": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Ingredients",
+            "icon": "none",
+            "content": "<p>A short, honest list: desert botanicals, ceramides and gentle hydrators. The full INCI list is printed on the packaging.</p>"
+          }
+        },
+        "delivery": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Delivery & returns",
+            "icon": "none",
+            "content": "<p>Free delivery on orders over $50. Not right for your skin? Return unopened items within 30 days.</p>"
           }
         }
       },
@@ -50,8 +80,11 @@
         "variant_picker",
         "quantity_selector",
         "buy_buttons",
+        "trust",
         "description",
-        "share"
+        "how_to_use",
+        "ingredients",
+        "delivery"
       ],
       "settings": {
         "enable_sticky_info": true,
@@ -66,7 +99,8 @@
         "hide_variants": true,
         "enable_video_looping": false,
         "padding_top": 36,
-        "padding_bottom": 12
+        "padding_bottom": 12,
+        "dunas_sticky_atc": true
       }
     },
     "disclosures": {
