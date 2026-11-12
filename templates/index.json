@@ -40,11 +40,18 @@
         "padding_bottom": 120,
         "button_style": "muted"
       }
+    },
+    "reviews": {
+      "type": "dunas-reviews",
+      "blocks": {},
+      "block_order": [],
+      "settings": {}
     }
   },
   "order": [
     "hero",
     "banner",
-    "showcase"
+    "showcase",
+    "reviews"
   ]
 }

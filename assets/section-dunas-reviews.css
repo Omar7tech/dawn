@@ -1,0 +1,481 @@
+/*
+  DUNAS reviews: a track of white cards that starts on the page's left edge and runs off the
+  right edge of the screen, so the next card always peeks in. Swipe on phones; drag, scroll, the
+  round arrows or the keyboard on computers. Cards snap into place; a hairline below shows where
+  you are. Stars and the quotation mark in taupe, green for every action.
+*/
+
+.dunas-rv {
+  --rv-ink: var(--color-foreground);
+  --rv-muted: rgba(var(--color-foreground), 0.62);
+  --rv-rule: rgba(var(--color-foreground), 0.12);
+  --rv-accent: 169, 137, 112;
+  --rv-green: var(--dunas-green, 85, 99, 97);
+  --rv-cream: var(--dunas-cream, 241, 239, 231);
+  --rv-dark: var(--dunas-ink, 49, 50, 45);
+  --rv-ease: var(--dunas-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  /* the track's left edge lines up with the page content */
+  --rv-edge: max(1.5rem, calc((100% - var(--page-width, 120rem)) / 2 + 1.5rem));
+  --rv-card: min(84vw, 36rem);
+  --rv-gap: 1.2rem;
+  padding-top: calc(var(--rv-pt, 96px) * 0.7);
+  padding-bottom: calc(var(--rv-pb, 96px) * 0.7);
+  color: rgb(var(--rv-ink));
+  overflow: hidden;
+}
+
+.dunas-rv.color-scheme-3 {
+  --rv-accent: 214, 182, 157;
+}
+
+@media screen and (min-width: 750px) {
+  .dunas-rv {
+    --rv-edge: max(5rem, calc((100% - var(--page-width, 120rem)) / 2 + 5rem));
+    --rv-card: 40rem;
+    --rv-gap: 1.6rem;
+    padding-top: var(--rv-pt, 96px);
+    padding-bottom: var(--rv-pb, 96px);
+  }
+}
+
+/* ---------- Head: heading left, rating and arrows right ---------- */
+
+.dunas-rv__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2.4rem 4rem;
+  margin-bottom: clamp(3.2rem, 4.5vw, 5.6rem);
+}
+
+.dunas-rv__eyebrow {
+  margin: 0 0 1.6rem;
+  font-family: var(--font-body-family);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--rv-muted);
+}
+
+.dunas-rv__heading {
+  margin: 0;
+  font-size: clamp(3.6rem, 4.6vw, 6.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+}
+
+.dunas-rv__line {
+  display: block;
+}
+
+.dunas-rv__line:nth-child(2n) {
+  color: rgb(var(--rv-accent));
+}
+
+.dunas-rv__aside {
+  display: flex;
+  align-items: flex-end;
+  gap: 3.2rem;
+}
+
+.dunas-rv__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.6rem;
+  margin: 0;
+  font-family: var(--font-body-family);
+}
+
+.dunas-rv__score {
+  font-family: var(--dunas-display-font, var(--font-heading-family));
+  font-weight: var(--dunas-display-weight, 300);
+  font-size: 4rem;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.dunas-rv__out-of {
+  font-size: 1.5rem;
+  color: var(--rv-muted);
+}
+
+.dunas-rv__summary-text {
+  flex: 0 0 100%;
+  width: 100%;
+  margin-top: 0.6rem;
+  font-size: 1.2rem;
+  line-height: 1.4;
+  color: var(--rv-muted);
+}
+
+.dunas-rv__controls {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.dunas-rv__controls[hidden] {
+  display: none;
+}
+
+.dunas-rv__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.8rem;
+  height: 4.8rem;
+  padding: 0;
+  border: 0.1rem solid var(--rv-rule);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  color: rgb(var(--rv-ink));
+  cursor: pointer;
+  transition: background-color 250ms var(--rv-ease), border-color 250ms var(--rv-ease), color 250ms var(--rv-ease),
+    opacity 250ms ease, transform 150ms ease;
+}
+
+.dunas-rv__arrow svg {
+  transition: transform 300ms var(--rv-ease);
+}
+
+.dunas-rv__arrow--prev svg,
+[dir='rtl'] .dunas-rv__arrow:not(.dunas-rv__arrow--prev) svg {
+  transform: scaleX(-1);
+}
+
+[dir='rtl'] .dunas-rv__arrow--prev svg {
+  transform: none;
+}
+
+.dunas-rv__arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.dunas-rv__arrow:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.dunas-rv__arrow:focus-visible {
+  outline: 0.2rem solid rgb(var(--rv-green));
+  outline-offset: 0.2rem;
+}
+
+/* ---------- The track ---------- */
+
+.dunas-rv__viewport {
+  position: relative;
+}
+
+.dunas-rv__track {
+  display: flex;
+  gap: var(--rv-gap);
+  margin: 0;
+  padding: 0.6rem var(--rv-edge) 2.4rem;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--rv-edge);
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dunas-rv__track::-webkit-scrollbar {
+  display: none;
+}
+
+.dunas-rv__track:focus-visible {
+  outline: none;
+}
+
+.dunas-rv__track:focus-visible .dunas-rv__card {
+  box-shadow: 0 0 0 0.2rem rgba(var(--rv-green), 0.5);
+}
+
+.dunas-rv__track.is-draggable {
+  cursor: grab;
+}
+
+.dunas-rv__track.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  user-select: none;
+}
+
+.dunas-rv__track.is-dragging a {
+  pointer-events: none;
+}
+
+.dunas-rv__item {
+  display: flex;
+  flex: 0 0 var(--rv-card);
+  scroll-snap-align: start;
+}
+
+/* ---------- A card ---------- */
+
+.dunas-rv__card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 34rem;
+  margin: 0;
+  padding: 2.8rem 2.8rem 2.4rem;
+  border-radius: 2.4rem;
+  background: #fff;
+  color: rgb(var(--rv-dark));
+  box-shadow: 0 0.1rem 0 rgba(var(--rv-dark), 0.04), 0 1.6rem 3.2rem -2.4rem rgba(var(--rv-dark), 0.22);
+  transition: transform 400ms var(--rv-ease), box-shadow 400ms var(--rv-ease);
+}
+
+.dunas-rv__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 3.2rem;
+}
+
+.dunas-rv__stars {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.dunas-rv__star {
+  width: 2.2rem;
+  height: 2.2rem;
+  fill: rgba(var(--rv-dark), 0.1);
+  /* a soft rounded edge in the same colour, so the points are not sharp */
+  stroke: rgba(var(--rv-dark), 0.1);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+}
+
+.dunas-rv__star.is-on {
+  fill: rgb(var(--rv-accent));
+  stroke: rgb(var(--rv-accent));
+}
+
+@media screen and (max-width: 749px) {
+  .dunas-rv__star {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+.dunas-rv__mark {
+  flex: none;
+  width: 2.8rem;
+  height: auto;
+  margin-inline-start: auto;
+  fill: rgba(var(--rv-accent), 0.35);
+}
+
+.dunas-rv__quote {
+  flex: 1 1 auto;
+  margin: 2rem 0 0;
+  padding: 0;
+  border: 0;
+  font-style: normal;
+}
+
+.dunas-rv__quote p {
+  margin: 0;
+  font-family: var(--dunas-display-font, var(--font-heading-family));
+  font-weight: var(--dunas-display-weight, 300);
+  font-size: clamp(2rem, 2vw, 2.4rem);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: rgb(var(--rv-dark));
+}
+
+.dunas-rv__caption {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-top: 3.2rem;
+  padding-top: 2rem;
+  border-top: 0.1rem solid rgba(var(--rv-dark), 0.1);
+}
+
+.dunas-rv__avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: rgb(var(--rv-green));
+  font-family: var(--dunas-display-font, var(--font-heading-family));
+  font-size: 1.7rem;
+  color: rgb(var(--rv-cream));
+}
+
+.dunas-rv__item:nth-child(3n + 2) .dunas-rv__avatar {
+  background: rgb(var(--rv-accent));
+}
+
+.dunas-rv__item:nth-child(3n + 3) .dunas-rv__avatar {
+  background: rgba(var(--rv-accent), 0.22);
+  color: rgb(var(--rv-dark));
+}
+
+.dunas-rv__by {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  font-family: var(--font-body-family);
+}
+
+.dunas-rv__name {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.dunas-rv__detail {
+  overflow: hidden;
+  font-size: 1.3rem;
+  color: rgba(var(--rv-dark), 0.6);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.dunas-rv__product {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 0.8rem;
+  max-width: 100%;
+  margin-top: 1.6rem;
+  padding: 0.4rem 1.4rem 0.4rem 0.4rem;
+  border-radius: 10rem;
+  background: rgba(var(--rv-dark), 0.045);
+  color: rgb(var(--rv-dark));
+  font-family: var(--font-body-family);
+  font-size: 1.2rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 250ms ease;
+}
+
+.dunas-rv__product-img {
+  flex: none;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  object-fit: cover;
+  background: rgb(var(--rv-cream));
+}
+
+.dunas-rv__product-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.dunas-rv__product:focus-visible {
+  outline: 0.2rem solid rgb(var(--rv-green));
+  outline-offset: 0.2rem;
+}
+
+/* ---------- Where you are ---------- */
+
+.dunas-rv__progress {
+  position: relative;
+  height: 0.1rem;
+  margin-top: 0.8rem;
+  background: var(--rv-rule);
+  overflow: hidden;
+}
+
+.dunas-rv__progress[hidden] {
+  display: none;
+}
+
+.dunas-rv__progress-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: calc(var(--rv-visible, 0.3) * 100%);
+  background: rgb(var(--rv-green));
+  transform: translateX(calc(var(--rv-progress, 0) * (1 / var(--rv-visible, 0.3) - 1) * 100%));
+}
+
+[dir='rtl'] .dunas-rv__progress-bar {
+  left: auto;
+  right: 0;
+  transform: translateX(calc(var(--rv-progress, 0) * (1 / var(--rv-visible, 0.3) - 1) * -100%));
+}
+
+/* ---------- Hover: mouse only ---------- */
+
+@media (hover: hover) and (pointer: fine) {
+  .dunas-rv__card:hover {
+    transform: translateY(-0.2rem);
+    box-shadow: 0 0.1rem 0 rgba(var(--rv-dark), 0.04), 0 2.4rem 4rem -2.4rem rgba(var(--rv-dark), 0.3);
+  }
+
+  .dunas-rv__arrow:hover:not(:disabled) {
+    border-color: rgb(var(--rv-green));
+    background: rgb(var(--rv-green));
+    color: rgb(var(--rv-cream));
+  }
+
+  .dunas-rv__arrow:not(.dunas-rv__arrow--prev):hover:not(:disabled) svg {
+    transform: translateX(0.3rem);
+  }
+
+  .dunas-rv__arrow--prev:hover:not(:disabled) svg {
+    transform: scaleX(-1) translateX(0.3rem);
+  }
+
+  .dunas-rv__product:hover {
+    background: rgba(var(--rv-dark), 0.08);
+  }
+}
+
+/* ---------- Phones: swipe instead of arrows, rating under the heading ---------- */
+
+@media screen and (max-width: 749px) {
+  .dunas-rv__head {
+    align-items: flex-start;
+  }
+
+  .dunas-rv__aside {
+    width: 100%;
+  }
+
+  .dunas-rv__controls {
+    display: none !important;
+  }
+
+  .dunas-rv__card {
+    min-height: 30rem;
+    padding: 2.4rem 2.2rem 2.2rem;
+  }
+}
+
+/* theme editor note when no review is chosen yet */
+.dunas-rv__empty {
+  margin: 4rem auto;
+  padding: 2.4rem;
+  border: 0.1rem dashed rgba(var(--color-foreground), 0.25);
+  border-radius: 1.6rem;
+  font-family: var(--font-body-family);
+  font-size: 1.4rem;
+  line-height: 1.6;
+}
+
+.dunas-rv__empty p {
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dunas-rv__card {
+    transition: none;
+  }
+}

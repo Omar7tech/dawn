@@ -1,0 +1,270 @@
+{{ 'section-dunas-reviews.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'dunas-reviews.js' | asset_url }}" defer="defer"></script>
+
+{%- comment -%}
+  DUNAS reviews: real customer words, entered by hand.
+
+  Reviews come from the store's "Customer Reviews" metaobjects (type customer_reviews,
+  Shopify admin > Content > Metaobjects),
+  chosen and ordered in the section's "Reviews" setting, so they live in the store, not in the
+  theme, and can be reused on other pages. Quotes can also be added directly as blocks here.
+  Fields read from each entry: review (text), name, stars (rating), position and work (shown
+  together under the name), product (optional). The older keys quote, rating and detail also work.
+
+  The reviews sit on a track of cards that runs off the right edge of the page: swipe on
+  phones; drag, scroll, the arrow buttons or the keyboard on computers. The rating summary is the
+  average of the reviews shown here, and says so.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  # The chosen reviews, or, when none are chosen, every published Customer Review (newest last)
+  assign list = s.reviews
+  if list == blank and s.show_all
+    assign list = shop.metaobjects.customer_reviews.values
+  endif
+  assign total = 0
+  assign rated = 0
+  assign rating_sum = 0
+
+  for review in list limit: 12
+    assign text = review.review.value | default: review.quote.value
+    if text != blank
+      assign total = total | plus: 1
+      assign r = review.stars.value | default: review.rating.value
+      if r.rating != blank
+        assign r = r.rating
+      endif
+      assign r = r | plus: 0
+      if r > 0
+        assign rated = rated | plus: 1
+        assign rating_sum = rating_sum | plus: r
+      endif
+    endif
+  endfor
+  for block in section.blocks
+    if block.settings.quote != blank
+      assign total = total | plus: 1
+      assign rated = rated | plus: 1
+      assign rating_sum = rating_sum | plus: block.settings.rating
+    endif
+  endfor
+
+  if rated > 0
+    assign average = rating_sum | times: 1.0 | divided_by: rated | round: 1
+  endif
+-%}
+
+{%- if total > 0 -%}
+  {%- capture arrow -%}<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>{%- endcapture -%}
+  <section
+    class="dunas-rv color-{{ s.color_scheme }} gradient"
+    style="--rv-pt: {{ s.padding_top }}px; --rv-pb: {{ s.padding_bottom }}px;"
+    data-dunas-reviews
+    {% if s.autoplay %}
+      data-autoplay="{{ s.autoplay_seconds }}"
+    {% endif %}
+  >
+    <div class="page-width dunas-rv__head">
+      <div class="dunas-rv__intro">
+        {%- if s.eyebrow != blank -%}
+          <p class="dunas-rv__eyebrow">{{ s.eyebrow | escape }}</p>
+        {%- endif -%}
+        {%- if s.heading != blank -%}
+          {%- assign rv_lines = s.heading | newline_to_br | split: '<br />' -%}
+          <h2 class="dunas-rv__heading dunas-display" id="ReviewsHeading-{{ section.id }}">
+            {%- for line in rv_lines -%}
+              {%- assign line_text = line | strip -%}
+              {%- if line_text != blank -%}
+                <span class="dunas-rv__line">{{ line_text | escape }}</span>
+              {%- endif -%}
+            {%- endfor -%}
+          </h2>
+        {%- endif -%}
+      </div>
+
+      <div class="dunas-rv__aside">
+        {%- if s.show_summary and average -%}
+          <p class="dunas-rv__summary">
+            <span class="dunas-rv__score">{{ average }}</span>
+            <span class="dunas-rv__out-of">/ 5</span>
+            <span class="dunas-rv__summary-text">
+              {%- if total == 1 -%}
+                {{- s.summary_text_one | escape -}}
+              {%- else -%}
+                {{- s.summary_text | replace: '[count]', total | escape -}}
+              {%- endif -%}
+            </span>
+          </p>
+        {%- endif -%}
+        <div class="dunas-rv__controls" data-rv-controls hidden>
+          <button type="button" class="dunas-rv__arrow dunas-rv__arrow--prev" data-rv-prev aria-label="{{ 'general.slider.previous_slide' | t }}">
+            {{- arrow -}}
+          </button>
+          <button type="button" class="dunas-rv__arrow" data-rv-next aria-label="{{ 'general.slider.next_slide' | t }}">
+            {{- arrow -}}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dunas-rv__viewport">
+      <ol
+        class="dunas-rv__track"
+        role="list"
+        tabindex="0"
+        aria-roledescription="carousel"
+        {% if s.heading != blank %}
+          aria-labelledby="ReviewsHeading-{{ section.id }}"
+        {% endif %}
+        data-rv-track
+      >
+        {%- assign i = 0 -%}
+        {%- for review in list limit: 12 -%}
+          {%- assign text = review.review.value | default: review.quote.value -%}
+          {%- if text != blank -%}
+            {%- liquid
+              assign r = review.stars.value | default: review.rating.value
+              if r.rating != blank
+                assign r = r.rating
+              endif
+              assign detail = review.detail.value
+              if detail == blank
+                assign parts = ''
+                if review.position.value != blank
+                  assign parts = review.position.value
+                endif
+                if review.work.value != blank
+                  if parts != blank
+                    assign parts = parts | append: ' · '
+                  endif
+                  assign parts = parts | append: review.work.value
+                endif
+                assign detail = parts
+              endif
+            -%}
+            {%- render 'dunas-review',
+              index: i,
+              count: total,
+              quote: text,
+              name: review.name.value,
+              rating: r,
+              detail: detail,
+              product: review.product.value,
+              show_product: s.show_product
+            -%}
+            {%- assign i = i | plus: 1 -%}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- for block in section.blocks -%}
+          {%- if block.settings.quote != blank -%}
+            {%- render 'dunas-review',
+              index: i,
+              count: total,
+              quote: block.settings.quote,
+              name: block.settings.name,
+              rating: block.settings.rating,
+              detail: block.settings.detail,
+              product: block.settings.product,
+              show_product: s.show_product
+            -%}
+            {%- assign i = i | plus: 1 -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </ol>
+    </div>
+
+    <div class="page-width">
+      <div class="dunas-rv__progress" data-rv-progress hidden aria-hidden="true">
+        <span class="dunas-rv__progress-bar" data-rv-bar></span>
+      </div>
+    </div>
+  </section>
+{%- elsif request.design_mode -%}
+  <div class="page-width dunas-rv__empty">
+    <p>
+      <strong>DUNAS reviews:</strong> choose reviews in this section's "Reviews" setting (from Shopify
+      admin &gt; Content &gt; Metaobjects &gt; Customer Reviews), or add a quote below. Only real customer words, please.
+      This message only shows in the theme editor.
+    </p>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "DUNAS reviews",
+  "tag": "div",
+  "class": "section section-dunas-reviews",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Reviews" },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Every skin,\nin their own words.",
+      "info": "Every second line takes the brand accent."
+    },
+    {
+      "type": "metaobject_list",
+      "id": "reviews",
+      "label": "Reviews",
+      "metaobject_type": "customer_reviews",
+      "limit": 12,
+      "info": "From Shopify admin > Content > Metaobjects > Customer Reviews. Fields used: review (the text), name, stars, position and work (shown under the name), product (optional)."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_all",
+      "label": "Show all published reviews when none are chosen",
+      "info": "Every Customer Review you publish appears here on its own, up to 12. Choose reviews above to pick and order them instead.",
+      "default": true
+    },
+    { "type": "checkbox", "id": "show_summary", "label": "Show the average rating", "default": true },
+    {
+      "type": "text",
+      "id": "summary_text",
+      "label": "Average rating text",
+      "default": "Average of the [count] reviews shown here",
+      "info": "[count] becomes the number of reviews in this section."
+    },
+    {
+      "type": "text",
+      "id": "summary_text_one",
+      "label": "Rating text with one review",
+      "default": "Rating of the review shown here"
+    },
+    { "type": "checkbox", "id": "show_product", "label": "Show the reviewed product", "default": true },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Move to the next card on its own",
+      "info": "Pauses while the visitor points at or focuses the section. Off for reduced motion.",
+      "default": false
+    },
+    { "type": "range", "id": "autoplay_seconds", "label": "Seconds per card", "min": 5, "max": 15, "step": 1, "default": 8 },
+    { "type": "header", "content": "Layout" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
+    { "type": "range", "id": "padding_top", "label": "Space above", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Quote added here",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "For a quick addition. Reviews kept in Content > Metaobjects can be reused on other pages and stay if the theme changes."
+        },
+        { "type": "textarea", "id": "quote", "label": "Quote" },
+        { "type": "text", "id": "name", "label": "Name", "info": "First name and initial, e.g. Lina M." },
+        { "type": "range", "id": "rating", "label": "Rating", "min": 1, "max": 5, "step": 1, "default": 5 },
+        { "type": "text", "id": "detail", "label": "Detail", "info": "For example: Dry skin, Lisbon" },
+        { "type": "product", "id": "product", "label": "Product reviewed" }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [{ "name": "DUNAS reviews" }]
+}
+{% endschema %}
