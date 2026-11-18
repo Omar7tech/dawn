@@ -67,6 +67,11 @@
   object-fit: cover;
 }
 
+/* the dune photo is tall: keep her face and the falling sand in the frame */
+.dunas-why__img--dune {
+  object-position: 62% 32%;
+}
+
 .dunas-why__backdrop::after {
   content: '';
   position: absolute;
@@ -446,5 +451,26 @@
   }
   to {
     transform: scaleX(1);
+  }
+}
+
+/* the glass sits beside the subject, not over her: left on computers, low on phones */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 990px) {
+    .dunas-why--motion .dunas-why__pillar {
+      align-items: flex-start;
+      padding-left: max(var(--why-gutter), calc((100vw - var(--page-width, 120rem)) / 2 + 5rem));
+    }
+
+    .dunas-why--motion .dunas-why__glass {
+      width: min(52rem, 42vw);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) and (max-width: 989px) {
+    .dunas-why--motion .dunas-why__pillar {
+      justify-content: flex-end;
+      padding-bottom: calc(max(4svh, 2.4rem) + 3.2rem);
+    }
   }
 }

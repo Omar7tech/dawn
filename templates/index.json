@@ -23,7 +23,8 @@
         "button_link": "shopify://collections/all",
         "overlap_previous": true,
         "color_scheme": "scheme-1",
-        "button_style": "light"
+        "button_style": "light",
+        "image": "shopify://shop_images/beautiful-redheaded-woman-white-dress-hat-sweltering-day-idea-concept-freedom-happiness-wilderness.webp"
       }
     },
     "showcase": {
@@ -97,7 +98,6 @@
         "care"
       ],
       "settings": {
-        "image": "shopify://shop_images/beautiful-redheaded-woman-white-dress-hat-sweltering-day-idea-concept-freedom-happiness-wilderness.webp",
         "heading": "Why DUNAS?",
         "text": "<p>Because skincare should be more than premium packaging or passing trends—it should be purposeful, relevant and dependable enough to become part of everyday life.</p>",
         "closing": "Rooted in the UAE. Built around your care.",
@@ -112,7 +112,7 @@
     "banner",
     "showcase",
     "cinema",
-    "reviews",
-    "why"
+    "why",
+    "reviews"
   ]
 }

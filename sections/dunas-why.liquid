@@ -47,13 +47,14 @@
                 alt: ''
             }}
           {%- else -%}
+            {%- comment -%} the DUNAS dune photo: sand slipping through a hand {%- endcomment -%}
             <img
-              src="{{ 'dunas-banner.jpg' | asset_url }}"
+              src="{{ 'dunas-why.webp' | asset_url }}"
               alt=""
-              width="1800"
-              height="1009"
+              width="1334"
+              height="2000"
               loading="lazy"
-              class="dunas-why__img"
+              class="dunas-why__img dunas-why__img--dune"
             >
           {%- endif -%}
         </div>
@@ -184,7 +185,7 @@
       "type": "image_picker",
       "id": "image",
       "label": "Background photo",
-      "info": "Fills the screen behind the glass. Use a large original (3840px wide or more). Each pillar can also have its own photo."
+      "info": "Fills the screen behind the glass. Leave empty for the DUNAS dune photo. Use a large original (3840px wide or more). Each pillar can also have its own photo."
     },
     {
       "type": "range",
