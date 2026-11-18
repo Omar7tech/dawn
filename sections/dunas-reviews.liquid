@@ -2,18 +2,16 @@
 <script src="{{ 'dunas-reviews.js' | asset_url }}" defer="defer"></script>
 
 {%- comment -%}
-  DUNAS reviews: real customer words, entered by hand.
+  DUNAS reviews: real customer words as a deck of cards.
 
-  Reviews come from the store's "Customer Reviews" metaobjects (type customer_reviews,
-  Shopify admin > Content > Metaobjects),
-  chosen and ordered in the section's "Reviews" setting, so they live in the store, not in the
-  theme, and can be reused on other pages. Quotes can also be added directly as blocks here.
-  Fields read from each entry: review (text), name, stars (rating), position and work (shown
-  together under the name), product (optional). The older keys quote, rating and detail also work.
+  Reviews come from the store's "Customer Reviews" metaobjects (type customer_reviews, Shopify
+  admin > Content > Metaobjects): the ones chosen in "Reviews", or every published one when none
+  are chosen. Quotes can also be added here as blocks. Fields read: review (text), name, stars,
+  position and work (shown under the name), product (optional); quote, rating and detail work too.
 
-  The reviews sit on a track of cards that runs off the right edge of the page: swipe on
-  phones; drag, scroll, the arrow buttons or the keyboard on computers. The rating summary is the
-  average of the reviews shown here, and says so.
+  Left: the heading, a large average rating with its stars, and the arrows with a counter.
+  Right: the cards stacked like paper, the ones behind fanned and tinted. Drag or swipe the
+  front card away (assets/dunas-reviews.js) and it goes to the back as the next comes forward.
 {%- endcomment -%}
 
 {%- liquid
@@ -57,15 +55,20 @@
 
 {%- if total > 0 -%}
   {%- capture arrow -%}<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>{%- endcapture -%}
+  {%- liquid
+    if average
+      assign avg_stars = average | round
+    endif
+  -%}
   <section
-    class="dunas-rv color-{{ s.color_scheme }} gradient"
+    class="dunas-rv color-{{ s.color_scheme }} gradient{% if total > 1 %} dunas-rv--deck{% endif %}"
     style="--rv-pt: {{ s.padding_top }}px; --rv-pb: {{ s.padding_bottom }}px;"
     data-dunas-reviews
     {% if s.autoplay %}
       data-autoplay="{{ s.autoplay_seconds }}"
     {% endif %}
   >
-    <div class="page-width dunas-rv__head">
+    <div class="page-width dunas-rv__grid">
       <div class="dunas-rv__intro">
         {%- if s.eyebrow != blank -%}
           <p class="dunas-rv__eyebrow">{{ s.eyebrow | escape }}</p>
@@ -81,104 +84,113 @@
             {%- endfor -%}
           </h2>
         {%- endif -%}
-      </div>
 
-      <div class="dunas-rv__aside">
         {%- if s.show_summary and average -%}
-          <p class="dunas-rv__summary">
-            <span class="dunas-rv__score">{{ average }}</span>
-            <span class="dunas-rv__out-of">/ 5</span>
-            <span class="dunas-rv__summary-text">
-              {%- if total == 1 -%}
-                {{- s.summary_text_one | escape -}}
-              {%- else -%}
-                {{- s.summary_text | replace: '[count]', total | escape -}}
-              {%- endif -%}
+          <div class="dunas-rv__score">
+            <span class="dunas-rv__score-num">{{ average }}</span>
+            <span class="dunas-rv__score-meta">
+              <span class="dunas-rv__stars dunas-rv__stars--score" role="img" aria-label="{{ average }}/5">
+                {%- for i in (1..5) -%}
+                  <svg class="dunas-rv__star{% if i <= avg_stars %} is-on{% endif %}" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                    <path d="M12 2.8l2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9L12 2.8z" />
+                  </svg>
+                {%- endfor -%}
+              </span>
+              <span class="dunas-rv__score-text">
+                {%- if total == 1 -%}
+                  {{- s.summary_text_one | escape -}}
+                {%- else -%}
+                  {{- s.summary_text | replace: '[count]', total | escape -}}
+                {%- endif -%}
+              </span>
             </span>
-          </p>
+          </div>
         {%- endif -%}
-        <div class="dunas-rv__controls" data-rv-controls hidden>
-          <button type="button" class="dunas-rv__arrow dunas-rv__arrow--prev" data-rv-prev aria-label="{{ 'general.slider.previous_slide' | t }}">
-            {{- arrow -}}
-          </button>
-          <button type="button" class="dunas-rv__arrow" data-rv-next aria-label="{{ 'general.slider.next_slide' | t }}">
-            {{- arrow -}}
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <div class="dunas-rv__viewport">
-      <ol
-        class="dunas-rv__track"
-        role="list"
-        tabindex="0"
-        aria-roledescription="carousel"
-        {% if s.heading != blank %}
-          aria-labelledby="ReviewsHeading-{{ section.id }}"
+        {%- if total > 1 -%}
+          <div class="dunas-rv__controls">
+            <button type="button" class="dunas-rv__arrow dunas-rv__arrow--prev" data-rv-prev aria-label="{{ 'general.slider.previous_slide' | t }}">
+              {{- arrow -}}
+            </button>
+            <span class="dunas-rv__counter" aria-hidden="true">
+              <span data-rv-current>01</span>
+              <span class="dunas-rv__counter-sep"></span>
+              <span>{% if total < 10 %}0{% endif %}{{ total }}</span>
+            </span>
+            <button type="button" class="dunas-rv__arrow" data-rv-next aria-label="{{ 'general.slider.next_slide' | t }}">
+              {{- arrow -}}
+            </button>
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div
+        class="dunas-rv__deck"
+        data-rv-deck
+        {% if total > 1 %}
+          tabindex="0" role="region" aria-roledescription="carousel"
+          {% if s.heading != blank %}
+            aria-labelledby="ReviewsHeading-{{ section.id }}"
+          {% endif %}
         {% endif %}
-        data-rv-track
       >
-        {%- assign i = 0 -%}
-        {%- for review in list limit: 12 -%}
-          {%- assign text = review.review.value | default: review.quote.value -%}
-          {%- if text != blank -%}
-            {%- liquid
-              assign r = review.stars.value | default: review.rating.value
-              if r.rating != blank
-                assign r = r.rating
-              endif
-              assign detail = review.detail.value
-              if detail == blank
-                assign parts = ''
-                if review.position.value != blank
-                  assign parts = review.position.value
+        <ol class="dunas-rv__cards" role="list">
+          {%- assign i = 0 -%}
+          {%- for review in list limit: 12 -%}
+            {%- assign text = review.review.value | default: review.quote.value -%}
+            {%- if text != blank -%}
+              {%- liquid
+                assign r = review.stars.value | default: review.rating.value
+                if r.rating != blank
+                  assign r = r.rating
                 endif
-                if review.work.value != blank
-                  if parts != blank
-                    assign parts = parts | append: ' · '
+                assign detail = review.detail.value
+                if detail == blank
+                  assign parts = ''
+                  if review.position.value != blank
+                    assign parts = review.position.value
                   endif
-                  assign parts = parts | append: review.work.value
+                  if review.work.value != blank
+                    if parts != blank
+                      assign parts = parts | append: ' · '
+                    endif
+                    assign parts = parts | append: review.work.value
+                  endif
+                  assign detail = parts
                 endif
-                assign detail = parts
-              endif
-            -%}
-            {%- render 'dunas-review',
-              index: i,
-              count: total,
-              quote: text,
-              name: review.name.value,
-              rating: r,
-              detail: detail,
-              product: review.product.value,
-              show_product: s.show_product
-            -%}
-            {%- assign i = i | plus: 1 -%}
-          {%- endif -%}
-        {%- endfor -%}
-        {%- for block in section.blocks -%}
-          {%- if block.settings.quote != blank -%}
-            {%- render 'dunas-review',
-              index: i,
-              count: total,
-              quote: block.settings.quote,
-              name: block.settings.name,
-              rating: block.settings.rating,
-              detail: block.settings.detail,
-              product: block.settings.product,
-              show_product: s.show_product
-            -%}
-            {%- assign i = i | plus: 1 -%}
-          {%- endif -%}
-        {%- endfor -%}
-      </ol>
-    </div>
-
-    <div class="page-width">
-      <div class="dunas-rv__progress" data-rv-progress hidden aria-hidden="true">
-        <span class="dunas-rv__progress-bar" data-rv-bar></span>
+              -%}
+              {%- render 'dunas-review',
+                index: i,
+                count: total,
+                quote: text,
+                name: review.name.value,
+                rating: r,
+                detail: detail,
+                product: review.product.value,
+                show_product: s.show_product
+              -%}
+              {%- assign i = i | plus: 1 -%}
+            {%- endif -%}
+          {%- endfor -%}
+          {%- for block in section.blocks -%}
+            {%- if block.settings.quote != blank -%}
+              {%- render 'dunas-review',
+                index: i,
+                count: total,
+                quote: block.settings.quote,
+                name: block.settings.name,
+                rating: block.settings.rating,
+                detail: block.settings.detail,
+                product: block.settings.product,
+                show_product: s.show_product
+              -%}
+              {%- assign i = i | plus: 1 -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </ol>
       </div>
     </div>
+    <p class="visually-hidden" aria-live="polite" data-rv-status></p>
   </section>
 {%- elsif request.design_mode -%}
   <div class="page-width dunas-rv__empty">
@@ -237,11 +249,11 @@
     {
       "type": "checkbox",
       "id": "autoplay",
-      "label": "Move to the next card on its own",
+      "label": "Move to the next review on its own",
       "info": "Pauses while the visitor points at or focuses the section. Off for reduced motion.",
       "default": false
     },
-    { "type": "range", "id": "autoplay_seconds", "label": "Seconds per card", "min": 5, "max": 15, "step": 1, "default": 8 },
+    { "type": "range", "id": "autoplay_seconds", "label": "Seconds per review", "min": 5, "max": 15, "step": 1, "default": 8 },
     { "type": "header", "content": "Layout" },
     { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
     { "type": "range", "id": "padding_top", "label": "Space above", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 },

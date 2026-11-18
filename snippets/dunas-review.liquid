@@ -1,5 +1,5 @@
 {% doc %}
-  One review card in the DUNAS reviews track.
+  One card in the DUNAS reviews deck.
 
   @param {string} quote - The review text.
   @param {string} name - The reviewer's name.
@@ -7,7 +7,7 @@
   @param {string} [detail] - A short line such as position, skin type or city.
   @param {object} [product] - The product reviewed.
   @param {boolean} [show_product] - Show the product at the foot of the card.
-  @param {number} [index] - Position in the track, from 0.
+  @param {number} [index] - Position in the deck, from 0.
   @param {number} [count] - How many cards there are.
 
   @example
@@ -20,18 +20,34 @@
   endif
   assign initial = name | strip | slice: 0 | upcase
   assign position = index | default: 0 | plus: 1
+  assign length = quote | strip | size
+  assign size_class = ''
+  if length > 260
+    assign size_class = ' dunas-rv__card--long'
+  elsif length < 70
+    assign size_class = ' dunas-rv__card--short'
+  endif
 -%}
-<li class="dunas-rv__item" aria-roledescription="slide" aria-label="{{ position }} / {{ count | default: position }}">
-  <figure class="dunas-rv__card">
+<li
+  class="dunas-rv__item"
+  data-rv-card
+  data-pos="{{ index | default: 0 }}"
+  aria-roledescription="slide"
+  aria-label="{{ position }} / {{ count | default: position }}"
+>
+  <figure class="dunas-rv__card{{ size_class }}">
     <div class="dunas-rv__top">
+      <svg class="dunas-rv__mark" viewBox="0 0 32 24" width="32" height="24" aria-hidden="true" focusable="false">
+        <path d="M0 24V14.5C0 6.6 4.5 1.7 12.3 0l1.3 3.1C9 4.7 6.9 7.5 6.6 11.3H12.6V24H0Zm18.4 0V14.5c0-7.9 4.5-12.8 12.3-14.5L32 3.1c-4.6 1.6-6.7 4.4-7 8.2H31V24H18.4Z"/>
+      </svg>
       {%- if stars > 0 -%}
         <span class="dunas-rv__stars" role="img" aria-label="{{ stars }}/5">
           {%- for i in (1..5) -%}
             <svg
               class="dunas-rv__star{% if i <= stars %} is-on{% endif %}"
               viewBox="0 0 24 24"
-              width="22"
-              height="22"
+              width="18"
+              height="18"
               aria-hidden="true"
               focusable="false"
             >
@@ -40,9 +56,6 @@
           {%- endfor -%}
         </span>
       {%- endif -%}
-      <svg class="dunas-rv__mark" viewBox="0 0 32 24" width="32" height="24" aria-hidden="true" focusable="false">
-        <path d="M0 24V14.5C0 6.6 4.5 1.7 12.3 0l1.3 3.1C9 4.7 6.9 7.5 6.6 11.3H12.6V24H0Zm18.4 0V14.5c0-7.9 4.5-12.8 12.3-14.5L32 3.1c-4.6 1.6-6.7 4.4-7 8.2H31V24H18.4Z"/>
-      </svg>
     </div>
 
     <blockquote class="dunas-rv__quote">
@@ -57,24 +70,24 @@
           <span class="dunas-rv__detail">{{ detail | escape }}</span>
         {%- endif -%}
       </span>
+      {%- if show_product and product != blank and product.url -%}
+        <a class="dunas-rv__product" href="{{ product.url }}" draggable="false">
+          {%- if product.featured_image -%}
+            {{
+              product.featured_image
+              | image_url: width: 96
+              | image_tag:
+                loading: 'lazy',
+                width: 32,
+                height: 32,
+                class: 'dunas-rv__product-img',
+                alt: '',
+                draggable: 'false'
+            }}
+          {%- endif -%}
+          <span class="dunas-rv__product-name">{{ product.title | escape }}</span>
+        </a>
+      {%- endif -%}
     </figcaption>
-
-    {%- if show_product and product != blank and product.url -%}
-      <a class="dunas-rv__product" href="{{ product.url }}">
-        {%- if product.featured_image -%}
-          {{
-            product.featured_image
-            | image_url: width: 96
-            | image_tag:
-              loading: 'lazy',
-              width: 36,
-              height: 36,
-              class: 'dunas-rv__product-img',
-              alt: ''
-          }}
-        {%- endif -%}
-        <span class="dunas-rv__product-name">{{ product.title | escape }}</span>
-      </a>
-    {%- endif -%}
   </figure>
 </li>

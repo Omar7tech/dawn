@@ -1,122 +1,177 @@
 /*
-  DUNAS reviews track: native horizontal scrolling with snap (so swipe, trackpad and the
-  keyboard all work on their own), plus the round arrows (one card per press), dragging with the
-  mouse, and the hairline that shows where you are. Arrows and the hairline only appear when
-  the cards overflow. Optional auto-advance pauses while pointed at, focused or off screen, and
-  never runs for reduced motion.
+  DUNAS reviews deck.
+
+  The cards are stacked; data-pos says where each sits (0 front, 1 and 2 behind, 3 waiting,
+  'hidden' beyond). Next: the front card leaves to the side with a tilt while the others step
+  forward, then it slips in at the back. Previous: the last card flies back in from the left.
+  Drag or swipe the front card past a short distance to send it away; a shorter drag springs
+  back. Arrows, Left/Right keys on the focused deck, a counter, and a screen-reader status.
+  Optional auto-advance pauses on hover, focus, touch and off screen, never for reduced motion.
 */
 (() => {
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const LEAVE_MS = 600;
+
   const init = (root) => {
     if (root.dataset.rvReady) return;
     root.dataset.rvReady = 'true';
 
-    const track = root.querySelector('[data-rv-track]');
-    if (!track) return;
-    const controls = root.querySelector('[data-rv-controls]');
-    const prev = root.querySelector('[data-rv-prev]');
-    const next = root.querySelector('[data-rv-next]');
-    const progress = root.querySelector('[data-rv-progress]');
-    const rtl = () => getComputedStyle(track).direction === 'rtl';
+    const deck = root.querySelector('[data-rv-deck]');
+    const cards = Array.from(root.querySelectorAll('[data-rv-card]'));
+    if (!deck || cards.length < 2) return;
 
-    const step = () => {
-      const item = track.querySelector('.dunas-rv__item');
-      if (!item) return track.clientWidth;
-      const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
-      return item.getBoundingClientRect().width + gap;
+    const prevButton = root.querySelector('[data-rv-prev]');
+    const nextButton = root.querySelector('[data-rv-next]');
+    const current = root.querySelector('[data-rv-current]');
+    const status = root.querySelector('[data-rv-status]');
+    let order = cards.slice();
+    let busy = false;
+
+    const pad = (n) => String(n).padStart(2, '0');
+
+    const place = (card, index) => {
+      card.dataset.pos = index < 4 ? String(index) : 'hidden';
+      const front = index === 0;
+      card.toggleAttribute('inert', !front);
+      if (front) card.removeAttribute('aria-hidden');
+      else card.setAttribute('aria-hidden', 'true');
     };
 
-    const max = () => track.scrollWidth - track.clientWidth;
-    const position = () => Math.abs(track.scrollLeft); // negative in right-to-left
-
-    const update = () => {
-      const overflow = max() > 2;
-      if (controls) controls.hidden = !overflow;
-      if (progress) progress.hidden = !overflow;
-      if (!overflow) return;
-      const at = position();
-      if (prev) prev.disabled = at <= 2;
-      if (next) next.disabled = at >= max() - 2;
-      root.style.setProperty('--rv-visible', (track.clientWidth / track.scrollWidth).toFixed(4));
-      root.style.setProperty('--rv-progress', (at / max()).toFixed(4));
+    const render = (announce) => {
+      order.forEach((card, index) => place(card, index));
+      const number = cards.indexOf(order[0]) + 1;
+      if (current) current.textContent = pad(number);
+      if (announce && status) status.textContent = `${number} / ${cards.length}`;
     };
 
-    const go = (direction) => {
-      track.scrollBy({ left: direction * step() * (rtl() ? -1 : 1), behavior: 'smooth' });
+    // put a card somewhere without animating the move, then give the transitions back
+    const jump = (card, fn) => {
+      card.style.transition = 'none';
+      fn();
+      void card.offsetWidth;
+      card.style.transition = '';
     };
 
-    if (prev) prev.addEventListener('click', () => go(-1));
-    if (next) next.addEventListener('click', () => go(1));
-    track.addEventListener('scroll', () => requestAnimationFrame(update), { passive: true });
-    new ResizeObserver(update).observe(track);
-    update();
+    const next = (side = 'left') => {
+      if (busy) return;
+      busy = true;
+      const front = order[0];
+      front.style.transform = '';
+      front.classList.remove('is-dragging');
+      front.classList.add(`is-leaving-${side}`);
+      order = order.slice(1).concat(front);
+      // everyone else steps forward while the front card leaves
+      order.slice(0, -1).forEach((card, index) => place(card, index));
+      setTimeout(() => {
+        jump(front, () => {
+          front.classList.remove('is-leaving-left', 'is-leaving-right');
+          place(front, order.length - 1);
+        });
+        render(true);
+        busy = false;
+      }, still.matches ? 0 : LEAVE_MS);
+    };
 
-    // drag with the mouse (touch and trackpads already scroll natively)
-    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-      track.classList.add('is-draggable');
-      let startX = 0;
-      let startScroll = 0;
-      let moved = false;
-      let pointer = null;
-
-      track.addEventListener('pointerdown', (event) => {
-        if (event.pointerType !== 'mouse' || event.button !== 0 || max() <= 2) return;
-        pointer = event.pointerId;
-        startX = event.clientX;
-        startScroll = track.scrollLeft;
-        moved = false;
+    const prev = () => {
+      if (busy) return;
+      busy = true;
+      const last = order[order.length - 1];
+      // bring it in from the left
+      jump(last, () => {
+        last.classList.add('is-leaving-left');
+        last.dataset.pos = '0';
       });
+      order = [last].concat(order.slice(0, -1));
+      requestAnimationFrame(() => {
+        last.classList.remove('is-leaving-left');
+        render(true);
+        setTimeout(() => (busy = false), still.matches ? 0 : 450);
+      });
+    };
 
-      track.addEventListener('pointermove', (event) => {
-        if (pointer !== event.pointerId) return;
-        const dx = event.clientX - startX;
-        if (!moved && Math.abs(dx) < 6) return;
-        if (!moved) {
-          moved = true;
-          track.classList.add('is-dragging');
-          track.setPointerCapture(pointer);
+    if (nextButton) nextButton.addEventListener('click', () => next('left'));
+    if (prevButton) prevButton.addEventListener('click', prev);
+
+    deck.addEventListener('keydown', (event) => {
+      const rtl = document.documentElement.dir === 'rtl';
+      if (event.key === (rtl ? 'ArrowLeft' : 'ArrowRight')) next(rtl ? 'right' : 'left');
+      else if (event.key === (rtl ? 'ArrowRight' : 'ArrowLeft')) prev();
+      else return;
+      event.preventDefault();
+    });
+
+    // drag or swipe the front card
+    let start = null;
+    let moved = false;
+
+    deck.addEventListener('pointerdown', (event) => {
+      const front = order[0];
+      if (busy || !front.contains(event.target) || (event.pointerType === 'mouse' && event.button !== 0)) return;
+      start = { x: event.clientX, y: event.clientY, t: performance.now(), id: event.pointerId };
+      moved = false;
+    });
+
+    deck.addEventListener('pointermove', (event) => {
+      if (!start || event.pointerId !== start.id) return;
+      const dx = event.clientX - start.x;
+      const dy = event.clientY - start.y;
+      if (!moved) {
+        // a vertical gesture is a page scroll, not a swipe
+        if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 8) {
+          start = null;
+          return;
         }
-        track.scrollLeft = startScroll - dx;
-      });
+        if (Math.abs(dx) < 6) return;
+        moved = true;
+        order[0].classList.add('is-dragging');
+        deck.setPointerCapture(event.pointerId);
+      }
+      order[0].style.transform = `translate(${dx}px, ${Math.abs(dx) * 0.06}px) rotate(${dx * 0.03}deg)`;
+    });
 
-      const end = () => {
-        if (pointer === null) return;
-        pointer = null;
-        if (!moved) return;
-        // let snapping settle the nearest card
-        const before = track.scrollLeft;
-        track.classList.remove('is-dragging');
-        const snap = Math.round(before / step()) * step();
-        track.scrollTo({ left: snap, behavior: 'smooth' });
-      };
-      track.addEventListener('pointerup', end);
-      track.addEventListener('pointercancel', end);
+    const release = (event) => {
+      if (!start || event.pointerId !== start.id) return;
+      const dx = event.clientX - start.x;
+      const speed = Math.abs(dx) / Math.max(performance.now() - start.t, 1);
+      start = null;
+      if (!moved) return;
+      const front = order[0];
+      if (Math.abs(dx) > Math.min(120, deck.clientWidth * 0.22) || speed > 0.6) {
+        next(dx < 0 ? 'left' : 'right');
+      } else {
+        front.classList.remove('is-dragging');
+        front.style.transform = '';
+      }
+    };
+    deck.addEventListener('pointerup', release);
+    deck.addEventListener('pointercancel', release);
 
-      // a drag is not a click on the product link inside a card
-      track.addEventListener(
-        'click',
-        (event) => {
-          if (moved) {
-            event.preventDefault();
-            event.stopPropagation();
-            moved = false;
-          }
-        },
-        true
-      );
-    }
+    // a drag is not a click on the product link
+    deck.addEventListener(
+      'click',
+      (event) => {
+        if (moved) {
+          event.preventDefault();
+          event.stopPropagation();
+          moved = false;
+        }
+      },
+      true
+    );
 
-    // optional auto-advance, one card at a time, back to the start at the end
+    render(false);
+
+    // optional auto-advance
     const seconds = Number(root.dataset.autoplay) || 0;
-    if (seconds && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (seconds && !still.matches) {
       let timer = 0;
       let paused = false;
       let onScreen = false;
       const tick = () => {
         clearTimeout(timer);
-        if (paused || !onScreen || max() <= 2) return;
+        if (paused || !onScreen) return;
         timer = setTimeout(() => {
-          if (position() >= max() - 2) track.scrollTo({ left: 0, behavior: 'smooth' });
-          else go(1);
+          next('left');
           tick();
         }, seconds * 1000);
       };
@@ -134,7 +189,7 @@
       root.addEventListener('focusout', (event) => {
         if (!root.contains(event.relatedTarget)) resume();
       });
-      track.addEventListener('touchstart', pause, { passive: true });
+      deck.addEventListener('touchstart', pause, { passive: true });
       new IntersectionObserver(
         (entries) => {
           onScreen = entries[0].isIntersecting;
