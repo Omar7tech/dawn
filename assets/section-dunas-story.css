@@ -152,27 +152,69 @@
   }
 }
 
-/* ---------- Computers: photo, words, photo in a row ---------- */
+/* ---------- Layout: photo, words, photo (triptych) ---------- */
 
 @media screen and (min-width: 990px) {
-  .dunas-story__grid {
+  .dunas-story--triptych .dunas-story__grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1fr);
     gap: clamp(3.2rem, 4.5vw, 6.4rem);
   }
 
-  .dunas-story__photo {
+  .dunas-story--triptych .dunas-story__photo {
     aspect-ratio: 3 / 4;
   }
 
   /* a little rhythm: the first photo sits lower, the second higher */
-  .dunas-story__photo--one {
+  .dunas-story--triptych .dunas-story__photo--one {
     margin-top: 12rem;
   }
 
-  .dunas-story__photo--two {
+  .dunas-story--triptych .dunas-story__photo--two {
     margin-bottom: 12rem;
   }
 
+}
+
+/* ---------- Layout: words, then the two photos (spread) ---------- */
+
+.dunas-story--spread .dunas-story__grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    'copy copy'
+    'one two';
+  column-gap: clamp(1.2rem, 2vw, 2.4rem);
+  row-gap: clamp(4.8rem, 7vw, 8rem);
+  align-items: start;
+  max-width: 112rem;
+}
+
+.dunas-story--spread .dunas-story__copy {
+  grid-area: copy;
+  max-width: 60rem;
+}
+
+.dunas-story--spread .dunas-story__photo {
+  aspect-ratio: 4 / 5;
+}
+
+.dunas-story--spread .dunas-story__photo--one {
+  grid-area: one;
+}
+
+/* the second photo sits a little lower: a quiet rhythm, not a collage */
+.dunas-story--spread .dunas-story__photo--two {
+  grid-area: two;
+  margin-top: clamp(3.2rem, 7vw, 9.6rem);
+}
+
+.dunas-story--spread .dunas-story__heading {
+  font-size: clamp(4.8rem, 6.4vw, 9.6rem);
+}
+
+@media screen and (max-width: 749px) {
+  .dunas-story--spread .dunas-story__photo {
+    border-radius: 2rem;
+  }
 }
 
 /* ---------- Scroll motion (CSS scroll timelines, no script) ---------- */
@@ -195,13 +237,13 @@
 
   /* computers: the two photos drift a little in opposite directions */
   @media (prefers-reduced-motion: no-preference) and (min-width: 990px) {
-    .dunas-story--motion .dunas-story__photo--one {
+    .dunas-story--motion.dunas-story--triptych .dunas-story__photo--one {
       animation: dunas-story-open linear both, dunas-story-rise linear both;
       animation-timeline: view(), view();
       animation-range: entry 0% entry 100%, cover 0% cover 100%;
     }
 
-    .dunas-story--motion .dunas-story__photo--two {
+    .dunas-story--motion.dunas-story--triptych .dunas-story__photo--two {
       animation: dunas-story-open linear both, dunas-story-sink linear both;
       animation-timeline: view(), view();
       animation-range: entry 0% entry 100%, cover 0% cover 100%;
@@ -211,7 +253,7 @@
 
 @keyframes dunas-story-open {
   from {
-    clip-path: inset(4% 4% round var(--story-radius));
+    clip-path: inset(3% 3% round var(--story-radius));
   }
   to {
     clip-path: inset(0 round var(--story-radius));
@@ -220,7 +262,7 @@
 
 @keyframes dunas-story-settle {
   from {
-    scale: 1.16;
+    scale: 1.08;
   }
   to {
     scale: 1;

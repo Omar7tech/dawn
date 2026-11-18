@@ -1,11 +1,12 @@
 {{ 'section-dunas-story.css' | asset_url | stylesheet_tag }}
 
 {%- comment -%}
-  DUNAS story: photo, words, photo.
-  Phones: the first photo, the heading, story and buttons centred, then the second photo.
-  Computers: the same order left to right, the words centred between two tall photos.
-  On scroll (CSS only) each photo opens from a soft frame and settles its zoom; on computers the
-  two drift a little in opposite directions. Still for reduced motion.
+  DUNAS story, two layouts (setting "Layout"):
+    spread    - the words centred like a magazine opener, then the two photos side by side
+                (phones too), the second set a little lower.
+    triptych  - photo, words, photo: stacked on phones, side by side on computers.
+  On scroll (CSS only) each photo eases open from a slight frame and settles its zoom. Nothing
+  grows past its frame. Still for reduced motion.
 {%- endcomment -%}
 
 {%- liquid
@@ -14,7 +15,7 @@
 -%}
 
 <section
-  class="dunas-story color-{{ s.color_scheme }} gradient{% if s.scroll_motion %} dunas-story--motion{% endif %}"
+  class="dunas-story dunas-story--{{ s.layout | default: 'spread' }} color-{{ s.color_scheme }} gradient{% if s.scroll_motion %} dunas-story--motion{% endif %}"
   style="--story-pt: {{ s.padding_top }}px; --story-pb: {{ s.padding_bottom }}px;"
 >
   <div class="page-width dunas-story__grid">
@@ -25,7 +26,7 @@
           | image_url: width: 1400
           | image_tag:
             widths: '450, 650, 900, 1200, 1400',
-            sizes: '(min-width: 990px) 30vw, 92vw',
+            sizes: '(min-width: 990px) 40vw, 50vw',
             loading: 'lazy',
             class: 'dunas-story__img',
             alt: s.image.alt
@@ -76,7 +77,7 @@
           | image_url: width: 1400
           | image_tag:
             widths: '450, 650, 900, 1200, 1400',
-            sizes: '(min-width: 990px) 30vw, 92vw',
+            sizes: '(min-width: 990px) 40vw, 50vw',
             loading: 'lazy',
             class: 'dunas-story__img',
             alt: s.image_2.alt
@@ -94,8 +95,18 @@
   "tag": "div",
   "class": "section section-dunas-story",
   "settings": [
-    { "type": "image_picker", "id": "image", "label": "First photo", "info": "Above the words on phones, left of them on computers." },
-    { "type": "image_picker", "id": "image_2", "label": "Second photo", "info": "Below the words on phones, right of them on computers." },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "spread", "label": "Words, then the two photos" },
+        { "value": "triptych", "label": "Photo, words, photo" }
+      ],
+      "default": "spread"
+    },
+    { "type": "image_picker", "id": "image", "label": "First photo" },
+    { "type": "image_picker", "id": "image_2", "label": "Second photo" },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Our story" },
     {
       "type": "textarea",

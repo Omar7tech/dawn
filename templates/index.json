@@ -50,6 +50,7 @@
     "story": {
       "type": "dunas-story",
       "settings": {
+        "layout": "spread",
         "image": "shopify://shop_images/portrait-young-woman-posing-confidently-outdoors-with-round-mirror.webp",
         "image_2": "shopify://shop_images/close-up-portrait-blissful-woman-with-wavy-hairs-posig-tropical-garden-wearing-elegant-silk-robe-spa-skincare-concept.webp",
         "button_label": "Find your routine",
