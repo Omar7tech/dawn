@@ -1,0 +1,450 @@
+/*
+  DUNAS "Why DUNAS?".
+
+  Base (no scroll timelines, reduced motion, or motion off): the photo behind, the heading and
+  intro, the pillars as a grid of frosted glass panels, then the closing and buttons.
+
+  Held scroll: the section is (pillars + 2) screens tall and its stage holds the screen.
+     0-16%   opening: heading and intro, then they lift away
+    14-86%   the pillars share this span equally. Each panel, over its share (--a to --d):
+               0-22%  slides in from the right and comes into focus
+              22-80%  holds
+              80-100% glides out to the left
+             A pillar's own photo cross-fades in behind it on the same timing.
+    86-100%  closing lines and buttons
+  The segmented line at the foot fills one part per pillar.
+*/
+
+.dunas-why {
+  --why-cream: var(--dunas-cream, 241, 239, 231);
+  --why-dark: var(--dunas-ink, 49, 50, 45);
+  --why-ease: var(--dunas-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  --why-gutter: 1.5rem;
+  position: relative;
+  isolation: isolate;
+  color: rgb(var(--why-cream));
+  background: rgb(var(--why-dark));
+}
+
+@media screen and (min-width: 750px) {
+  .dunas-why {
+    --why-gutter: 5rem;
+  }
+}
+
+/* ---------- Still layout (the base) ---------- */
+
+.dunas-why__stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(4.8rem, 7vw, 8rem);
+  padding: clamp(8rem, 12vw, 14.4rem) var(--why-gutter);
+  overflow: clip;
+}
+
+.dunas-why__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.dunas-why__bg {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+}
+
+.dunas-why__bg--pillar {
+  opacity: 0;
+}
+
+.dunas-why__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dunas-why__backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 90% at 50% 50%, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, calc(var(--why-dim, 0.35) * 0.9)) 100%),
+    rgba(0, 0, 0, var(--why-dim, 0.35));
+}
+
+.dunas-why__intro,
+.dunas-why__outro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 76rem;
+  text-align: center;
+}
+
+.dunas-why__eyebrow,
+.dunas-why__closing {
+  margin: 0 0 2rem;
+  font-family: var(--font-body-family);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(var(--why-cream), 0.8);
+}
+
+.dunas-why__heading {
+  margin: 0;
+  text-wrap: balance;
+  font-size: clamp(5.6rem, 10vw, 15rem);
+  line-height: 0.92;
+  letter-spacing: -0.05em;
+  color: rgb(var(--why-cream));
+}
+
+.dunas-why__lede {
+  max-width: 44ch;
+  margin-top: clamp(2.4rem, 3vw, 3.2rem);
+  font-family: var(--font-body-family);
+  font-size: clamp(1.6rem, 1.4vw, 1.9rem);
+  line-height: 1.7;
+  color: rgba(var(--why-cream), 0.86);
+  text-wrap: pretty;
+}
+
+.dunas-why__lede > *,
+.dunas-why__text > * {
+  margin: 0;
+}
+
+.dunas-why__pillars {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.6rem;
+  width: 100%;
+  max-width: 112rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media screen and (min-width: 750px) {
+  .dunas-why__pillars {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.4rem;
+  }
+}
+
+/* the glass panel */
+.dunas-why__glass {
+  height: 100%;
+  padding: clamp(2.8rem, 4vw, 5.2rem);
+  border: 0.1rem solid rgba(255, 255, 255, 0.26);
+  border-radius: 3.2rem;
+  /* a little depth under the frost, so cream words read over bright photos too */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04)),
+    rgba(var(--why-dark), 0.22);
+  -webkit-backdrop-filter: blur(2.4rem) saturate(1.4);
+  backdrop-filter: blur(2.4rem) saturate(1.4);
+  box-shadow: inset 0 0.1rem 0 rgba(255, 255, 255, 0.35), 0 4rem 8rem -4rem rgba(0, 0, 0, 0.5);
+  color: rgb(var(--why-cream));
+}
+
+.dunas-why__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: clamp(3.2rem, 5vw, 5.6rem);
+}
+
+.dunas-why__num {
+  font-family: var(--font-body-family);
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  font-variant-numeric: tabular-nums;
+  color: rgba(var(--why-cream), 0.75);
+}
+
+.dunas-why__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 5.2rem;
+  height: 5.2rem;
+  border: 0.1rem solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dunas-why__icon svg {
+  width: 2.4rem;
+  height: 2.4rem;
+}
+
+.dunas-why__title {
+  margin: 0;
+  font-size: clamp(3.2rem, 3.8vw, 5.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: rgb(var(--why-cream));
+}
+
+.dunas-why__text {
+  max-width: 40ch;
+  margin-top: clamp(1.6rem, 2vw, 2.4rem);
+  font-family: var(--font-body-family);
+  font-size: clamp(1.5rem, 1.25vw, 1.8rem);
+  line-height: 1.7;
+  color: rgba(var(--why-cream), 0.86);
+  text-wrap: pretty;
+}
+
+.dunas-why__progress {
+  display: none;
+}
+
+.dunas-why__signature {
+  margin: 0;
+  font-size: clamp(4.4rem, 6.4vw, 9.6rem);
+  text-wrap: balance;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  color: rgb(var(--why-cream));
+}
+
+.dunas-why__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: clamp(3.2rem, 4vw, 4.8rem);
+}
+
+.dunas-why__button {
+  min-width: 22rem;
+}
+
+@media screen and (max-width: 749px) {
+  .dunas-why__actions {
+    width: 100%;
+  }
+
+  .dunas-why__button {
+    flex: 1 1 100%;
+  }
+}
+
+/* ---------- The held scroll ---------- */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .dunas-why--motion .dunas-why__track {
+      height: var(--why-length, 600svh);
+      view-timeline: --why block;
+    }
+
+    .dunas-why--motion .dunas-why__stage {
+      position: sticky;
+      top: 0;
+      display: block;
+      height: 100svh;
+      padding: 0;
+    }
+
+    /* the shared photo settles slowly the whole way through */
+    .dunas-why--motion .dunas-why__bg--base .dunas-why__img {
+      animation: dunas-why-settle linear both;
+      animation-timeline: --why;
+      animation-range: contain 0% contain 100%;
+    }
+
+    .dunas-why--motion .dunas-why__bg--pillar {
+      animation: dunas-why-bg linear both;
+      animation-timeline: --why;
+      animation-range: contain var(--a) contain var(--d);
+    }
+
+    /* every layer is centred on the held screen */
+    .dunas-why--motion .dunas-why__intro,
+    .dunas-why--motion .dunas-why__outro,
+    .dunas-why--motion .dunas-why__pillar {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      max-width: none;
+      padding: calc(var(--dunas-header-total, 9rem) + 2rem) var(--why-gutter) 9svh;
+    }
+
+    .dunas-why--motion .dunas-why__intro {
+      animation: dunas-why-away linear both;
+      animation-timeline: --why;
+      animation-range: contain 6% contain 16%;
+    }
+
+    .dunas-why--motion .dunas-why__intro > * {
+      max-width: 76rem;
+    }
+
+    .dunas-why--motion .dunas-why__pillars {
+      display: block;
+      max-width: none;
+    }
+
+    .dunas-why--motion .dunas-why__pillar {
+      pointer-events: none;
+      animation: dunas-why-pillar linear both;
+      animation-timeline: --why;
+      animation-range: contain var(--a) contain var(--d);
+    }
+
+    .dunas-why--motion .dunas-why__glass {
+      width: min(58rem, 100%);
+      height: auto;
+      pointer-events: auto;
+    }
+
+    .dunas-why--motion .dunas-why__outro {
+      animation: dunas-why-in linear both;
+      animation-timeline: --why;
+      animation-range: contain 86% contain 96%;
+    }
+
+    .dunas-why--motion .dunas-why__outro > * {
+      max-width: 76rem;
+    }
+
+    /* the segmented progress line */
+    .dunas-why--motion .dunas-why__progress {
+      position: absolute;
+      left: 50%;
+      bottom: max(4svh, 2.4rem);
+      display: flex;
+      gap: 0.8rem;
+      width: min(40rem, calc(100% - 2 * var(--why-gutter)));
+      transform: translateX(-50%);
+      animation: dunas-why-progress linear both;
+      animation-timeline: --why;
+      animation-range: contain 10% contain 92%;
+    }
+
+    .dunas-why--motion .dunas-why__step {
+      position: relative;
+      flex: 1 1 0;
+      height: 0.2rem;
+      overflow: hidden;
+      border-radius: 1rem;
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .dunas-why--motion .dunas-why__step-fill {
+      position: absolute;
+      inset: 0;
+      background: rgb(var(--why-cream));
+      transform-origin: left;
+      animation: dunas-why-fill linear both;
+      animation-timeline: --why;
+      animation-range: contain var(--a) contain var(--d);
+    }
+
+    [dir='rtl'] .dunas-why--motion .dunas-why__step-fill {
+      transform-origin: right;
+    }
+  }
+}
+
+@keyframes dunas-why-settle {
+  from {
+    scale: 1.18;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+@keyframes dunas-why-bg {
+  0% {
+    opacity: 0;
+  }
+  22%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes dunas-why-away {
+  from {
+    opacity: 1;
+    translate: 0 0;
+    filter: blur(0);
+  }
+  to {
+    opacity: 0;
+    translate: 0 -6rem;
+    filter: blur(0.8rem);
+  }
+}
+
+@keyframes dunas-why-pillar {
+  0% {
+    opacity: 0;
+    translate: 16vw 0;
+    scale: 0.94;
+    filter: blur(1.2rem);
+  }
+  22%,
+  80% {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    translate: -14vw 0;
+    scale: 0.96;
+    filter: blur(1rem);
+  }
+}
+
+@keyframes dunas-why-in {
+  from {
+    opacity: 0;
+    translate: 0 4rem;
+    filter: blur(0.8rem);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    filter: blur(0);
+  }
+}
+
+@keyframes dunas-why-progress {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  6%,
+  92% {
+    opacity: 1;
+  }
+}
+
+@keyframes dunas-why-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

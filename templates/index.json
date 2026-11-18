@@ -53,6 +53,58 @@
         "image": "shopify://shop_images/portrait-young-woman-posing-confidently-outdoors-with-round-mirror.webp",
         "image_2": "shopify://shop_images/close-up-portrait-blissful-woman-with-wavy-hairs-posig-tropical-garden-wearing-elegant-silk-robe-spa-skincare-concept.webp"
       }
+    },
+    "why": {
+      "type": "dunas-why",
+      "blocks": {
+        "camel": {
+          "type": "pillar",
+          "settings": {
+            "title": "Camel Milk, With Purpose",
+            "icon": "drop",
+            "text": "<p>We place camel milk at the heart of modern skincare as a meaningful regional ingredient—not a novelty or marketing story.</p>"
+          }
+        },
+        "uae": {
+          "type": "pillar",
+          "settings": {
+            "title": "Rooted in UAE Life",
+            "icon": "sun",
+            "text": "<p>DUNAS is shaped by the UAE, its culture and the realities of skin living through heat, sun, air conditioning, travel and changing days.</p>"
+          }
+        },
+        "simple": {
+          "type": "pillar",
+          "settings": {
+            "title": "Simple Daily Care",
+            "icon": "leaf",
+            "text": "<p>Four thoughtful essentials create clear morning and evening routines without unnecessary complexity.</p>"
+          }
+        },
+        "care": {
+          "type": "pillar",
+          "settings": {
+            "title": "Care Beyond the Product",
+            "icon": "hand",
+            "text": "<p>DUNAS Companion Care offers personal guidance before and after purchase, helping your routine stay relevant as your skin changes.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "camel",
+        "uae",
+        "simple",
+        "care"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/beautiful-redheaded-woman-white-dress-hat-sweltering-day-idea-concept-freedom-happiness-wilderness.webp",
+        "heading": "Why DUNAS?",
+        "text": "<p>Because skincare should be more than premium packaging or passing trends—it should be purposeful, relevant and dependable enough to become part of everyday life.</p>",
+        "closing": "Rooted in the UAE. Built around your care.",
+        "signature": "Every Skin. Every Day.",
+        "button_label": "Find My Routine",
+        "button_label_2": "Discover Our Story"
+      }
     }
   },
   "order": [
@@ -60,6 +112,7 @@
     "banner",
     "showcase",
     "cinema",
-    "reviews"
+    "reviews",
+    "why"
   ]
 }

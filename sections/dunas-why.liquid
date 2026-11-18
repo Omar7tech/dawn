@@ -1,0 +1,270 @@
+{{ 'section-dunas-why.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  DUNAS "Why DUNAS?": the brand's reasons, told as one held scroll.
+
+  The section holds the screen over a full-bleed photo while the visitor scrolls or swipes:
+    opening  - the heading and intro, large
+    pillars  - each reason arrives as a frosted glass panel from the right, comes into focus,
+               holds, then glides out to the left as the next arrives; a pillar's own photo, if
+               set, cross-fades in behind it; a segmented line at the foot shows progress
+    closing  - the closing lines and the two buttons
+  The timing is shared out between however many pillars there are. Driven by the page's own
+  scroll (CSS scroll timelines, no script). Browsers without them, and reduced motion, get a
+  still layout: heading, then the pillars as a glass grid, then the closing.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign pillars = section.blocks | where: 'type', 'pillar'
+  assign count = pillars.size
+  if count == 0
+    assign count = 1
+  endif
+  # the share of the held scroll: opening 0-14, pillars 14-86, closing 86-100
+  assign seg = 72.0 | divided_by: count
+  assign track = count | plus: 2 | times: 100
+-%}
+
+<section
+  class="dunas-why color-{{ s.color_scheme }}{% if s.scroll_motion %} dunas-why--motion{% endif %}"
+  style="--why-length: {{ track }}svh; --why-dim: {{ s.overlay | divided_by: 100.0 }}; --why-count: {{ count }};"
+>
+  <div class="dunas-why__track">
+    <div class="dunas-why__stage">
+      {%- comment -%} the shared photo, and any pillar's own photo above it {%- endcomment -%}
+      <div class="dunas-why__backdrop" aria-hidden="true">
+        <div class="dunas-why__bg dunas-why__bg--base">
+          {%- if s.image != blank -%}
+            {{
+              s.image
+              | image_url: width: 3840
+              | image_tag:
+                widths: '750, 1100, 1500, 2000, 2600, 3200, 3840',
+                sizes: '100vw',
+                loading: 'lazy',
+                class: 'dunas-why__img',
+                alt: ''
+            }}
+          {%- else -%}
+            <img
+              src="{{ 'dunas-banner.jpg' | asset_url }}"
+              alt=""
+              width="1800"
+              height="1009"
+              loading="lazy"
+              class="dunas-why__img"
+            >
+          {%- endif -%}
+        </div>
+        {%- for block in pillars -%}
+          {%- if block.settings.image != blank -%}
+            {%- liquid
+              assign a = seg | times: forloop.index0 | plus: 14
+              assign b = seg | times: 0.22 | plus: a
+              assign c = seg | times: 0.8 | plus: a
+              assign d = seg | plus: a
+            -%}
+            <div
+              class="dunas-why__bg dunas-why__bg--pillar"
+              style="--a: {{ a }}%; --b: {{ b }}%; --c: {{ c }}%; --d: {{ d }}%;"
+            >
+              {{
+                block.settings.image
+                | image_url: width: 3840
+                | image_tag:
+                  widths: '750, 1100, 1500, 2000, 2600, 3200, 3840',
+                  sizes: '100vw',
+                  loading: 'lazy',
+                  class: 'dunas-why__img',
+                  alt: ''
+              }}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      {%- comment -%} opening {%- endcomment -%}
+      <header class="dunas-why__intro">
+        {%- if s.eyebrow != blank -%}
+          <p class="dunas-why__eyebrow">{{ s.eyebrow | escape }}</p>
+        {%- endif -%}
+        {%- if s.heading != blank -%}
+          <h2 class="dunas-why__heading dunas-display">{{ s.heading | escape }}</h2>
+        {%- endif -%}
+        {%- if s.text != blank -%}
+          <div class="dunas-why__lede">{{ s.text }}</div>
+        {%- endif -%}
+      </header>
+
+      {%- comment -%} the pillars {%- endcomment -%}
+      <ol class="dunas-why__pillars" role="list">
+        {%- for block in pillars -%}
+          {%- liquid
+            assign a = seg | times: forloop.index0 | plus: 14
+            assign b = seg | times: 0.22 | plus: a
+            assign c = seg | times: 0.8 | plus: a
+            assign d = seg | plus: a
+            assign number = forloop.index
+          -%}
+          <li
+            class="dunas-why__pillar"
+            style="--a: {{ a }}%; --b: {{ b }}%; --c: {{ c }}%; --d: {{ d }}%;"
+            {{ block.shopify_attributes }}
+          >
+            <article class="dunas-why__glass">
+              <div class="dunas-why__meta">
+                <span class="dunas-why__num">{% if number < 10 %}0{% endif %}{{ number }}</span>
+                {%- if block.settings.icon != 'none' -%}
+                  <span class="dunas-why__icon" aria-hidden="true">
+                    {%- render 'dunas-icon', name: block.settings.icon -%}
+                  </span>
+                {%- endif -%}
+              </div>
+              {%- if block.settings.title != blank -%}
+                <h3 class="dunas-why__title dunas-display">{{ block.settings.title | escape }}</h3>
+              {%- endif -%}
+              {%- if block.settings.text != blank -%}
+                <div class="dunas-why__text">{{ block.settings.text }}</div>
+              {%- endif -%}
+            </article>
+          </li>
+        {%- endfor -%}
+      </ol>
+
+      {%- comment -%} progress, one part per pillar {%- endcomment -%}
+      {%- if pillars.size > 1 -%}
+        <div class="dunas-why__progress" aria-hidden="true">
+          {%- for block in pillars -%}
+            {%- liquid
+              assign a = seg | times: forloop.index0 | plus: 14
+              assign d = seg | plus: a
+            -%}
+            <span class="dunas-why__step" style="--a: {{ a }}%; --d: {{ d }}%;">
+              <span class="dunas-why__step-fill"></span>
+            </span>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} closing {%- endcomment -%}
+      <footer class="dunas-why__outro">
+        {%- if s.closing != blank -%}
+          <p class="dunas-why__closing">{{ s.closing | escape }}</p>
+        {%- endif -%}
+        {%- if s.signature != blank -%}
+          <p class="dunas-why__signature dunas-display">{{ s.signature | escape }}</p>
+        {%- endif -%}
+        {%- if s.button_label != blank or s.button_label_2 != blank -%}
+          <div class="dunas-why__actions">
+            {%- if s.button_label != blank -%}
+              <a href="{{ s.button_link | default: routes.all_products_collection_url }}" class="dunas-btn dunas-btn--light dunas-why__button">
+                {{- s.button_label | escape -}}
+              </a>
+            {%- endif -%}
+            {%- if s.button_label_2 != blank -%}
+              <a href="{{ s.button_link_2 | default: routes.root_url }}" class="dunas-btn dunas-btn--glass dunas-why__button">
+                {{- s.button_label_2 | escape -}}
+              </a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </footer>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "DUNAS why",
+  "tag": "div",
+  "class": "section section-dunas-why",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background photo",
+      "info": "Fills the screen behind the glass. Use a large original (3840px wide or more). Each pillar can also have its own photo."
+    },
+    {
+      "type": "range",
+      "id": "overlay",
+      "label": "Photo shade",
+      "min": 0,
+      "max": 70,
+      "step": 5,
+      "unit": "%",
+      "default": 35
+    },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Why DUNAS?" },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Intro",
+      "default": "<p>Because skincare should be more than premium packaging or passing trends—it should be purposeful, relevant and dependable enough to become part of everyday life.</p>"
+    },
+    { "type": "header", "content": "Closing" },
+    { "type": "text", "id": "closing", "label": "Closing line", "default": "Rooted in the UAE. Built around your care." },
+    { "type": "text", "id": "signature", "label": "Signature", "default": "Every Skin. Every Day." },
+    { "type": "text", "id": "button_label", "label": "First button", "default": "Find My Routine" },
+    { "type": "url", "id": "button_link", "label": "First button link" },
+    { "type": "text", "id": "button_label_2", "label": "Second button", "default": "Discover Our Story" },
+    { "type": "url", "id": "button_link_2", "label": "Second button link" },
+    { "type": "header", "content": "Motion" },
+    {
+      "type": "checkbox",
+      "id": "scroll_motion",
+      "label": "Play as the page scrolls",
+      "info": "The section holds the screen and the pillars arrive one by one as glass panels. Chrome, Edge and Safari; a still glass grid elsewhere and for reduced motion.",
+      "default": true
+    },
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" }
+  ],
+  "blocks": [
+    {
+      "type": "pillar",
+      "name": "Pillar",
+      "limit": 6,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Camel Milk, With Purpose" },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>We place camel milk at the heart of modern skincare as a meaningful regional ingredient—not a novelty or marketing story.</p>"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "drop", "label": "Drop" },
+            { "value": "sun", "label": "Sun" },
+            { "value": "leaf", "label": "Leaf" },
+            { "value": "hand", "label": "Hand" },
+            { "value": "heart", "label": "Heart" },
+            { "value": "shield", "label": "Shield" },
+            { "value": "sparkle", "label": "Sparkle" },
+            { "value": "dune", "label": "Dune" },
+            { "value": "none", "label": "None" }
+          ],
+          "default": "drop"
+        },
+        { "type": "image_picker", "id": "image", "label": "Own photo (optional)", "info": "Cross-fades in behind this pillar." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "DUNAS why",
+      "blocks": [
+        { "type": "pillar" },
+        { "type": "pillar", "settings": { "title": "Rooted in UAE Life", "icon": "sun", "text": "<p>DUNAS is shaped by the UAE, its culture and the realities of skin living through heat, sun, air conditioning, travel and changing days.</p>" } },
+        { "type": "pillar", "settings": { "title": "Simple Daily Care", "icon": "leaf", "text": "<p>Four thoughtful essentials create clear morning and evening routines without unnecessary complexity.</p>" } },
+        { "type": "pillar", "settings": { "title": "Care Beyond the Product", "icon": "hand", "text": "<p>DUNAS Companion Care offers personal guidance before and after purchase, helping your routine stay relevant as your skin changes.</p>" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
