@@ -941,7 +941,7 @@
 }
 
 .dunas-collection-story__line:nth-child(2n) {
-  color: rgb(var(--dunas-sand));
+  color: inherit; /* headings are one colour throughout */
 }
 
 .dunas-collection-story__text {

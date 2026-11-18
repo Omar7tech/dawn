@@ -126,7 +126,7 @@
 }
 
 .dunas-ct__line:nth-child(2n) {
-  color: rgb(var(--ct-accent));
+  color: inherit; /* headings are one colour throughout */
 }
 
 @keyframes dunas-ct-rise {

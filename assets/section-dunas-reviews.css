@@ -77,7 +77,7 @@
 }
 
 .dunas-rv__line:nth-child(2n) {
-  color: rgb(var(--rv-accent));
+  color: inherit; /* headings are one colour throughout */
 }
 
 /* the large average */

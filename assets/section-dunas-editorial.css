@@ -56,7 +56,7 @@
 }
 
 .dunas-ed__line:nth-child(2n) {
-  color: rgb(var(--ed-accent));
+  color: inherit; /* headings are one colour throughout */
 }
 
 .dunas-ed__rte {
@@ -594,7 +594,7 @@ a.dunas-ed-cards__card:focus-visible {
 }
 
 .dunas-ed-cta--image .dunas-ed__line:nth-child(2n) {
-  color: rgb(var(--dunas-sand));
+  color: inherit;
 }
 
 .dunas-ed-cta__media {

@@ -92,7 +92,7 @@
 }
 
 .dunas-story__line:nth-child(2n) {
-  color: rgb(var(--story-accent));
+  color: inherit; /* headings are one colour throughout */
 }
 
 .dunas-story__heading sup {

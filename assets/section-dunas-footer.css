@@ -71,7 +71,7 @@
 }
 
 .dunas-footer__line:nth-child(2n) {
-  color: rgb(var(--accent));
+  color: inherit; /* headings are one colour throughout */
 }
 
 .dunas-footer__mark {
