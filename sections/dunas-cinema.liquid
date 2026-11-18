@@ -1,0 +1,160 @@
+{{ 'section-dunas-cinema.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  DUNAS cinema: the brand story as one held scroll.
+
+  The section holds the screen while the visitor scrolls through it:
+    1. The heading runs across the top in one line; the first photo waits below it as a calm
+       landscape window in the middle of the page.
+    2. The window opens until the photo fills the screen and its zoom settles; the heading turns
+       cream over it.
+    3. The second photo rises and covers the first.
+    4. A frosted card with the story and the button settles at the bottom left, and holds.
+  Photos are requested up to 3840px wide (the originals must be at least that for the sharpest
+  result on large screens); phones get small files through the srcset.
+  Driven by the page's own scroll (CSS scroll timelines, no script). Browsers without them, and
+  reduced motion, get a still layout with everything visible.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign heading = s.heading | escape | replace: '®', '<sup>®</sup>' | newline_to_br | split: '<br />'
+-%}
+
+<section
+  class="dunas-cinema color-{{ s.color_scheme }} gradient{% if s.scroll_motion %} dunas-cinema--motion{% endif %}"
+  style="--cinema-length: {{ s.scroll_length | default: 300 }}svh; --cinema-dim: {{ s.overlay | divided_by: 100.0 }};"
+>
+  <div class="dunas-cinema__track">
+    <div class="dunas-cinema__stage">
+      {%- if s.heading != blank -%}
+        <h2 class="dunas-cinema__title dunas-display">
+          {%- for line in heading -%}
+            {%- assign line_text = line | strip -%}
+            {%- if line_text != blank -%}
+              <span class="dunas-cinema__line">{{ line_text }}</span>
+              {%- unless forloop.last -%}{{ ' ' }}{%- endunless -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </h2>
+      {%- endif -%}
+
+      <figure class="dunas-cinema__photo dunas-cinema__photo--one">
+        {%- if s.image != blank -%}
+          {{
+            s.image
+            | image_url: width: 3840
+            | image_tag:
+              widths: '750, 1100, 1500, 2000, 2600, 3200, 3840',
+              sizes: '100vw',
+              loading: 'lazy',
+              class: 'dunas-cinema__img',
+              alt: s.image.alt
+          }}
+        {%- else -%}
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'dunas-cinema__img dunas-cinema__img--placeholder' }}
+        {%- endif -%}
+      </figure>
+
+      <figure class="dunas-cinema__photo dunas-cinema__photo--two">
+        {%- if s.image_2 != blank -%}
+          {{
+            s.image_2
+            | image_url: width: 3840
+            | image_tag:
+              widths: '750, 1100, 1500, 2000, 2600, 3200, 3840',
+              sizes: '100vw',
+              loading: 'lazy',
+              class: 'dunas-cinema__img',
+              alt: s.image_2.alt
+          }}
+        {%- else -%}
+          {{ 'lifestyle-2' | placeholder_svg_tag: 'dunas-cinema__img dunas-cinema__img--placeholder' }}
+        {%- endif -%}
+      </figure>
+
+      <div class="dunas-cinema__card">
+        {%- if s.eyebrow != blank -%}
+          <p class="dunas-cinema__eyebrow">{{ s.eyebrow | escape }}</p>
+        {%- endif -%}
+        {%- if s.text != blank -%}
+          <div class="dunas-cinema__text">{{ s.text }}</div>
+        {%- endif -%}
+        {%- if s.button_label != blank -%}
+          {%- assign link = s.button_link | default: routes.all_products_collection_url -%}
+          <a href="{{ link }}" class="dunas-btn dunas-btn--solid dunas-cinema__button">{{ s.button_label | escape }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "DUNAS cinema story",
+  "tag": "div",
+  "class": "section section-dunas-cinema",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "First photo",
+      "info": "Opens from a window to full screen. Use a large original (3840px wide or more) so it stays sharp on big screens."
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "Second photo",
+      "info": "Rises over the first and holds the story card. Large original recommended."
+    },
+    {
+      "type": "range",
+      "id": "overlay",
+      "label": "Photo shade",
+      "info": "Darkens the photos a little so the heading and card stay readable.",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "%",
+      "default": 20
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "EverySkin.\nEveryDay®",
+      "info": "Set on one line across the top. ® is set small."
+    },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Our story" },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Story",
+      "default": "<p>DUNAS stands for calm, resilient and dependable skincare, shaped by the camel’s enduring character as a provider and trusted companion in UAE culture.</p>"
+    },
+    { "type": "text", "id": "button_label", "label": "Button", "default": "Find your routine" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "header", "content": "Motion" },
+    {
+      "type": "checkbox",
+      "id": "scroll_motion",
+      "label": "Play the story as the page scrolls",
+      "info": "The section holds the screen while the photo opens and the second rises. Chrome, Edge and Safari; a still layout elsewhere and for reduced motion.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "scroll_length",
+      "label": "Story length",
+      "options": [
+        { "value": "240", "label": "Short" },
+        { "value": "300", "label": "Medium" },
+        { "value": "380", "label": "Long" }
+      ],
+      "default": "300"
+    },
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" }
+  ],
+  "presets": [{ "name": "DUNAS cinema story" }]
+}
+{% endschema %}

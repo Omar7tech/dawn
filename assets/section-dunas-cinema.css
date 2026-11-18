@@ -1,0 +1,321 @@
+/*
+  DUNAS cinema story.
+
+  Base (no scroll timelines, reduced motion, or motion off): a still Swiss layout, the heading
+  across the top, then the first photo, the story, the second photo.
+
+  Scroll story (the section is three screens tall; its stage holds the screen):
+     0-40%  the window under the heading opens until the first photo fills the screen
+    15-35%  the heading turns from ink to cream over the photo
+    44-72%  the second photo rises and covers the first
+    66-86%  the frosted story card settles at the bottom left
+    86-100% everything holds
+*/
+
+.dunas-cinema {
+  --cinema-ink: var(--color-foreground);
+  --cinema-cream: var(--dunas-cream, 241, 239, 231);
+  --cinema-dark: var(--dunas-ink, 49, 50, 45);
+  --cinema-accent: 169, 137, 112;
+  --cinema-gutter: 1.5rem;
+  --cinema-radius: 2.4rem;
+  position: relative;
+  color: rgb(var(--cinema-ink));
+}
+
+@media screen and (min-width: 750px) {
+  .dunas-cinema {
+    --cinema-gutter: 5rem;
+    --cinema-radius: 2.8rem;
+  }
+}
+
+/* ---------- Still layout (the base) ---------- */
+
+.dunas-cinema__stage {
+  display: flex;
+  flex-direction: column;
+  gap: 3.2rem;
+  max-width: var(--page-width, 120rem);
+  margin: 0 auto;
+  padding: 4.8rem var(--cinema-gutter) 8rem;
+  container-type: inline-size;
+}
+
+.dunas-cinema__title {
+  order: 1;
+  margin: 0;
+  font-size: calc((100cqi - 0rem) * 0.138);
+  line-height: 0.9;
+  letter-spacing: -0.055em;
+  white-space: nowrap;
+}
+
+.dunas-cinema__line {
+  display: inline;
+}
+
+.dunas-cinema__title sup {
+  position: relative;
+  top: -3.6em;
+  margin-inline-start: 0.12em;
+  font-family: var(--font-body-family);
+  font-size: 0.16em;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 0;
+  vertical-align: baseline;
+}
+
+.dunas-cinema__photo {
+  position: relative;
+  margin: 0;
+  overflow: clip;
+  aspect-ratio: 3 / 2;
+  border-radius: var(--cinema-radius);
+  background: rgba(var(--cinema-accent), 0.18);
+}
+
+.dunas-cinema__photo--one {
+  order: 2;
+}
+
+.dunas-cinema__card {
+  order: 3;
+  max-width: 46rem;
+}
+
+.dunas-cinema__photo--two {
+  order: 4;
+}
+
+.dunas-cinema__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dunas-cinema__img--placeholder {
+  fill: rgba(var(--cinema-dark), 0.2);
+}
+
+.dunas-cinema__eyebrow {
+  margin: 0 0 1.6rem;
+  font-family: var(--font-body-family);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(var(--cinema-accent));
+}
+
+.dunas-cinema__text {
+  font-family: var(--font-body-family);
+  font-size: 1.7rem;
+  line-height: 1.7;
+  color: rgba(var(--cinema-ink), 0.8);
+  text-wrap: pretty;
+}
+
+.dunas-cinema__text > * {
+  margin: 0;
+}
+
+.dunas-cinema__button {
+  margin-top: 2.8rem;
+  min-width: 22rem;
+}
+
+/* ---------- The scroll story ---------- */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .dunas-cinema--motion .dunas-cinema__track {
+      height: var(--cinema-length, 300svh);
+      view-timeline: --cinema block;
+    }
+
+    .dunas-cinema--motion .dunas-cinema__stage {
+      --cinema-title: calc((100cqi - 2 * var(--cinema-gutter)) * 0.138);
+      /* where the window sits before it opens: under the heading, centred */
+      --cinema-from-top: calc(var(--dunas-header-total, 9rem) + var(--cinema-title) + 4.8rem);
+      --cinema-from-side: 1.5rem;
+      --cinema-from-bottom: 16svh;
+      position: sticky;
+      top: 0;
+      display: block;
+      height: 100svh;
+      max-width: none;
+      padding: 0;
+      overflow: clip;
+      background: rgb(var(--color-background));
+    }
+
+    .dunas-cinema--motion .dunas-cinema__title {
+      position: absolute;
+      top: calc(var(--dunas-header-total, 9rem) + 2.4rem);
+      left: var(--cinema-gutter);
+      right: var(--cinema-gutter);
+      z-index: 2;
+      font-size: var(--cinema-title);
+      color: rgb(var(--cinema-ink));
+      pointer-events: none;
+      animation: dunas-cinema-ink linear both;
+      animation-timeline: --cinema;
+      animation-range: contain 15% contain 35%;
+    }
+
+    /* both photos fill the stage */
+    .dunas-cinema--motion .dunas-cinema__photo {
+      position: absolute;
+      inset: 0;
+      aspect-ratio: auto;
+      border-radius: 0;
+      background: rgb(var(--cinema-dark));
+    }
+
+    .dunas-cinema--motion .dunas-cinema__photo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, calc(var(--cinema-dim, 0.2) * 1.2)) 0%,
+        rgba(0, 0, 0, calc(var(--cinema-dim, 0.2) * 0.3)) 38%,
+        rgba(0, 0, 0, calc(var(--cinema-dim, 0.2) * 0.4)) 62%,
+        rgba(0, 0, 0, calc(var(--cinema-dim, 0.2) * 1.6)) 100%
+      );
+      pointer-events: none;
+    }
+
+    /* 1. the window opens to the full screen */
+    .dunas-cinema--motion .dunas-cinema__photo--one {
+      animation: dunas-cinema-open linear both;
+      animation-timeline: --cinema;
+      animation-range: contain 0% contain 40%;
+    }
+
+    .dunas-cinema--motion .dunas-cinema__photo--one .dunas-cinema__img {
+      animation: dunas-cinema-settle linear both;
+      animation-timeline: --cinema;
+      animation-range: contain 0% contain 44%;
+    }
+
+    /* 3. the second photo rises and covers the first */
+    .dunas-cinema--motion .dunas-cinema__photo--two {
+      animation: dunas-cinema-rise linear both;
+      animation-timeline: --cinema;
+      animation-range: contain 44% contain 72%;
+    }
+
+    .dunas-cinema--motion .dunas-cinema__photo--two .dunas-cinema__img {
+      animation: dunas-cinema-settle-two linear both;
+      animation-timeline: --cinema;
+      animation-range: contain 44% contain 86%;
+    }
+
+    /* 4. the frosted card settles at the bottom left */
+    .dunas-cinema--motion .dunas-cinema__card {
+      position: absolute;
+      left: var(--cinema-gutter);
+      bottom: max(4svh, 2.4rem);
+      z-index: 3;
+      width: min(46rem, calc(100% - 2 * var(--cinema-gutter)));
+      max-width: none;
+      padding: clamp(2.4rem, 3vw, 3.6rem);
+      border: 0.1rem solid rgba(255, 255, 255, 0.28);
+      border-radius: var(--cinema-radius);
+      background: rgba(var(--cinema-cream), 0.12);
+      -webkit-backdrop-filter: blur(2rem) saturate(1.3);
+      backdrop-filter: blur(2rem) saturate(1.3);
+      box-shadow: 0 3rem 6rem -3rem rgba(0, 0, 0, 0.45), inset 0 0.1rem 0 rgba(255, 255, 255, 0.3);
+      animation: dunas-cinema-card linear both;
+      animation-timeline: --cinema;
+      animation-range: contain 66% contain 86%;
+    }
+
+    .dunas-cinema--motion .dunas-cinema__eyebrow {
+      color: rgb(var(--cinema-cream));
+      opacity: 0.85;
+    }
+
+    .dunas-cinema--motion .dunas-cinema__text {
+      color: rgb(var(--cinema-cream));
+    }
+
+    .dunas-cinema--motion .dunas-cinema__button {
+      border-color: rgb(var(--cinema-cream));
+      background: rgb(var(--cinema-cream));
+      color: rgb(var(--cinema-dark));
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) and (min-width: 750px) {
+    .dunas-cinema--motion .dunas-cinema__stage {
+      --cinema-from-side: 24vw;
+      --cinema-from-bottom: 7svh;
+    }
+  }
+}
+
+@keyframes dunas-cinema-open {
+  from {
+    clip-path: inset(
+      var(--cinema-from-top) var(--cinema-from-side) var(--cinema-from-bottom) var(--cinema-from-side)
+        round var(--cinema-radius)
+    );
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 0);
+  }
+}
+
+@keyframes dunas-cinema-settle {
+  from {
+    scale: 1.18;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+@keyframes dunas-cinema-rise {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes dunas-cinema-settle-two {
+  from {
+    scale: 1.14;
+    translate: 0 5%;
+  }
+  to {
+    scale: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes dunas-cinema-ink {
+  from {
+    color: rgb(var(--cinema-ink));
+  }
+  to {
+    color: rgb(var(--cinema-cream));
+  }
+}
+
+@keyframes dunas-cinema-card {
+  from {
+    opacity: 0;
+    translate: 0 3.2rem;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}

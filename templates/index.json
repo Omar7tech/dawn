@@ -47,17 +47,11 @@
       "block_order": [],
       "settings": {}
     },
-    "story": {
-      "type": "dunas-story",
+    "cinema": {
+      "type": "dunas-cinema",
       "settings": {
-        "layout": "swiss",
         "image": "shopify://shop_images/portrait-young-woman-posing-confidently-outdoors-with-round-mirror.webp",
-        "image_2": "shopify://shop_images/close-up-portrait-blissful-woman-with-wavy-hairs-posig-tropical-garden-wearing-elegant-silk-robe-spa-skincare-concept.webp",
-        "button_label": "Find your routine",
-        "button_label_2": "",
-        "padding_top": 32,
-        "entrance": false,
-        "scroll_motion": true
+        "image_2": "shopify://shop_images/close-up-portrait-blissful-woman-with-wavy-hairs-posig-tropical-garden-wearing-elegant-silk-robe-spa-skincare-concept.webp"
       }
     }
   },
@@ -65,7 +59,7 @@
     "hero",
     "banner",
     "showcase",
-    "story",
+    "cinema",
     "reviews"
   ]
 }
