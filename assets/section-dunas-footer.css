@@ -553,3 +553,44 @@
   right: auto;
   left: 0;
 }
+
+/* ---------- The wordmark across the full width ----------
+   The horizontal DUNAS wordmark runs edge to edge of the content at the top of the footer;
+   the statement and the newsletter sit below it, then the links. */
+
+.dunas-footer.dunas-footer--tall-logo .footer__content-top {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'mark'
+    'brand'
+    'news'
+    'links';
+}
+
+.dunas-footer.dunas-footer--tall-logo .dunas-footer__mark {
+  grid-area: mark;
+  justify-self: stretch;
+  width: 100%;
+  padding-bottom: clamp(3.2rem, 5vw, 6.4rem);
+  border-bottom: 0.1rem solid var(--rule, rgba(var(--ink), 0.16));
+}
+
+.dunas-footer.dunas-footer--tall-logo .dunas-footer__mark .dunas-logo {
+  width: 100%;
+  height: auto;
+}
+
+@media screen and (min-width: 750px) {
+  .dunas-footer.dunas-footer--tall-logo .footer__content-top {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      'mark mark'
+      'brand news'
+      'links links';
+  }
+
+  .dunas-footer.dunas-footer--tall-logo .dunas-footer__mark {
+    width: 100%;
+  }
+}

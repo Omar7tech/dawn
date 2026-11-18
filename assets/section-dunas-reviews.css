@@ -570,3 +570,48 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---------- On the brand green (the footer's scheme) ----------
+   Sand instead of taupe for the small accents, cream outlines for the arrows. The white cards
+   stay white so the deck glows against the green. */
+
+.dunas-rv.color-scheme-3 {
+  --rv-accent: 214, 182, 157;
+  --rv-rule: rgba(var(--color-foreground), 0.2);
+}
+
+.dunas-rv.color-scheme-3 .dunas-rv__card {
+  --rv-accent: 169, 137, 112;
+}
+
+.dunas-rv.color-scheme-3 .dunas-rv__arrow {
+  border-color: rgba(var(--color-foreground), 0.35);
+  background: transparent;
+  color: rgb(var(--color-foreground));
+}
+
+.dunas-rv.color-scheme-3 .dunas-rv__score-meta .dunas-rv__star {
+  fill: rgba(var(--color-foreground), 0.2);
+  stroke: rgba(var(--color-foreground), 0.2);
+}
+
+.dunas-rv.color-scheme-3 .dunas-rv__score-meta .dunas-rv__star.is-on {
+  fill: rgb(var(--rv-accent));
+  stroke: rgb(var(--rv-accent));
+}
+
+.dunas-rv.color-scheme-3 .dunas-rv__item[data-pos='1'] .dunas-rv__card {
+  box-shadow: 0 2rem 4rem -3rem rgba(0, 0, 0, 0.4);
+}
+
+.dunas-rv.color-scheme-3 .dunas-rv__item[data-pos='0'] .dunas-rv__card {
+  box-shadow: 0 0.1rem 0 rgba(0, 0, 0, 0.04), 0 3rem 6rem -3rem rgba(0, 0, 0, 0.45);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dunas-rv.color-scheme-3 .dunas-rv__arrow:hover {
+    border-color: rgb(var(--color-foreground));
+    background: rgb(var(--color-foreground));
+    color: rgb(var(--color-background));
+  }
+}

@@ -46,7 +46,9 @@
       "type": "dunas-reviews",
       "blocks": {},
       "block_order": [],
-      "settings": {}
+      "settings": {
+        "color_scheme": "scheme-3"
+      }
     },
     "cinema": {
       "type": "dunas-cinema",

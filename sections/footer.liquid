@@ -52,8 +52,8 @@
     {%- unless only_empty_brand -%}
       <div class="footer__content-top page-width">
         {%- comment -%}
-          DUNAS: the brand block from the home design. The statement set large, with the tall
-          vertical wordmark on the right, the same composition as the hero.
+          DUNAS: the brand block. The wordmark runs across the full width at the top, the
+          statement set large below it, the newsletter beside the statement.
         {%- endcomment -%}
         <div class="dunas-footer__brand">
           {%- if section.settings.dunas_footer_tagline != blank -%}
@@ -70,7 +70,7 @@
         </div>
         {%- if section.settings.dunas_footer_tall_logo -%}
           <a href="{{ routes.root_url }}" class="dunas-footer__mark" aria-label="{{ shop.name | escape }}">
-            {%- render 'dunas-logo', vertical: true -%}
+            {%- render 'dunas-logo' -%}
           </a>
         {%- endif -%}
         {%- if section.blocks.size > 0 -%}
@@ -454,7 +454,7 @@
     {
       "type": "checkbox",
       "id": "dunas_footer_tall_logo",
-      "label": "Show tall DUNAS logo",
+      "label": "Show the full-width DUNAS wordmark",
       "default": true
     },
     {
