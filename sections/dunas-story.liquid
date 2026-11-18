@@ -1,12 +1,16 @@
 {{ 'section-dunas-story.css' | asset_url | stylesheet_tag }}
+{%- if section.settings.entrance -%}
+  <script src="{{ 'dunas-story.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
 
 {%- comment -%}
   DUNAS story, two layouts (setting "Layout"):
     spread    - the words centred like a magazine opener, then the two photos side by side
                 (phones too), the second set a little lower.
     triptych  - photo, words, photo: stacked on phones, side by side on computers.
-  On scroll (CSS only) each photo eases open from a slight frame and settles its zoom. Nothing
-  grows past its frame. Still for reduced motion.
+  "Open as the page scrolls" (default): tied to the scroll, the photos open from a smaller
+  window inside their frames and the words slide into place (CSS only). Nothing grows past its
+  frame. "Entrance animation" is the once-only alternative. Still for reduced motion.
 {%- endcomment -%}
 
 {%- liquid
@@ -15,11 +19,11 @@
 -%}
 
 <section
-  class="dunas-story dunas-story--{{ s.layout | default: 'spread' }} color-{{ s.color_scheme }} gradient{% if s.scroll_motion %} dunas-story--motion{% endif %}"
+  class="dunas-story dunas-story--{{ s.layout | default: 'swiss' }}{% if s.layout == 'swiss' or s.layout == blank %} dunas-story--spread{% endif %} color-{{ s.color_scheme }} gradient{% if s.scroll_motion %} dunas-story--motion{% endif %}{% if s.entrance %} dunas-story--entrance{% endif %}"
   style="--story-pt: {{ s.padding_top }}px; --story-pb: {{ s.padding_bottom }}px;"
 >
   <div class="page-width dunas-story__grid">
-    <figure class="dunas-story__photo dunas-story__photo--one">
+    <figure class="dunas-story__photo dunas-story__photo--one" data-story-reveal>
       {%- if s.image != blank -%}
         {{
           s.image
@@ -36,7 +40,7 @@
       {%- endif -%}
     </figure>
 
-    <div class="dunas-story__copy">
+    <div class="dunas-story__copy" data-story-reveal>
       {%- if s.eyebrow != blank -%}
         <p class="dunas-story__eyebrow">{{ s.eyebrow | escape }}</p>
       {%- endif -%}
@@ -46,7 +50,8 @@
           {%- for line in heading -%}
             {%- assign line_text = line | strip -%}
             {%- if line_text != blank -%}
-              <span class="dunas-story__line">{{ line_text }}</span>
+              <span class="dunas-story__line" style="--i: {{ forloop.index0 }};">{{ line_text }}</span>
+              {%- unless forloop.last -%}{{ ' ' }}{%- endunless -%}
             {%- endif -%}
           {%- endfor -%}
         </h2>
@@ -70,7 +75,7 @@
       {%- endif -%}
     </div>
 
-    <figure class="dunas-story__photo dunas-story__photo--two">
+    <figure class="dunas-story__photo dunas-story__photo--two" data-story-reveal>
       {%- if s.image_2 != blank -%}
         {{
           s.image_2
@@ -100,10 +105,11 @@
       "id": "layout",
       "label": "Layout",
       "options": [
+        { "value": "swiss", "label": "Full-width heading, story left, photos right" },
         { "value": "spread", "label": "Words, then the two photos" },
         { "value": "triptych", "label": "Photo, words, photo" }
       ],
-      "default": "spread"
+      "default": "swiss"
     },
     { "type": "image_picker", "id": "image", "label": "First photo" },
     { "type": "image_picker", "id": "image_2", "label": "Second photo" },
@@ -128,9 +134,16 @@
     { "type": "header", "content": "Motion and layout" },
     {
       "type": "checkbox",
+      "id": "entrance",
+      "label": "Entrance animation",
+      "info": "Plays once as the section comes into view, instead of following the scroll. Turn off \"Photos move with the scroll\" when using it.",
+      "default": false
+    },
+    {
+      "type": "checkbox",
       "id": "scroll_motion",
-      "label": "Photos move with the scroll",
-      "info": "Each photo opens from a soft frame and settles; on computers they drift apart a little. Chrome, Edge and Safari; still elsewhere and for reduced motion.",
+      "label": "Open as the page scrolls",
+      "info": "The photos open from a smaller window and the words slide into place, following the scroll. Chrome, Edge and Safari; still elsewhere and for reduced motion.",
       "default": true
     },
     { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },

@@ -13,7 +13,9 @@
   padding-top: calc(var(--story-pt, 96px) * 0.7);
   padding-bottom: calc(var(--story-pb, 120px) * 0.7);
   color: rgb(var(--story-ink));
-  overflow: hidden;
+  /* clip, not hidden: hidden would make the section its own scroll container and freeze the
+     scroll-linked motion of everything inside it */
+  overflow: clip;
 }
 
 .dunas-story.color-scheme-3 {
@@ -39,7 +41,7 @@
 
 .dunas-story__photo {
   margin: 0;
-  overflow: hidden;
+  overflow: clip;
   aspect-ratio: 4 / 3;
   border-radius: var(--story-radius);
   background: rgba(var(--story-accent), 0.18);
@@ -222,13 +224,13 @@
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     /* each photo opens from a soft inner frame while its zoom settles */
-    .dunas-story--motion .dunas-story__photo {
+    .dunas-story--motion.dunas-story--triptych .dunas-story__photo {
       animation: dunas-story-open linear both;
       animation-timeline: view();
       animation-range: entry 0% entry 100%;
     }
 
-    .dunas-story--motion .dunas-story__img {
+    .dunas-story--motion.dunas-story--triptych .dunas-story__img {
       animation: dunas-story-settle linear both;
       animation-timeline: view();
       animation-range: entry 0% cover 50%;
@@ -284,5 +286,356 @@
   }
   to {
     translate: 0 3rem;
+  }
+}
+
+/* ---------- Spread: the story opens as you scroll (CSS scroll timelines, no script) ----------
+   Tied to the scroll, so it opens going down and closes going back up.
+   Photos: a smaller window inside the frame opens to the full photo while the zoom settles;
+   the second photo also rises into its lower place. Words: the two heading lines slide toward
+   each other as they come into focus; the eyebrow, story and button rise in. */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .dunas-story--motion.dunas-story--spread .dunas-story__photo {
+      animation: dunas-story-window linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+
+    .dunas-story--motion.dunas-story--spread .dunas-story__img {
+      animation: dunas-story-settle-wide linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 60%;
+    }
+
+    .dunas-story--motion.dunas-story--spread .dunas-story__photo--two {
+      animation: dunas-story-window linear both, dunas-story-lift linear both;
+      animation-timeline: view(), view();
+      animation-range: entry 0% cover 45%, entry 0% cover 70%;
+    }
+
+    .dunas-story--motion.dunas-story--spread .dunas-story__line {
+      animation: dunas-story-line-in linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 35%;
+    }
+
+    .dunas-story--motion.dunas-story--spread .dunas-story__line:nth-child(2n) {
+      animation-name: dunas-story-line-in-alt;
+    }
+
+    .dunas-story--motion.dunas-story--spread .dunas-story__eyebrow,
+    .dunas-story--motion.dunas-story--spread .dunas-story__text,
+    .dunas-story--motion.dunas-story--spread .dunas-story__actions {
+      animation: dunas-story-rise-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+  }
+}
+
+@keyframes dunas-story-window {
+  from {
+    clip-path: inset(14% 12% round calc(var(--story-radius) * 1.6));
+  }
+  to {
+    clip-path: inset(0 round var(--story-radius));
+  }
+}
+
+@keyframes dunas-story-settle-wide {
+  from {
+    scale: 1.25;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+@keyframes dunas-story-lift {
+  from {
+    translate: 0 8rem;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
+@keyframes dunas-story-line-in {
+  from {
+    opacity: 0;
+    translate: -6rem 0;
+    filter: blur(0.6rem);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    filter: blur(0);
+  }
+}
+
+@keyframes dunas-story-line-in-alt {
+  from {
+    opacity: 0;
+    translate: 6rem 0;
+    filter: blur(0.6rem);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    filter: blur(0);
+  }
+}
+
+@keyframes dunas-story-rise-in {
+  from {
+    opacity: 0;
+    translate: 0 2.4rem;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* ---------- Entrance (assets/dunas-story.js arms it, plays once on view) ----------
+   Words: the eyebrow rises, each heading line comes into focus from a soft blur, then the
+   story and the button follow. Photos: a smooth upward wipe while the zoom settles, the
+   second a beat after the first. Only armed when scripts run and motion is welcome. */
+
+.dunas-story.is-armed .dunas-story__eyebrow,
+.dunas-story.is-armed .dunas-story__text,
+.dunas-story.is-armed .dunas-story__actions {
+  opacity: 0;
+  translate: 0 1.6rem;
+  transition: opacity 900ms cubic-bezier(0.22, 1, 0.36, 1), translate 1000ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dunas-story.is-armed .dunas-story__line {
+  opacity: 0;
+  translate: 0 0.3em;
+  filter: blur(0.8rem);
+  transition: opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1), translate 1100ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1000ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(150ms + var(--i, 0) * 140ms);
+}
+
+.dunas-story.is-armed .dunas-story__text {
+  transition-delay: 480ms;
+}
+
+.dunas-story.is-armed .dunas-story__actions {
+  transition-delay: 620ms;
+}
+
+.dunas-story.is-armed .dunas-story__copy.is-in .dunas-story__eyebrow,
+.dunas-story.is-armed .dunas-story__copy.is-in .dunas-story__text,
+.dunas-story.is-armed .dunas-story__copy.is-in .dunas-story__actions,
+.dunas-story.is-armed .dunas-story__copy.is-in .dunas-story__line {
+  opacity: 1;
+  translate: 0 0;
+  filter: none;
+}
+
+/* photos: a curtain rising, the zoom settling underneath. The wipe is on the image, not the
+   frame, so the frame stays visible to the observer that starts it. */
+.dunas-story.is-armed .dunas-story__photo {
+  background: transparent;
+}
+
+.dunas-story.is-armed .dunas-story__photo .dunas-story__img {
+  clip-path: inset(100% 0 0 0);
+  scale: 1.18;
+  transition: clip-path 1300ms cubic-bezier(0.76, 0, 0.24, 1), scale 1800ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dunas-story.is-armed .dunas-story__photo--two .dunas-story__img {
+  transition-delay: 180ms;
+}
+
+.dunas-story.is-armed .dunas-story__photo.is-in .dunas-story__img {
+  clip-path: inset(0 0 0 0);
+  scale: 1;
+}
+
+/* a quiet zoom on hover, once the photos have arrived (mouse only) */
+@media (hover: hover) and (pointer: fine) {
+  .dunas-story:not(.is-armed) .dunas-story__photo .dunas-story__img {
+    transition: scale 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .dunas-story__photo.is-in:hover .dunas-story__img,
+  .dunas-story:not(.is-armed) .dunas-story__photo:hover .dunas-story__img {
+    scale: 1.03;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dunas-story.is-armed .dunas-story__eyebrow,
+  .dunas-story.is-armed .dunas-story__text,
+  .dunas-story.is-armed .dunas-story__actions,
+  .dunas-story.is-armed .dunas-story__line,
+  .dunas-story.is-armed .dunas-story__photo,
+  .dunas-story.is-armed .dunas-story__photo .dunas-story__img {
+    opacity: 1;
+    translate: 0 0;
+    filter: none;
+    clip-path: none;
+    scale: 1;
+    transition: none;
+  }
+}
+
+/* =====================================================================
+   Layout: full-width heading, story left, photos right (swiss)
+   Phones use the spread layout above (the section carries both classes), with the heading in
+   one colour. Computers: a twelve-column grid. Row 1 the eyebrow, row 2 the heading on one line
+   across the full width over a hairline rule, then the story on columns 1-4 and the two photos
+   on columns 6-12, the second set lower.
+   ===================================================================== */
+
+.dunas-story--swiss .dunas-story__line:nth-child(2n) {
+  color: inherit;
+}
+
+@media screen and (min-width: 990px) {
+  .dunas-story--swiss .dunas-story__grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-areas: none;
+    column-gap: clamp(1.6rem, 2vw, 2.4rem);
+    row-gap: 0;
+    align-items: start;
+    max-width: var(--page-width, 120rem);
+    /* the heading below is sized as a share of this grid's own width */
+    container-type: inline-size;
+  }
+
+  /* the words' own box steps aside so its parts sit on the grid */
+  .dunas-story--swiss .dunas-story__copy {
+    display: contents;
+  }
+
+  .dunas-story--swiss .dunas-story__eyebrow {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    justify-self: start;
+    margin: 0 0 2rem;
+    text-align: start;
+  }
+
+  .dunas-story--swiss .dunas-story__heading {
+    position: relative;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin: 0 0 clamp(4rem, 5vw, 6.4rem);
+    padding-bottom: clamp(2.8rem, 3.2vw, 4rem);
+    /* sized as a share of the grid's width, so the one line runs edge to edge at any size */
+    font-size: 13.8cqi;
+    line-height: 0.88;
+    letter-spacing: -0.055em;
+    text-align: start;
+    white-space: nowrap;
+  }
+
+  .dunas-story--swiss .dunas-story__line {
+    display: inline;
+  }
+
+  /* the hairline under the heading */
+  .dunas-story--swiss .dunas-story__heading::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0.1rem;
+    background: rgba(var(--story-ink), 0.18);
+    transform-origin: left;
+  }
+
+  .dunas-story--swiss .dunas-story__heading sup {
+    top: -3.6em;
+    font-size: 0.16em;
+  }
+
+  .dunas-story--swiss .dunas-story__text {
+    grid-column: 1 / span 4;
+    grid-row: 3;
+    max-width: 36ch;
+    margin: 0;
+    font-size: 1.8rem;
+    text-align: start;
+  }
+
+  .dunas-story--swiss .dunas-story__actions {
+    grid-column: 1 / span 4;
+    grid-row: 4;
+    justify-content: flex-start;
+    width: auto;
+    margin-top: 3.2rem;
+  }
+
+  .dunas-story--swiss .dunas-story__photo--one {
+    grid-column: 6 / span 3;
+    grid-row: 3 / span 3;
+  }
+
+  .dunas-story--swiss .dunas-story__photo--two {
+    grid-column: 9 / span 4;
+    grid-row: 3 / span 3;
+    margin-top: clamp(4.8rem, 8vw, 11.2rem);
+  }
+
+  .dunas-story--swiss .dunas-story__photo--one {
+    aspect-ratio: 3 / 4;
+  }
+
+  .dunas-story--swiss .dunas-story__photo--two {
+    aspect-ratio: 4 / 5;
+  }
+}
+
+/* swiss motion on computers: the heading rises in whole, the rule draws across */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 990px) {
+    .dunas-story--motion.dunas-story--swiss .dunas-story__line,
+    .dunas-story--motion.dunas-story--swiss .dunas-story__line:nth-child(2n) {
+      animation: none;
+    }
+
+    .dunas-story--motion.dunas-story--swiss .dunas-story__heading {
+      animation: dunas-story-title-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+
+    .dunas-story--motion.dunas-story--swiss .dunas-story__heading::after {
+      animation: dunas-story-rule linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 45%;
+    }
+  }
+}
+
+@keyframes dunas-story-title-in {
+  from {
+    opacity: 0;
+    translate: 0 0.25em;
+    filter: blur(0.8rem);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    filter: blur(0);
+  }
+}
+
+@keyframes dunas-story-rule {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
   }
 }
