@@ -11,6 +11,8 @@
 */
 
 .dunas-rv {
+  /* keep this section's own layering inside it, below the sticky header */
+  isolation: isolate;
   --rv-ink: var(--color-foreground);
   --rv-muted: rgba(var(--color-foreground), 0.62);
   --rv-rule: rgba(var(--color-foreground), 0.14);

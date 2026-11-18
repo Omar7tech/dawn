@@ -1,4 +1,6 @@
 .dunas-showcase {
+  /* keep the cards' layering inside the section, below the sticky header */
+  isolation: isolate;
   padding-top: calc(var(--dunas-pad-top) * 0.75);
   padding-bottom: calc(var(--dunas-pad-bottom) * 0.75);
 }

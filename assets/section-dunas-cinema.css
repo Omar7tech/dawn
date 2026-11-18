@@ -13,6 +13,8 @@
 */
 
 .dunas-cinema {
+  /* keep this section's own layering inside it, below the sticky header */
+  isolation: isolate;
   --cinema-ink: var(--color-foreground);
   --cinema-cream: var(--dunas-cream, 241, 239, 231);
   --cinema-dark: var(--dunas-ink, 49, 50, 45);
