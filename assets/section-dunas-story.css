@@ -1,0 +1,246 @@
+/*
+  DUNAS story: photo, words, photo.
+  Phones: stacked in that order, the words centred between two wide rounded photos.
+  Computers: a triptych, two tall photos with the words centred between them; the first photo
+  sits a little lower than the second, so the row has rhythm. Scroll motion at the end.
+*/
+
+.dunas-story {
+  --story-ink: var(--color-foreground);
+  --story-muted: rgba(var(--color-foreground), 0.72);
+  --story-accent: 169, 137, 112;
+  --story-radius: 2.4rem;
+  padding-top: calc(var(--story-pt, 96px) * 0.7);
+  padding-bottom: calc(var(--story-pb, 120px) * 0.7);
+  color: rgb(var(--story-ink));
+  overflow: hidden;
+}
+
+.dunas-story.color-scheme-3 {
+  --story-accent: 214, 182, 157;
+}
+
+@media screen and (min-width: 750px) {
+  .dunas-story {
+    --story-radius: 2.8rem;
+    padding-top: var(--story-pt, 96px);
+    padding-bottom: var(--story-pb, 120px);
+  }
+}
+
+.dunas-story__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(4rem, 8vw, 5.6rem);
+  align-items: center;
+}
+
+/* ---------- The photos ---------- */
+
+.dunas-story__photo {
+  margin: 0;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--story-radius);
+  background: rgba(var(--story-accent), 0.18);
+}
+
+.dunas-story__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dunas-story__img--placeholder {
+  fill: rgba(var(--story-ink), 0.2);
+}
+
+/* ---------- The words ---------- */
+
+.dunas-story__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 48rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.dunas-story__eyebrow {
+  margin: 0 0 2.4rem;
+  font-family: var(--font-body-family);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(var(--story-accent));
+}
+
+.dunas-story__heading {
+  margin: 0;
+  font-size: clamp(4.6rem, 5vw, 7.6rem);
+  line-height: 0.96;
+  letter-spacing: -0.045em;
+  overflow-wrap: anywhere;
+}
+
+.dunas-story__line {
+  display: block;
+}
+
+.dunas-story__line:nth-child(2n) {
+  color: rgb(var(--story-accent));
+}
+
+.dunas-story__heading sup {
+  position: relative;
+  /* measured in the mark's own small size: about half a capital height above the line */
+  top: -2.7em;
+  margin-inline-start: 0.12em;
+  font-family: var(--font-body-family);
+  font-size: 0.2em;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 0;
+  vertical-align: baseline;
+}
+
+.dunas-story__text {
+  max-width: 34ch;
+  margin-top: 2.8rem;
+  font-family: var(--font-body-family);
+  font-size: 1.7rem;
+  font-weight: 400;
+  line-height: 1.75;
+  letter-spacing: 0.005em;
+  color: rgba(var(--story-ink), 0.78);
+  text-wrap: pretty;
+}
+
+.dunas-story__text > * {
+  margin: 0;
+}
+
+.dunas-story__text > * + * {
+  margin-top: 1.2rem;
+}
+
+.dunas-story__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  margin-top: 3.6rem;
+}
+
+.dunas-story__actions .dunas-btn {
+  min-width: 24rem;
+}
+
+@media screen and (min-width: 990px) {
+  .dunas-story__text {
+    font-size: 1.8rem;
+  }
+}
+
+/* phones: the buttons full width, one per line */
+@media screen and (max-width: 749px) {
+  .dunas-story__actions .dunas-btn {
+    flex: 1 1 100%;
+  }
+}
+
+/* ---------- Computers: photo, words, photo in a row ---------- */
+
+@media screen and (min-width: 990px) {
+  .dunas-story__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: clamp(3.2rem, 4.5vw, 6.4rem);
+  }
+
+  .dunas-story__photo {
+    aspect-ratio: 3 / 4;
+  }
+
+  /* a little rhythm: the first photo sits lower, the second higher */
+  .dunas-story__photo--one {
+    margin-top: 12rem;
+  }
+
+  .dunas-story__photo--two {
+    margin-bottom: 12rem;
+  }
+
+}
+
+/* ---------- Scroll motion (CSS scroll timelines, no script) ---------- */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* each photo opens from a soft inner frame while its zoom settles */
+    .dunas-story--motion .dunas-story__photo {
+      animation: dunas-story-open linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+
+    .dunas-story--motion .dunas-story__img {
+      animation: dunas-story-settle linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 50%;
+    }
+  }
+
+  /* computers: the two photos drift a little in opposite directions */
+  @media (prefers-reduced-motion: no-preference) and (min-width: 990px) {
+    .dunas-story--motion .dunas-story__photo--one {
+      animation: dunas-story-open linear both, dunas-story-rise linear both;
+      animation-timeline: view(), view();
+      animation-range: entry 0% entry 100%, cover 0% cover 100%;
+    }
+
+    .dunas-story--motion .dunas-story__photo--two {
+      animation: dunas-story-open linear both, dunas-story-sink linear both;
+      animation-timeline: view(), view();
+      animation-range: entry 0% entry 100%, cover 0% cover 100%;
+    }
+  }
+}
+
+@keyframes dunas-story-open {
+  from {
+    clip-path: inset(4% 4% round var(--story-radius));
+  }
+  to {
+    clip-path: inset(0 round var(--story-radius));
+  }
+}
+
+@keyframes dunas-story-settle {
+  from {
+    scale: 1.16;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+@keyframes dunas-story-rise {
+  from {
+    translate: 0 3rem;
+  }
+  to {
+    translate: 0 -3rem;
+  }
+}
+
+@keyframes dunas-story-sink {
+  from {
+    translate: 0 -3rem;
+  }
+  to {
+    translate: 0 3rem;
+  }
+}

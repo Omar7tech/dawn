@@ -37,7 +37,7 @@
         "button_link": "shopify://collections/all",
         "color_scheme": "scheme-1",
         "padding_top": 64,
-        "padding_bottom": 120,
+        "padding_bottom": 48,
         "button_style": "muted"
       }
     },
@@ -46,12 +46,23 @@
       "blocks": {},
       "block_order": [],
       "settings": {}
+    },
+    "story": {
+      "type": "dunas-story",
+      "settings": {
+        "image": "shopify://shop_images/portrait-young-woman-posing-confidently-outdoors-with-round-mirror.webp",
+        "image_2": "shopify://shop_images/close-up-portrait-blissful-woman-with-wavy-hairs-posig-tropical-garden-wearing-elegant-silk-robe-spa-skincare-concept.webp",
+        "button_label": "Find your routine",
+        "button_label_2": "",
+        "padding_top": 32
+      }
     }
   },
   "order": [
     "hero",
     "banner",
     "showcase",
+    "story",
     "reviews"
   ]
 }
